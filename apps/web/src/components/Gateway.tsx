@@ -47,9 +47,11 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
   const nodes = useStore(state => state.nodes);
   const incidents = useStore(state => state.incidents);
   const kpis = useStore(state => state.kpis);
+  const setIsAuthenticated = useStore(state => state.setIsAuthenticated);
+  const isAuthenticated = useStore(state => state.isAuthenticated);
   const isDark = theme === 'dark';
 
-  const [activeTab, setActiveTab] = useState('Overview');
+  const [activeTab, setActiveTab] = useState('Issues');
   const [showStaffModal, setShowStaffModal] = useState(false);
   const [officerId, setOfficerId] = useState('OFFICER-7741');
   const [stationCode, setStationCode] = useState('JP-ZONE-04');
@@ -62,14 +64,13 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
 
   const handleStaffLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsAuthenticated(true);
     onSelectRole('dashboard');
   };
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
-    if (tab === 'Overview' || tab === 'City Explore' || tab === 'Insights') {
-      onSelectRole('dashboard');
-    } else if (tab === 'Issues') {
+    if (tab === 'Issues') {
       onSelectRole('citizen');
     } else if (tab === 'About') {
       setShowAboutModal(true);
@@ -143,7 +144,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
 
           {/* Tab-style Nav with Cyan Accent Active Underline */}
           <nav style={{ display: 'flex', gap: '2px', height: '44px', alignItems: 'center' }}>
-            {['Overview', 'City Explore', 'Issues', 'Insights', 'About'].map(tab => {
+            {['Issues', 'About'].map(tab => {
               const isActive = activeTab === tab;
               return (
                 <button

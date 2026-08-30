@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useStore } from './store';
 import Gateway from './components/Gateway';
 import CitizenApp from './components/CitizenApp';
@@ -14,7 +14,37 @@ export type AppView = 'gateway' | 'dashboard' | 'citizen';
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('gateway');
   const theme = useStore(state => state.theme);
+  const isAuthenticated = useStore(state => state.isAuthenticated);
   const isDark = theme === 'dark';
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '') as AppView;
+      if (['gateway', 'dashboard', 'citizen'].includes(hash)) {
+        setCurrentView(hash);
+      }
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    // Only set initial view from hash if it exists
+    if (window.location.hash) {
+      handleHashChange();
+    }
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  useEffect(() => {
+    window.location.hash = currentView;
+  }, [currentView]);
+
+  useEffect(() => {
+    if (currentView === 'dashboard' && !isAuthenticated) {
+      setCurrentView('gateway');
+    }
+  }, [currentView, isAuthenticated]);
+
+  if (currentView === 'dashboard' && !isAuthenticated) {
+    return null;
+  }
 
   if (currentView === 'gateway') {
     return <Gateway onSelectRole={(role) => setCurrentView(role)} />;

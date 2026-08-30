@@ -63,6 +63,8 @@ interface AppState {
   resolveIncident: (incidentId: string) => void;
   pingNode: (nodeId: string) => void;
   recalibrateNode: (nodeId: string) => void;
+  isAuthenticated: boolean;
+  setIsAuthenticated: (auth: boolean) => void;
 }
 
 const initialNodes: CityNode[] = [
@@ -173,9 +175,11 @@ export const useStore = create<AppState>((set) => ({
   interactionLoop: { stage: "act", relatedIncidentId: "INC-001" },
   activeDomain: "all",
   theme: "dark",
+  isAuthenticated: false,
 
   setActiveDomain: (domain) => set({ activeDomain: domain }),
   toggleTheme: () => set((state) => ({ theme: state.theme === "dark" ? "light" : "dark" })),
+  setIsAuthenticated: (auth: boolean) => set({ isAuthenticated: auth }),
 
   triggerAnomaly: (nodeId, mockIncident) => {
     set((state) => {

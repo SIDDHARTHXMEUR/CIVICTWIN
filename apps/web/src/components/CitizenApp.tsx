@@ -499,23 +499,6 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
             {/* Action Buttons */}
             <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
               <button
-                onClick={() => onNavigate('dashboard')}
-                style={{
-                  flex: 1.2,
-                  backgroundColor: '#b7102a',
-                  color: '#ffffff',
-                  border: 'none',
-                  padding: '12px',
-                  fontSize: '11px',
-                  fontWeight: 800,
-                  fontFamily: '"JetBrains Mono", monospace',
-                  cursor: 'pointer',
-                  boxShadow: '2px 2px 0px #0a0a0a',
-                }}
-              >
-                VIEW IN COMMAND CENTER →
-              </button>
-              <button
                 onClick={() => onNavigate('gateway')}
                 style={{
                   flex: 1,
