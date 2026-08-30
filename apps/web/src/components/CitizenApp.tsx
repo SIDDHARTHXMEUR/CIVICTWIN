@@ -59,6 +59,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [stepIndex, setStepIndex] = useState(0);
   const [createdIncident, setCreatedIncident] = useState<Incident | null>(null);
+  const [wasMerged, setWasMerged] = useState(false);
 
   const steps = [
     '1. Encrypting telemetry & packaging report...',
@@ -77,13 +78,14 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
     setTimeout(() => setStepIndex(3), 2100);
 
     setTimeout(() => {
-      const incident = addCitizenReport({
+      const { incident, merged } = addCitizenReport({
         category,
         description,
         location,
         photoUrl: selectedPhoto || undefined,
       });
       setCreatedIncident(incident);
+      setWasMerged(merged);
       setSubmitState('success');
     }, 2800);
   };
@@ -91,6 +93,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
   const handleReset = () => {
     setSubmitState('idle');
     setCreatedIncident(null);
+    setWasMerged(false);
     setDescription('');
   };
 
@@ -380,23 +383,35 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
             flexDirection: 'column',
             gap: '20px',
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `2px solid ${isDark ? '#2a2f3d' : '#1a1c17'}`, paddingBottom: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: `2px solid ${isDark ? '#2a2f3d' : '#1a1c17'}`, paddingBottom: '16px' }}>
               <div>
                 <div style={{
                   fontSize: '10px',
                   fontFamily: '"JetBrains Mono", monospace',
                   fontWeight: 700,
                   color: '#ffffff',
-                  backgroundColor: '#0891b2',
+                  backgroundColor: wasMerged ? '#eab308' : '#0891b2',
                   display: 'inline-block',
                   padding: '3px 8px',
                   marginBottom: '6px',
                 }}>
-                  ✓ REPORT TRIAGED & SPATIALLY MARKED
+                  {wasMerged ? '⚠ MATCHED EXISTING INCIDENT' : '✓ NEW INCIDENT TRIAGED'}
                 </div>
                 <h2 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: isDark ? '#f3f4f6' : '#1a1c17' }}>
                   Incident Ref: {createdIncident?.id}
                 </h2>
+                <div style={{ fontSize: '11px', marginTop: '6px', color: isDark ? '#9ca3af' : '#4e4444' }}>
+                  <strong>REPORTED BY: {createdIncident?.reportCount} {createdIncident?.reportCount === 1 ? 'citizen' : 'citizens'}</strong>
+                  {wasMerged ? (
+                    <span style={{ display: 'block', marginTop: '2px' }}>
+                      This matches a report already confirmed by {(createdIncident?.reportCount || 2) - 1} other citizens — you are now report #{createdIncident?.reportCount}.
+                    </span>
+                  ) : (
+                    <span style={{ display: 'block', marginTop: '2px' }}>
+                      You are the first to report this. We'll notify you if others confirm it.
+                    </span>
+                  )}
+                </div>
               </div>
               <div style={{
                 textAlign: 'right',

@@ -2,6 +2,16 @@ import { useState } from 'react';
 import { useStore } from '../store';
 import type { Incident } from '../store';
 
+function getRelativeTime(timestamp: number) {
+  const diff = Date.now() - timestamp;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hr ago`;
+  return `${Math.floor(hrs / 24)} d ago`;
+}
+
 export default function DecisionRail() {
   const incidents = useStore(state => state.incidents);
   const resolveIncident = useStore(state => state.resolveIncident);
@@ -12,6 +22,7 @@ export default function DecisionRail() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const openIncidents = incidents.filter(i => i.status === 'open');
+  const resolvedIncidents = incidents.filter(i => i.status === 'resolved');
   const criticalIncidents = openIncidents.filter(i => i.tab === 'critical');
   const warningIncidents = openIncidents.filter(i => i.tab === 'warnings');
 
@@ -162,6 +173,27 @@ export default function DecisionRail() {
 
         {/* Predictive model card shown on warnings tab */}
         {activeTab === 'warnings' && <PredictiveCard isDark={isDark} onAction={(lbl) => setToastMessage(`✓ PREDICTIVE REROUTE DISPATCHED: ${lbl}`)} />}
+
+        {/* Resolved Today Section */}
+        {resolvedIncidents.length > 0 && (
+          <div style={{ marginTop: '16px' }}>
+            <div style={{ fontSize: '10px', fontWeight: 800, color: isDark ? '#6b7280' : '#9ca3af', fontFamily: '"JetBrains Mono", monospace', marginBottom: '8px' }}>
+              RESOLVED TODAY
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {resolvedIncidents.map(i => (
+                <div key={i.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', opacity: 0.6 }}>
+                  <div style={{ fontSize: '11px', color: isDark ? '#f3f4f6' : '#1a1c17', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '140px' }}>
+                    {i.title}
+                  </div>
+                  <div style={{ fontSize: '9px', color: isDark ? '#9ca3af' : '#6b7280', fontFamily: '"JetBrains Mono", monospace' }}>
+                    {getRelativeTime(i.updatedAt)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer Meta */}
@@ -211,11 +243,31 @@ function AlertCard({ incident, onAction, isDark }: {
         padding: '8px 10px',
         borderRadius: '0px',
       }}>
-        <div style={{ fontSize: '8px', fontWeight: 800, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.08em', marginBottom: '2px', fontFamily: '"JetBrains Mono", monospace' }}>
-          {tagText}
-        </div>
-        <div style={{ fontSize: '12px', fontWeight: 800, color: '#ffffff', lineHeight: 1.2, fontFamily: '"Space Grotesk", sans-serif' }}>
-          {incident.title}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <div>
+            <div style={{ fontSize: '8px', fontWeight: 800, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.08em', marginBottom: '2px', fontFamily: '"JetBrains Mono", monospace' }}>
+              {tagText}
+            </div>
+            <div style={{ fontSize: '12px', fontWeight: 800, color: '#ffffff', lineHeight: 1.2, fontFamily: '"Space Grotesk", sans-serif' }}>
+              {incident.title}
+            </div>
+          </div>
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.8)', fontFamily: '"JetBrains Mono", monospace' }}>
+              {getRelativeTime(incident.updatedAt)}
+            </div>
+            <div style={{ 
+              fontSize: '8px', 
+              fontWeight: 800, 
+              backgroundColor: 'rgba(255,255,255,0.2)', 
+              color: '#ffffff', 
+              padding: '2px 4px', 
+              marginTop: '4px',
+              fontFamily: '"JetBrains Mono", monospace' 
+            }}>
+              REPORTED BY: {incident.reportCount}
+            </div>
+          </div>
         </div>
       </div>
 

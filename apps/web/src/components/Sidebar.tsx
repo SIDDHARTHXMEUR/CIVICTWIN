@@ -27,6 +27,7 @@ interface SidebarProps {
 
 export default function Sidebar({ onNavigate }: SidebarProps) {
   const nodes = useStore(state => state.nodes);
+  const incidents = useStore(state => state.incidents);
   const activeDomain = useStore(state => state.activeDomain);
   const setActiveDomain = useStore(state => state.setActiveDomain);
   const theme = useStore(state => state.theme);
@@ -110,11 +111,18 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
               ? nodes.length
               : nodes.filter(n => n.domain === item.id).length;
 
+            const openIncidents = incidents.filter(i => i.status === 'open');
+            let badgeCount = 0;
+            if (item.id === 'infrastructure') badgeCount = openIncidents.filter(i => i.category.includes('infrastructure')).length;
+            else if (item.id === 'mobility') badgeCount = openIncidents.filter(i => i.category.includes('mobility')).length;
+            else if (item.id === 'environment') badgeCount = openIncidents.filter(i => i.category.includes('environment')).length;
+            else if (item.id === 'intelligence') badgeCount = openIncidents.length;
+
             return (
               <div 
                 key={item.id} 
                 onClick={() => setActiveDomain(item.id)}
-                title={isCollapsed ? `${item.idx} / ${item.label} (${nodesCount})` : undefined}
+                title={isCollapsed ? `${item.label} (${badgeCount} incidents)` : undefined}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -135,35 +143,43 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                 <IconComponent size={14} color={isActive ? (isDark ? '#4fc9dc' : '#0a0a0a') : isDark ? '#9ca3af' : '#3a3a3a'} strokeWidth={isActive ? 2.5 : 2} />
                 {!isCollapsed && (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px', width: '100%', justifyContent: 'space-between' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: isActive ? 800 : 600,
+                      color: isActive ? (isDark ? '#ffffff' : '#0a0a0a') : (isDark ? '#9ca3af' : '#3a3a3a'),
+                      letterSpacing: '0.04em',
+                    }}>
+                      {item.label}
+                    </span>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
                       <span style={{
-                        fontSize: '9px',
+                        fontSize: '8.5px',
                         fontFamily: '"JetBrains Mono", monospace',
                         fontWeight: 800,
-                        color: isActive ? (isDark ? '#4fc9dc' : '#0a0a0a') : isDark ? '#6b7280' : '#6b7280',
+                        backgroundColor: isActive ? '#4fc9dc' : isDark ? '#2a2f3d' : '#d5d0c3',
+                        color: isActive ? '#0a0a0a' : isDark ? '#9ca3af' : '#374151',
+                        padding: '1px 4px',
+                        borderRadius: '0px',
                       }}>
-                        {item.idx}
+                        {nodesCount}
                       </span>
-                      <span style={{
-                        fontSize: '10px',
-                        fontWeight: isActive ? 800 : 600,
-                        color: isActive ? (isDark ? '#ffffff' : '#0a0a0a') : (isDark ? '#9ca3af' : '#3a3a3a'),
-                        letterSpacing: '0.04em',
-                      }}>
-                        / {item.label}
-                      </span>
+                      {item.id !== 'all' && (
+                        <span style={{
+                          fontSize: '8.5px',
+                          fontFamily: '"JetBrains Mono", monospace',
+                          fontWeight: 800,
+                          backgroundColor: badgeCount > 0 ? '#ea3b1b' : (isDark ? '#1c202c' : '#e8e4d8'),
+                          color: badgeCount > 0 ? '#ffffff' : (isDark ? '#4b5563' : '#9ca3af'),
+                          border: `1px solid ${badgeCount > 0 ? '#ea3b1b' : (isDark ? '#2a2f3d' : '#d5d0c3')}`,
+                          padding: '0px 4px',
+                          borderRadius: '0px',
+                          minWidth: '12px',
+                          textAlign: 'center'
+                        }}>
+                          {badgeCount}
+                        </span>
+                      )}
                     </div>
-                    <span style={{
-                      fontSize: '8.5px',
-                      fontFamily: '"JetBrains Mono", monospace',
-                      fontWeight: 800,
-                      backgroundColor: isActive ? '#4fc9dc' : isDark ? '#2a2f3d' : '#d5d0c3',
-                      color: isActive ? '#0a0a0a' : isDark ? '#9ca3af' : '#374151',
-                      padding: '1px 4px',
-                      borderRadius: '0px',
-                    }}>
-                      {nodesCount}
-                    </span>
                   </div>
                 )}
               </div>

@@ -42,6 +42,10 @@ export interface Incident {
   status: "open" | "resolved";
   rootCause?: string;
   recommendedAction?: string;
+  reportCount: number;
+  lat?: number;
+  lng?: number;
+  updatedAt: number;
 }
 
 export interface InteractionLoopState {
@@ -59,7 +63,7 @@ interface AppState {
   setActiveDomain: (domain: string) => void;
   toggleTheme: () => void;
   triggerAnomaly: (nodeId: string, mockIncident: Partial<Incident>) => void;
-  addCitizenReport: (report: { category: string; description: string; photoUrl?: string; location: string }) => Incident;
+  addCitizenReport: (report: { category: string; description: string; photoUrl?: string; location: string }) => { incident: Incident; merged: boolean };
   resolveIncident: (incidentId: string) => void;
   pingNode: (nodeId: string) => void;
   recalibrateNode: (nodeId: string) => void;
@@ -67,6 +71,7 @@ interface AppState {
   setIsAuthenticated: (auth: boolean) => void;
 }
 
+const now = Date.now();
 const initialNodes: CityNode[] = [
   {
     id: "JP-W01", name: "Water Main Grid 7", lat: 26.9124, lng: 75.7873, domain: "infrastructure", status: "anomaly",
@@ -129,6 +134,7 @@ const initialIncidents: Incident[] = [
     status: "open",
     rootCause: "Acoustic sensor drop indicates high-pressure pipe fracture at Substation Grid 7.",
     recommendedAction: "Isolate Valve V-14 and reroute water distribution through Secondary Grid 3B.",
+    reportCount: 1, lat: 26.9124, lng: 75.7873, updatedAt: now - 3600000,
   },
   {
     id: "INC-002",
@@ -147,6 +153,7 @@ const initialIncidents: Incident[] = [
     status: "open",
     rootCause: "Arterial volume surge combined with automated signal timer desynchronization.",
     recommendedAction: "Override junction JP-T02 signal sequence to green-wave & notify transit control.",
+    reportCount: 1, lat: 26.9197, lng: 75.7857, updatedAt: now - 1800000,
   },
   {
     id: "INC-003",
@@ -165,8 +172,20 @@ const initialIncidents: Incident[] = [
     status: "open",
     rootCause: "Peak load spike exceeding primary transformer rated thermal capacity by 14%.",
     recommendedAction: "Shed non-essential municipal grid load and dispatch electrical inspection unit.",
+    reportCount: 1, lat: 26.9250, lng: 75.8191, updatedAt: now - 7200000,
   },
 ];
+
+function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371e3; // metres
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+}
 
 export const useStore = create<AppState>((set) => ({
   nodes: initialNodes,
@@ -198,6 +217,10 @@ export const useStore = create<AppState>((set) => ({
         linkedNodeId: nodeId,
         actions: mockIncident.actions || [{ label: "Isolate System", kind: "primary" }],
         status: "open",
+        reportCount: 1,
+        lat: state.nodes.find(n => n.id === nodeId)?.lat || 26.9,
+        lng: state.nodes.find(n => n.id === nodeId)?.lng || 75.8,
+        updatedAt: Date.now(),
       };
       const updatedKpis = state.kpis.map(kpi => {
         if (kpi.id === "city-health")   return { ...kpi, value: 68, deltaPct: -5.7, status: "alert" as const };
@@ -214,44 +237,90 @@ export const useStore = create<AppState>((set) => ({
   },
 
   addCitizenReport: (report) => {
-    const targetNodeId = "JP-T04"; // Link to Ajmeri Gate Junction node
-    const newIncident: Incident = {
-      id: `INC-CIT-${Math.floor(Math.random() * 8999) + 1000}`,
-      category: "environmental-hazard",
-      title: `Citizen Report: Drainage Overflow`,
-      description: `${report.description} (${report.location})`,
-      severity: 8.9,
-      impactPct: 82,
-      confidencePct: 94,
-      tab: "critical",
-      linkedNodeId: targetNodeId,
-      actions: [
-        { label: "VERIFY TELEMETRY", kind: "primary" },
-        { label: "DISPATCH FIELD CREW", kind: "secondary" },
-      ],
-      status: "open",
-      rootCause: "Stormwater drain blockage reported near Ajmeri Gate junction causing street runoff.",
-      recommendedAction: "Deploy Zone 2 Municipal Drainage Crew to clear drain grates.",
-    };
+    let lat = 26.9197;
+    let lng = 75.7857;
+    const match = report.location.match(/(\d+\.\d+)°\s*[NS],\s*(\d+\.\d+)°\s*[EW]/);
+    if (match) {
+      lat = parseFloat(match[1]);
+      lng = parseFloat(match[2]);
+    }
+
+    let mappedCategory = "physical-infrastructure";
+    if (report.category.includes("Traffic") || report.category.includes("Road")) mappedCategory = "mobility-gridlock";
+    if (report.category.includes("AQI") || report.category.includes("Garbage")) mappedCategory = "environmental-hazard";
+
+    let mergedIncident: Incident | null = null;
+    let resultIncident: Incident | null = null;
+    let isMerged = false;
 
     set((state) => {
-      const updatedNodes = state.nodes.map(node =>
-        node.id === targetNodeId ? { ...node, status: "anomaly" as NodeStatus, packetLoss: 6.2 } : node
+      // Find matching incident
+      const existing = state.incidents.find(i => 
+        i.status === "open" && 
+        i.category === mappedCategory && 
+        i.lat && i.lng && 
+        getDistance(lat, lng, i.lat, i.lng) <= 500
       );
-      const updatedKpis = state.kpis.map(kpi => {
-        if (kpi.id === "city-health") return { ...kpi, value: 65, deltaPct: -8.2, status: "alert" as const };
-        if (kpi.id === "mobility-flow") return { ...kpi, value: 52, deltaPct: -18.5, status: "alert" as const };
-        return kpi;
-      });
-      return {
-        nodes: updatedNodes,
-        incidents: [newIncident, ...state.incidents],
-        interactionLoop: { stage: "act", relatedIncidentId: newIncident.id },
-        kpis: updatedKpis,
-      };
+
+      if (existing) {
+        mergedIncident = {
+          ...existing,
+          reportCount: (existing.reportCount || 1) + 1,
+          updatedAt: Date.now(),
+          severity: Math.min(10, existing.severity + 0.2),
+        };
+        resultIncident = mergedIncident;
+        isMerged = true;
+        
+        return {
+          incidents: state.incidents.map(i => i.id === existing.id ? mergedIncident! : i),
+        };
+      } else {
+        const targetNodeId = "JP-T04";
+        const newIncident: Incident = {
+          id: `INC-CIT-${Math.floor(Math.random() * 8999) + 1000}`,
+          category: mappedCategory,
+          title: `Citizen Report: ${report.category}`,
+          description: `${report.description} (${report.location})`,
+          severity: 8.9,
+          impactPct: 82,
+          confidencePct: 94,
+          tab: "critical",
+          linkedNodeId: targetNodeId,
+          actions: [
+            { label: "VERIFY TELEMETRY", kind: "primary" },
+            { label: "DISPATCH FIELD CREW", kind: "secondary" },
+          ],
+          status: "open",
+          rootCause: "Citizen reported issue pending spatial verification.",
+          recommendedAction: "Deploy municipal crew for field inspection.",
+          reportCount: 1,
+          lat, lng,
+          updatedAt: Date.now()
+        };
+        
+        resultIncident = newIncident;
+        isMerged = false;
+
+        const updatedNodes = state.nodes.map(node =>
+          node.id === targetNodeId ? { ...node, status: "anomaly" as NodeStatus, packetLoss: 6.2 } : node
+        );
+        const updatedKpis = state.kpis.map(kpi => {
+          if (kpi.id === "city-health") return { ...kpi, value: 65, deltaPct: -8.2, status: "alert" as const };
+          if (kpi.id === "mobility-flow") return { ...kpi, value: 52, deltaPct: -18.5, status: "alert" as const };
+          return kpi;
+        });
+        
+        return {
+          nodes: updatedNodes,
+          incidents: [newIncident, ...state.incidents],
+          interactionLoop: { stage: "act", relatedIncidentId: newIncident.id },
+          kpis: updatedKpis,
+        };
+      }
     });
 
-    return newIncident;
+    return { incident: resultIncident!, merged: isMerged };
   },
 
   resolveIncident: (incidentId) => {
