@@ -13,7 +13,7 @@
 - **No decoration.** No gradients, no shadows, no rounded corners on structural elements.
 - **Color = severity.** Red is reserved exclusively for genuine alerts. Never decorative.
 - **Mono for data.** All sensor readings, IDs, coordinates, timestamps use JetBrains Mono.
-- **Dark for context, light for content.** The sidebar is dark (authority + focus). The main canvas is light (maximum legibility for dense data).
+- **Dark for context, light for content.** The default theme is Light Mode for maximum legibility on dense data canvases, while the sidebar remains dark for authority and focus.
 
 ---
 
@@ -150,6 +150,7 @@ Border-right: none (edge of viewport)
 Logo area:    16px padding, border-bottom #2a2d35
 Nav item:     full width, 10px 12px padding
 Active state: background #1e2028, border-left 3px solid #ffffff
+Badges:       Single right-aligned dynamic badge for active incidents. Red (#ea3b1b) if domain has critical anomalies, neutral gray otherwise.
 ```
 
 ### TopBar
@@ -215,6 +216,7 @@ Critical:
   Header bg:    #b7102a
   Category label: 8px / 700 / rgba(255,255,255,0.7) / "⚠ PHYSICAL INFRASTRUCTURE"
   Title:        12px / 700 / white
+  Meta Data:    Relative timestamp (e.g. "12 min ago") and "REPORTED BY: [N]" corroboration count
   Body bg:      #ffffff
   Buttons:      full-width split, primary = #b7102a bg, secondary = ghost border
 
@@ -235,6 +237,7 @@ Tabs:          9px / uppercase, active underline = tab color
   Critical   → #b7102a
   Warnings   → #f59e0b
   Insights   → #6b7280
+Log:           "RESOLVED TODAY" section at bottom to show actively cleared incidents
 Footer:        white bg, 20px dark square "AI" badge + "Engine Online" + green dot
 ```
 
