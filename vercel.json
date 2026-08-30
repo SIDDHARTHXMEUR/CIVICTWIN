@@ -1,0 +1,6 @@
+{
+  "framework": "vite",
+  "buildCommand": "npm run build --prefix apps/web",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "npm install --prefix apps/web"
+}

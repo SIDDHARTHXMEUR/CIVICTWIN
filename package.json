@@ -1,0 +1,16 @@
+{
+  "name": "civictwin",
+  "private": true,
+  "version": "2.4.0",
+  "type": "module",
+  "scripts": {
+    "dev": "npm --prefix apps/web run dev",
+    "build": "npm --prefix apps/web run build",
+    "preview": "npm --prefix apps/web run preview",
+    "lint": "npm --prefix apps/web run lint",
+    "postinstall": "cd apps/web && npm install"
+  },
+  "workspaces": [
+    "apps/*"
+  ]
+}

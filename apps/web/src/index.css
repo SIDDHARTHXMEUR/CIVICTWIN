@@ -1,0 +1,117 @@
+@import '@fontsource/hanken-grotesk/400.css';
+@import '@fontsource/hanken-grotesk/700.css';
+@import '@fontsource/hanken-grotesk/800.css';
+@import '@fontsource/jetbrains-mono/500.css';
+
+@import "tailwindcss";
+
+@theme {
+  /* Layered Warm Sand (#F0EDE4), Ink (#0A0A0A), Cyan (#4FC9DC) & Critical Red-Orange (#EA3B1B) */
+  --color-surface: #f5f2e8;
+  --color-surface-dim: #e8e4d8;
+  --color-surface-bright: #f8f6f0;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f2e8;
+  --color-surface-container: #e8e4d8;
+  --color-surface-container-high: #e0dcd0;
+  --color-surface-container-highest: #d5d0c3;
+  --color-on-surface: #0a0a0a;
+  --color-on-surface-variant: #3a3a3a;
+  --color-inverse-surface: #0a0a0a;
+  --color-inverse-on-surface: #f0ede4;
+  --color-outline: #0a0a0a;
+  --color-outline-variant: #d5d0c3;
+  --color-surface-tint: #4fc9dc;
+  --color-primary: #0a0a0a;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1c202c;
+  --color-on-primary-container: #ffffff;
+  --color-inverse-primary: #4fc9dc;
+  --color-secondary: #4fc9dc;
+  --color-on-secondary: #0a0a0a;
+  --color-secondary-container: #00364e;
+  --color-on-secondary-container: #4fc9dc;
+  --color-tertiary: #002030;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #00364e;
+  --color-on-tertiary-container: #4fc9dc;
+  --color-error: #ea3b1b;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #ea3b1b;
+  --color-background: #f0ede4;
+  --color-on-background: #0a0a0a;
+  --color-surface-variant: #e8e4d8;
+
+  /* Fonts */
+  --font-family-sans: "Space Grotesk", "Hanken Grotesk", sans-serif;
+  --font-family-display: "Space Grotesk", sans-serif;
+  --font-family-mono: "JetBrains Mono", monospace;
+
+  /* Border Radius - sharp everywhere */
+  --radius: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-full: 9999px;
+
+  /* Animations */
+  --animate-slideUpFade: slideUpFade 0.4s ease-out forwards;
+  --animate-rhythmicPulse: rhythmicPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-markerPulse: markerPulse 1.5s infinite;
+  --animate-shimmer-scan: shimmer-scan 4s linear infinite;
+
+  @keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(16px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes rhythmicPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.02); }
+  }
+  @keyframes markerPulse {
+    0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(183, 16, 42, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(183, 16, 42, 0); }
+    100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(183, 16, 42, 0); }
+  }
+  @keyframes shimmer-scan {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.leaflet-container .leaflet-popup-content-wrapper,
+.leaflet-container .leaflet-popup-tip,
+.leaflet-container .leaflet-tooltip {
+  border-radius: 0px !important;
+}
+
+/* Reusable 3D Beveled Frame utility - refined bevel & highlights */
+.beveled-3d-frame {
+  border: 2px solid #111318 !important;
+  border-radius: 0px !important;
+  box-shadow: 
+    inset 1px 1px 0 rgba(255, 255, 255, 0.18),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.5),
+    0 3px 10px rgba(0, 0, 0, 0.18) !important;
+  position: relative;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  font-family: var(--font-family-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
