@@ -193,7 +193,7 @@ export const useStore = create<AppState>((set) => ({
   incidents: initialIncidents,
   interactionLoop: { stage: "act", relatedIncidentId: "INC-001" },
   activeDomain: "all",
-  theme: "dark",
+  theme: "light",
   isAuthenticated: false,
 
   setActiveDomain: (domain) => set({ activeDomain: domain }),

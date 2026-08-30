@@ -1,4 +1,4 @@
-# CIVICTWIN
+ # CIVICTWIN
 ### Municipal Urban Operational Layer & Spatial Digital Twin
 
 > **See the city. Predict the risk. Act before it escalates.**
@@ -96,7 +96,8 @@ The reporting flow automatically captures:
 ```
 Location → Incident Type → Severity → Evidence → Dispatch
 ```
-GPS-based location tagging reduces the friction between discovering a problem and creating an actionable municipal incident.
+GPS-based location tagging reduces the friction between discovering a problem and creating an actionable municipal incident. 
+Additionally, the system features **Intelligent Report Merging**, automatically clustering identical reports within a 500m radius to prioritize corroborated issues and increment their report count without cluttering the operational layer.
 
 ### AI Severity & Risk Intelligence
 Every incoming incident is evaluated through an intelligence layer that determines:
@@ -112,9 +113,10 @@ The central operational interface allows operators to simultaneously monitor:
 - Spatial risk
 - Sensor telemetry
 - Emergency alerts & response actions
+- **Live domain monitoring** via dynamic active incident count badges on the navigation sidebar
 
 ### Decision Rail
-The Decision Rail converts intelligence into action. Instead of forcing an operator to navigate through multiple screens, high-priority incidents surface contextual actions directly inside the operational workspace.
+The Decision Rail converts intelligence into action. Instead of forcing an operator to navigate through multiple screens, high-priority incidents surface contextual actions directly inside the operational workspace. Alerts display real-time **Corroboration Metrics** (e.g., "REPORTED BY: 3"), relative timestamps, and non-clipping action buttons. A live **Resolved Today Log** ensures visibility into actively cleared issues.
 
 Example workflow:
 ```
