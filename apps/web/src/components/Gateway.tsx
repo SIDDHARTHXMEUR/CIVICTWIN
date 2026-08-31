@@ -48,7 +48,6 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
   const incidents = useStore(state => state.incidents);
   const kpis = useStore(state => state.kpis);
   const setIsAuthenticated = useStore(state => state.setIsAuthenticated);
-  const isAuthenticated = useStore(state => state.isAuthenticated);
   const isDark = theme === 'dark';
 
   const [activeTab, setActiveTab] = useState('Issues');

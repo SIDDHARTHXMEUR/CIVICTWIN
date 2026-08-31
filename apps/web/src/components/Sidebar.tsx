@@ -26,7 +26,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ onNavigate }: SidebarProps) {
-  const nodes = useStore(state => state.nodes);
   const incidents = useStore(state => state.incidents);
   const activeDomain = useStore(state => state.activeDomain);
   const setActiveDomain = useStore(state => state.setActiveDomain);
@@ -107,9 +106,6 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           {navItems.map((item) => {
             const isActive = activeDomain === item.id;
             const IconComponent = item.icon;
-            const nodesCount = item.id === 'all' || item.id === 'intelligence'
-              ? nodes.length
-              : nodes.filter(n => n.domain === item.id).length;
 
             const openIncidents = incidents.filter(i => i.status === 'open');
             let domainIncidents = openIncidents;
