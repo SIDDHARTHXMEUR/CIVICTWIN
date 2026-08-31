@@ -65,7 +65,7 @@ P["PREDICT<br/><br/>Severity<br/>Risk<br/>Anomalies<br/>Priority"]
 A["ACT<br/><br/>Dispatch<br/>Escalate<br/>Resolve<br/>Verify"] 
 
 O --> P --> A 
-A -. "New city state" .-> O
+A -.->|New city state| O
 ```
 
 **Observe**: Build a live picture of what is happening across the city.  
@@ -250,7 +250,7 @@ DEC --> DISP
 DEC --> ESC 
 DISP --> RES 
 ESC --> RES 
-RES -. "Updated city state" .-> SP
+RES -.->|Updated city state| SP
 ```
 
 **Product layers**
@@ -278,7 +278,7 @@ I["Resolve incident"]
 J["Verify updated<br/>city state"] 
 
 A --> B --> C --> D --> E --> F --> G --> H --> I --> J 
-J -. "Continuous monitoring" .-> E
+J -.->|Continuous monitoring| E
 ```
 `Detect → Understand → Locate → Prioritize → Act → Verify`
 
@@ -530,7 +530,7 @@ S["SENSE"] --> U["UNDERSTAND"]
 U --> P["PREDICT"] 
 P --> I["INTERVENE"] 
 I --> V["VERIFY"] 
-V -. "Continuous learning" .-> S
+V -.->|Continuous learning| S
 ```
 The goal is to move from reactive incident handling toward proactive infrastructure intervention.
 
