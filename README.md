@@ -215,42 +215,42 @@ This connects the event on the map with the asset producing the signal.
 CivicTwin separates collection, intelligence, and operations while keeping them connected through common spatial context.
 
 ```mermaid
-flowchart TB 
-subgraph INPUTS [URBAN SIGNALS] 
-C["Citizen Reports"] 
-S["IoT / Telemetry"] 
-INF["Infrastructure State"] 
-ENV["Environmental Signals"] 
-end 
+flowchart TB
+    subgraph INPUTS["URBAN SIGNALS"]
+        C["Citizen Reports"]
+        S["IoT / Telemetry"]
+        INF["Infrastructure State"]
+        ENV["Environmental Signals"]
+    end
 
-subgraph CORE [CIVICTWIN OPERATIONAL LAYER] 
-ING["Signal & Incident Intake"] 
-INT["Intelligence Layer<br/>Severity · Risk · Priority"] 
-SP["Spatial Digital Twin"] 
-CMD["Municipal Command Center"] 
-DEC["Decision Rail"] 
-end 
+    subgraph CORE["CIVICTWIN OPERATIONAL LAYER"]
+        ING["Signal & Incident Intake"]
+        INT["Intelligence Layer<br/>Severity · Risk · Priority"]
+        SP["Spatial Digital Twin"]
+        CMD["Municipal Command Center"]
+        DEC["Decision Rail"]
+    end
 
-subgraph ACTION [CITY RESPONSE] 
-DISP["Dispatch"] 
-ESC["Escalate"] 
-RES["Resolve & Verify"] 
-end 
+    subgraph ACTION["CITY RESPONSE"]
+        DISP["Dispatch"]
+        ESC["Escalate"]
+        RES["Resolve & Verify"]
+    end
 
-C --> ING 
-S --> ING 
-INF --> ING 
-ENV --> ING 
-ING --> INT 
-ING --> SP 
-INT --> CMD 
-SP --> CMD 
-CMD --> DEC 
-DEC --> DISP 
-DEC --> ESC 
-DISP --> RES 
-ESC --> RES 
-RES -.->|Updated city state| SP
+    C --> ING
+    S --> ING
+    INF --> ING
+    ENV --> ING
+    ING --> INT
+    ING --> SP
+    INT --> CMD
+    SP --> CMD
+    CMD --> DEC
+    DEC --> DISP
+    DEC --> ESC
+    DISP --> RES
+    ESC --> RES
+    RES -.->|Updated city state| SP
 ```
 
 **Product layers**
