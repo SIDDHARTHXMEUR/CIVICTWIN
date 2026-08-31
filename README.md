@@ -1,6 +1,9 @@
  # CIVICTWIN
 ### Municipal Urban Operational Layer & Spatial Digital Twin
 
+🔗 **Live Demo**: [https://civictwin-web-silk.vercel.app](https://civictwin-web-silk.vercel.app)
+🔗 **GitHub**: [https://github.com/SIDDHARTHXMEUR/CIVICTWIN](https://github.com/SIDDHARTHXMEUR/CIVICTWIN)
+
 > **See the city. Predict the risk. Act before it escalates.**
 
 **CivicTwin** is a real-time municipal operations and spatial intelligence platform that transforms fragmented urban telemetry and citizen-reported incidents into a unified operational view of the city.
@@ -390,4 +393,5 @@ CivicTwin currently demonstrates the complete operational loop (*Citizen → Spa
 **CivicTwin** — Municipal Urban Operational Layer & Spatial Digital Twin  
 *Observe → Predict → Act*
 
+🔗 **Live Demo**: [https://civictwin-web-silk.vercel.app](https://civictwin-web-silk.vercel.app)  
 🔗 **GitHub Repository**: [https://github.com/SIDDHARTHXMEUR/CIVICTWIN](https://github.com/SIDDHARTHXMEUR/CIVICTWIN)
