@@ -216,14 +216,14 @@ CivicTwin separates collection, intelligence, and operations while keeping them 
 
 ```mermaid
 flowchart TB 
-subgraph INPUTS["URBAN SIGNALS"] 
+subgraph INPUTS [URBAN SIGNALS] 
 C["Citizen Reports"] 
 S["IoT / Telemetry"] 
 INF["Infrastructure State"] 
 ENV["Environmental Signals"] 
 end 
 
-subgraph CORE["CIVICTWIN OPERATIONAL LAYER"] 
+subgraph CORE [CIVICTWIN OPERATIONAL LAYER] 
 ING["Signal & Incident Intake"] 
 INT["Intelligence Layer<br/>Severity · Risk · Priority"] 
 SP["Spatial Digital Twin"] 
@@ -231,7 +231,7 @@ CMD["Municipal Command Center"]
 DEC["Decision Rail"] 
 end 
 
-subgraph ACTION["CITY RESPONSE"] 
+subgraph ACTION [CITY RESPONSE] 
 DISP["Dispatch"] 
 ESC["Escalate"] 
 RES["Resolve & Verify"] 
