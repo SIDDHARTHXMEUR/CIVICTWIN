@@ -110,8 +110,8 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
     }}>
       {/* Top Header */}
       <header style={{
-        backgroundColor: isDark ? '#12141a' : '#0a0a0a',
-        color: '#ffffff',
+        backgroundColor: isDark ? '#12141a' : '#f5f2e8',
+        color: isDark ? '#ffffff' : '#0a0a0a',
         padding: '12px 24px',
         borderBottom: `2px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
         display: 'flex',
