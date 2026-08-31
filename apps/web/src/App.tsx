@@ -43,7 +43,7 @@ function App() {
   }, [currentView, isAuthenticated]);
 
   if (currentView === 'dashboard' && !isAuthenticated) {
-    return null;
+    return <Gateway onSelectRole={(role) => setCurrentView(role)} />;
   }
 
   if (currentView === 'gateway') {
