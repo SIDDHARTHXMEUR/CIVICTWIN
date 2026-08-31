@@ -3,7 +3,7 @@
 
 See the city. Predict the risk. Act before it escalates.
 
-<p align="center"> <a href="https://civictwin-web-silk.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>GitHub Repository</strong></a> </p>
+<p align="center"> <a href="https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>GitHub Repository</strong></a> </p>
 
 ### Overview
 CivicTwin is a real-time municipal operations and spatial intelligence platform that turns fragmented urban signals into a single operational picture.
@@ -421,7 +421,7 @@ The interface follows a Swiss Functionalist / International Typographic directio
 5. **Open**
    `http://localhost:5173`
 
-   **Live Demo**: [https://civictwin-web-silk.vercel.app/](https://civictwin-web-silk.vercel.app/)
+   **Live Demo**: [https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/](https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/)
 
 ---
 
@@ -596,6 +596,6 @@ See the city. Predict the risk. Act before it escalates.
 **Municipal Urban Operational Layer & Spatial Digital Twin**  
 *Observe → Predict → Act*
 
-<p align="center"> <a href="https://civictwin-web-silk.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>Repository</strong></a> </p>
+<p align="center"> <a href="https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>Repository</strong></a> </p>
 
 **Built for Urban Intelligence**
