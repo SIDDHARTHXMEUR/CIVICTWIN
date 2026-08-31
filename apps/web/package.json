@@ -20,7 +20,6 @@
     "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@rolldown/binding-linux-x64-gnu": "^1.2.6",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/leaflet": "^1.9.22",
     "@types/node": "^24.13.3",
