@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useStore } from '../store';
 import { Sun, Moon, Search, Bell, User } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -54,7 +54,14 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
   const [showStaffModal, setShowStaffModal] = useState(false);
   const [officerId, setOfficerId] = useState('OFFICER-7741');
   const [stationCode, setStationCode] = useState('JP-ZONE-04');
-  const [password, setPassword] = useState('');
+  const [pin, setPin] = useState(['', '', '', '']);
+  
+  const pinRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   const [showAboutModal, setShowAboutModal] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
@@ -63,8 +70,47 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
 
   const handleStaffLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsAuthenticated(true);
-    onSelectRole('dashboard');
+    if (pin.every(digit => /^[0-9]$/.test(digit))) {
+      setIsAuthenticated(true);
+      onSelectRole('dashboard');
+    }
+  };
+
+  const handlePinChange = (index: number, value: string) => {
+    if (value && !/^[0-9]$/.test(value)) return;
+
+    const newPin = [...pin];
+    newPin[index] = value;
+    setPin(newPin);
+
+    if (value && index < 3) {
+      pinRefs[index + 1].current?.focus();
+    }
+
+    if (newPin.every(digit => /^[0-9]$/.test(digit))) {
+      setIsAuthenticated(true);
+      onSelectRole('dashboard');
+    }
+  };
+
+  const handlePinKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !pin[index] && index > 0) {
+      const newPin = [...pin];
+      newPin[index - 1] = '';
+      setPin(newPin);
+      pinRefs[index - 1].current?.focus();
+    }
+  };
+
+  const handlePinPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').trim();
+    if (/^\d{4}$/.test(pastedData)) {
+      const digits = pastedData.split('');
+      setPin(digits);
+      setIsAuthenticated(true);
+      onSelectRole('dashboard');
+    }
   };
 
   const handleTabClick = (tab: string) => {
@@ -789,23 +835,33 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                 <label style={{ display: 'block', fontSize: '10px', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace', marginBottom: '4px', color: isDark ? '#9ca3af' : '#3a3a3a' }}>
                   PASSKEY / ACCESS PIN
                 </label>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter any passcode"
-                  style={{
-                    width: '100%',
-                    padding: '8px 10px',
-                    fontSize: '12px',
-                    fontFamily: '"JetBrains Mono", monospace',
-                    border: `1px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
-                    backgroundColor: isDark ? '#1c202c' : '#f0ede4',
-                    color: isDark ? '#f3f4f6' : '#0a0a0a',
-                    boxSizing: 'border-box',
-                    borderRadius: '0px',
-                  }}
-                />
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {pin.map((digit, index) => (
+                    <input
+                      key={index}
+                      ref={pinRefs[index]}
+                      type="password"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handlePinChange(index, e.target.value)}
+                      onKeyDown={(e) => handlePinKeyDown(index, e)}
+                      onPaste={index === 0 ? handlePinPaste : (e) => e.preventDefault()}
+                      style={{
+                        width: '40px',
+                        height: '40px',
+                        textAlign: 'center',
+                        fontSize: '18px',
+                        fontFamily: '"JetBrains Mono", monospace',
+                        border: `1px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
+                        backgroundColor: isDark ? '#1c202c' : '#f0ede4',
+                        color: isDark ? '#f3f4f6' : '#0a0a0a',
+                        boxSizing: 'border-box',
+                        borderRadius: '0px',
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
 
               <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
