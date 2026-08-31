@@ -252,7 +252,8 @@ CivicTwin intentionally avoids the typical *"dark background + neon gradients + 
    ```
 
 5. **Open CivicTwin**
-   Navigate to `http://localhost:5173`.
+   Navigate to `http://localhost:5173`.  
+   **Live Demo**: [https://civictwin-web-silk.vercel.app/](https://civictwin-web-silk.vercel.app/)
 
 ---
 
