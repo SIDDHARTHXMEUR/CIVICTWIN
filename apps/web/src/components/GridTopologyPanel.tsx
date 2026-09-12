@@ -20,11 +20,17 @@ L.Icon.Default.mergeOptions({
 // Red-Orange (#ea3b1b) = anomaly/critical (large 18px, pulsing ring animation)
 
 const JAIPUR_WARDS = [
-  { id: 'Mansarovar', coords: [[26.88, 75.76], [26.92, 75.76], [26.92, 75.80], [26.88, 75.80]] as [number, number][], risk: 72 },
+  { id: 'Mansarovar', coords: [[26.85, 75.76], [26.88, 75.76], [26.88, 75.80], [26.85, 75.80]] as [number, number][], risk: 72 },
   { id: 'Civil Lines', coords: [[26.91, 75.78], [26.94, 75.78], [26.94, 75.82], [26.91, 75.82]] as [number, number][], risk: 45 },
-  { id: 'Walled City', coords: [[26.92, 75.81], [26.93, 75.81], [26.93, 75.83], [26.92, 75.83]] as [number, number][], risk: 88 },
+  { id: 'Walled City', coords: [[26.92, 75.81], [26.93, 75.81], [26.93, 75.83], [26.92, 75.83]] as [number, number][], risk: 92 },
   { id: 'Malviya Nagar', coords: [[26.85, 75.80], [26.88, 75.80], [26.88, 75.83], [26.85, 75.83]] as [number, number][], risk: 61 },
-  { id: 'Vaishali Nagar', coords: [[26.89, 75.72], [26.92, 75.72], [26.92, 75.75], [26.89, 75.75]] as [number, number][], risk: 53 }
+  { id: 'Vaishali Nagar', coords: [[26.89, 75.72], [26.92, 75.72], [26.92, 75.76], [26.89, 75.76]] as [number, number][], risk: 53 },
+  { id: 'C-Scheme', coords: [[26.89, 75.78], [26.91, 75.78], [26.91, 75.81], [26.89, 75.81]] as [number, number][], risk: 38 },
+  { id: 'Tonk Road', coords: [[26.85, 75.78], [26.88, 75.78], [26.88, 75.82], [26.85, 75.82]] as [number, number][], risk: 68 },
+  { id: 'Amber-Jaigarh', coords: [[26.96, 75.83], [26.99, 75.83], [26.99, 75.87], [26.96, 75.87]] as [number, number][], risk: 75 },
+  { id: 'Jhotwara', coords: [[26.93, 75.73], [26.96, 75.73], [26.96, 75.77], [26.93, 75.77]] as [number, number][], risk: 42 },
+  { id: 'Sitapura', coords: [[26.81, 75.82], [26.84, 75.82], [26.84, 75.86], [26.81, 75.86]] as [number, number][], risk: 70 },
+  { id: 'Durgapura', coords: [[26.85, 75.76], [26.88, 75.76], [26.88, 75.80], [26.85, 75.80]] as [number, number][], risk: 35 },
 ];
 
 const createNodeIcon = (status: string) => {
@@ -277,17 +283,30 @@ export default function GridTopologyPanel() {
             </Polygon>
           ))}
 
-          {/* Spatial Anomaly Propagation Vector Line */}
+          {/* Spatial Anomaly Propagation Vector Lines */}
           {hasAnomaly && (
-            <Polyline
-              positions={[[26.9124, 75.7873], [26.9197, 75.7857], [26.9250, 75.8191]]}
-              pathOptions={{
-                color: '#ef4444',
-                weight: 4,
-                opacity: 0.85,
-                dashArray: '8, 12',
-              }}
-            />
+            <>
+              {/* Water break → MI Road → Hawa Mahal corridor */}
+              <Polyline
+                positions={[[26.9124, 75.7873], [26.9197, 75.7857], [26.9239, 75.8267]]}
+                pathOptions={{
+                  color: '#ef4444',
+                  weight: 3,
+                  opacity: 0.75,
+                  dashArray: '8, 12',
+                }}
+              />
+              {/* Nahargarh AQI → Walled City drift path */}
+              <Polyline
+                positions={[[26.9387, 75.8155], [26.9260, 75.8240], [26.9239, 75.8267]]}
+                pathOptions={{
+                  color: '#f59e0b',
+                  weight: 2,
+                  opacity: 0.6,
+                  dashArray: '4, 8',
+                }}
+              />
+            </>
           )}
 
           {displayedNodes.map(node => {
