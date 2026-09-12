@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { supabase } from '../lib/supabase';
 
 export type NodeStatus = "normal" | "warning" | "anomaly";
 
@@ -71,6 +72,7 @@ interface AppState {
   setIsAuthenticated: (auth: boolean) => void;
   focusedIncidentId: string | null;
   setFocusedIncidentId: (id: string | null) => void;
+  loadFromSupabase: () => Promise<void>;
 }
 
 const now = Date.now();
@@ -203,6 +205,60 @@ export const useStore = create<AppState>((set) => ({
   toggleTheme: () => set((state) => ({ theme: state.theme === "dark" ? "light" : "dark" })),
   setIsAuthenticated: (auth: boolean) => set({ isAuthenticated: auth }),
   setFocusedIncidentId: (id) => set({ focusedIncidentId: id }),
+
+  loadFromSupabase: async () => {
+    try {
+      const { data: assets, error } = await supabase.from('civic_assets').select('*');
+      if (error) {
+        console.error("Error fetching civic assets:", error);
+        return;
+      }
+      
+      const loadedNodes: CityNode[] = [];
+      const loadedIncidents: Incident[] = [];
+
+      assets.forEach((asset: any) => {
+        if (asset.type === 'sensor' || asset.type === 'infrastructure' || asset.type === 'node') {
+          loadedNodes.push({
+            id: asset.id,
+            name: asset.title,
+            lat: asset.latitude,
+            lng: asset.longitude,
+            domain: asset.domain as any,
+            status: asset.severity === 'critical' ? 'anomaly' : asset.severity === 'high' ? 'warning' : 'normal',
+            assetType: asset.type,
+            locationName: asset.description,
+            telemetryValue: asset.severity,
+          });
+        } else {
+          loadedIncidents.push({
+            id: asset.id,
+            category: asset.domain,
+            title: asset.title,
+            description: asset.description || '',
+            severity: asset.severity === 'critical' ? 9 : asset.severity === 'high' ? 7 : 4,
+            tab: asset.severity === 'critical' ? 'critical' : 'warnings',
+            status: asset.status === 'resolved' ? 'resolved' : 'open',
+            reportCount: 1,
+            lat: asset.latitude,
+            lng: asset.longitude,
+            updatedAt: new Date(asset.created_at).getTime(),
+            actions: [
+              { label: "VERIFY", kind: "primary" },
+              { label: "DISPATCH", kind: "secondary" },
+            ]
+          });
+        }
+      });
+
+      set((state) => ({
+        nodes: loadedNodes.length > 0 ? loadedNodes : state.nodes,
+        incidents: loadedIncidents.length > 0 ? loadedIncidents : state.incidents,
+      }));
+    } catch (e) {
+      console.error("Failed to load from Supabase:", e);
+    }
+  },
 
   triggerAnomaly: (nodeId, mockIncident) => {
     set((state) => {

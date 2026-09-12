@@ -18,6 +18,10 @@ function App() {
   const isDark = theme === 'dark';
 
   useEffect(() => {
+    useStore.getState().loadFromSupabase();
+  }, []);
+
+  useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '') as AppView;
       if (['gateway', 'dashboard', 'citizen'].includes(hash)) {

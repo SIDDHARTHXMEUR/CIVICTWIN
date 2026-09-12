@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore } from '../store';
+import { PaymentGate } from './PaymentGate';
 
 export default function IntelligencePanel() {
   const incidents = useStore(state => state.incidents);
@@ -147,27 +148,29 @@ export default function IntelligencePanel() {
               <div style={{ fontSize: '9px', fontWeight: 800, color: '#ea3b1b', letterSpacing: '0.08em', fontFamily: '"JetBrains Mono", monospace' }}>
                 RECOMMENDED ACTION
               </div>
-              <div style={{ fontSize: '11px', color: isDark ? '#f3f4f6' : '#0a0a0a', lineHeight: 1.4, fontWeight: 500, marginBottom: '6px' }}>
-                {topAnomaly.recommendedAction || "Isolate affected grid node and dispatch field unit."}
-              </div>
-              <button
-                onClick={() => resolveIncident(topAnomaly.id)}
-                style={{
-                  width: '100%',
-                  padding: '7px 10px',
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  fontFamily: '"JetBrains Mono", monospace',
-                  backgroundColor: '#ea3b1b',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '0px',
-                  cursor: 'pointer',
-                  letterSpacing: '0.04em',
-                }}
-              >
-                DISPATCH RESOLUTION →
-              </button>
+              <PaymentGate resourceId={`incident-${topAnomaly.id}`} priceAmount="100000">
+                <div style={{ fontSize: '11px', color: isDark ? '#f3f4f6' : '#0a0a0a', lineHeight: 1.4, fontWeight: 500, marginBottom: '6px' }}>
+                  {topAnomaly.recommendedAction || "Isolate affected grid node and dispatch field unit."}
+                </div>
+                <button
+                  onClick={() => resolveIncident(topAnomaly.id)}
+                  style={{
+                    width: '100%',
+                    padding: '7px 10px',
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    fontFamily: '"JetBrains Mono", monospace',
+                    backgroundColor: '#ea3b1b',
+                    color: '#ffffff',
+                    border: 'none',
+                    borderRadius: '0px',
+                    cursor: 'pointer',
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  DISPATCH RESOLUTION →
+                </button>
+              </PaymentGate>
             </div>
           </div>
         )}
