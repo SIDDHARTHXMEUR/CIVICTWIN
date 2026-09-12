@@ -132,7 +132,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
 
   const tileLayerUrl = isDark
     ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
 
   const openIncidentsCount = incidents.filter(i => i.status === 'open').length;
   const healthVal = Math.round(kpis.find(k => k.id === 'city-health')?.value || 72);

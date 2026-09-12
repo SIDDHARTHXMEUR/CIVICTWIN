@@ -457,7 +457,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                 style={{ width: '100%', height: '100%' }}
                 zoomControl={false}
               >
-                <TileLayer url={isDark ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"} />
+                <TileLayer url={isDark ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"} />
                 <Marker position={[26.9197, 75.7857]} icon={createCitizenMarkerIcon()}>
                   <Popup>
                     <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px' }}>
