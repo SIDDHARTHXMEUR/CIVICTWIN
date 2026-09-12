@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://civictwin.vercel.app/"><strong>🌐 Live Deployment</strong></a> &nbsp;&nbsp;|&nbsp;&nbsp; 
+  <a href="https://civictwin-web-silk.vercel.app/"><strong>🌐 Live Deployment</strong></a> &nbsp;&nbsp;|&nbsp;&nbsp; 
   <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>📂 GitHub Repository</strong></a>
 </p>
 
@@ -484,7 +484,7 @@ Cities already generate enormous volumes of data. The missing layer is not anoth
 </p>
 
 <p align="center">
-  <a href="https://civictwin.vercel.app/"><strong>🌐 Live Demo</strong></a> · 
+  <a href="https://civictwin-web-silk.vercel.app/"><strong>🌐 Live Demo</strong></a> &nbsp;&nbsp;|&nbsp;&nbsp; 
   <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>📂 GitHub Repository</strong></a>
 </p>
 
