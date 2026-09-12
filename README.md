@@ -41,25 +41,28 @@ Infrastructure    ──┘
 CivicTwin bridges this gap by unifying ingestion, spatial correlation, and triage into a single operational loop:
 
 ```mermaid
-flowchart LR 
-    C["Citizens<br/>Reports & Evidence"] 
-    S["Sensors<br/>Telemetry & Health"] 
-    I["Infrastructure<br/>Operational State"] 
-    E["Environmental<br/>AQI & Weather"] 
-    T["CIVICTWIN<br/>Operational Layer"] 
-    R["Risk & Severity<br/>Evaluation"] 
-    M["Spatial Context<br/>GIS Digital Twin"] 
-    D["Decision Rail<br/>Contextual Actions"] 
-    A["Municipal Action<br/>& Crew Dispatch"] 
+flowchart TD
+    subgraph INGESTION ["📥 01. INGESTION & URBAN SENSING"]
+        C["<b>👥 Citizens</b><br/>Grievances & Evidence"]
+        S["<b>📡 IoT Sensors</b><br/>Telemetry & Pressure"]
+        I["<b>🏗️ Infrastructure</b><br/>SCADA & Asset Health"]
+        E["<b>🌤️ Environmental</b><br/>AQI & Weather Monitors"]
+    end
 
-    C --> T 
-    S --> T 
-    I --> T 
-    E --> T 
-    T --> R 
-    T --> M 
-    R --> D 
-    M --> D 
+    subgraph ENGINE ["⚡ 02. CIVICTWIN OPERATIONAL LAYER"]
+        T["<b>🏛️ CIVICTWIN PLATFORM</b><br/>Unified Anomaly Engine & Spatial Ingestion"]
+        R["<b>⚖️ Risk & Severity</b><br/>Dynamic Scoring (1–10)"]
+        M["<b>🗺️ Spatial Context</b><br/>Leaflet GIS Digital Twin"]
+    end
+
+    subgraph RESOLUTION ["🚀 03. TRIAGE & DISPATCH"]
+        D["<b>🚨 Contextual Decision Rail</b><br/>Recommended Interventions & Root Causes"]
+        A["<b>🚚 Municipal Response</b><br/>VRPTW Crew Dispatch & Grid Isolation"]
+    end
+
+    C & S & I & E --> T
+    T --> R & M
+    R & M --> D
     D --> A
 ```
 
@@ -138,13 +141,16 @@ CivicTwin is structured around one continuous operational cycle:
 $$\text{Observe} \longrightarrow \text{Predict} \longrightarrow \text{Act} \longrightarrow \text{Verify}$$
 
 ```mermaid
-flowchart LR 
-    O["01. OBSERVE<br/><br/>Citizen Grievances<br/>Sensor Telemetry<br/>Infrastructure State<br/>Spatial Asset Grid"] 
-    P["02. PREDICT<br/><br/>Severity Scoring<br/>Cascade Probability<br/>Anomaly Drift Vectors<br/>Corroboration Clustering"] 
-    A["03. ACT<br/><br/>VRPTW Crew Dispatch<br/>Traffic Rerouting<br/>x402 Report Settlement<br/>Field Confirmation"] 
+flowchart TD
+    O["<b>01. OBSERVE</b><br/>• Ingest Citizen Grievances & GPS Evidence<br/>• 144 IoT Telemetry & Hydraulic Pressure Sensors<br/>• Real-time Spatial Infrastructure Grid & Basemaps"]
+    P["<b>02. PREDICT & EVALUATE</b><br/>• Automated Severity Scoring (1–10 Scale)<br/>• Anomaly Propagation Vectors & Spatial Risk Corridors<br/>• Intelligent 500m Grievance Corroboration Clustering"]
+    A["<b>03. ACT & INTERVENE</b><br/>• Contextual Decision Rail Triage Pane<br/>• Autonomous VRPTW Emergency Crew Dispatch Routing<br/>• Machine-to-Machine x402 Diagnostic Settlement (Algorand)"]
+    V["<b>04. VERIFY & AUDIT</b><br/>• Real-time Sensor Telemetry Normalization<br/>• Synchronized City Health Index Update<br/>• Immutable Ledger Audit Record & Municipal PDF Briefing"]
 
-    O --> P --> A 
-    A -.->|Updated City Health State| O
+    O --> P
+    P --> A
+    A --> V
+    V -.->|Continuous Operational Telemetry Loop| O
 ```
 
 1. **Observe**: Ingest real-time citizen reports and sensor telemetry onto a spatial map.
@@ -247,47 +253,41 @@ Generate formal municipal reports with one click:
 ## 03 — Technical Architecture & Data Flow
 
 ```mermaid
-flowchart TB
-    subgraph INTAKE [URBAN SIGNALS & SENSORS]
-        CIT["Citizen Gateway Reports"]
-        IOT["144 IoT Telemetry Sensors"]
-        INF["Physical Infrastructure Grids"]
-        ENV["Environmental AQI Monitors"]
+flowchart TD
+    subgraph INTAKE ["📡 01. URBAN INGESTION LAYER"]
+        CIT["<b>👥 Citizen Gateway</b><br/>Public Grievances & Geotagged Evidence"]
+        IOT["<b>📶 IoT Telemetry Grid</b><br/>144 SCADA, Hydraulic & Acoustic Sensors"]
+        INF["<b>🏗️ Infrastructure Assets</b><br/>Water Pipelines, Power Grids & Transit"]
+        ENV["<b>🌤️ Environmental Sensors</b><br/>Real-time AQI, Weather & Microclimate"]
     end
 
-    subgraph SERVICES [BACKEND & STORAGE]
-        SB[("Supabase Realtime Postgres")]
-        FAST["FastAPI AI & VRPTW Engine"]
-        ALGO["Algorand Testnet (x402 Protocol)"]
+    subgraph BACKEND ["⚙️ 02. CORE BACKEND & PERSISTENCE"]
+        SB[("<b>🗄️ Supabase Postgres</b><br/>Realtime Sync Channels & RLS Security")]
+        FAST["<b>⚡ FastAPI Service Engine</b><br/>VRPTW Routing Engine & Scenario Simulation"]
+        ALGO["<b>⛓️ Algorand Testnet</b><br/>x402 Micropayment Protocol Gateway"]
     end
 
-    subgraph WORKSPACE [CIVICTWIN COMMAND CENTER]
-        GIS["Leaflet Spatial Digital Twin"]
-        INT["Intelligence & Predictive Panel"]
-        CMD["Municipal Dashboard Shell"]
-        DEC["Decision Rail Triage Engine"]
-        PAL["Command Palette (Ctrl+K)"]
+    subgraph WORKSPACE ["💻 03. CIVICTWIN COMMAND CENTER"]
+        GIS["<b>🗺️ Leaflet Spatial Digital Twin</b><br/>Multi-basemap GIS, Vector Corridors & Anomaly Pins"]
+        DEC["<b>🚨 Contextual Decision Rail</b><br/>Tactical Triage, Severity Meters & Root Causes"]
+        INT["<b>🧠 Intelligence & Predictive Hub</b><br/>AI Predictive Diagnostics & Risk Scoring"]
+        CMD["<b>📊 Command Center Shell</b><br/>KPI Sparklines, Global Ctrl+K Palette & PDF Export"]
     end
 
-    subgraph ACTION [MUNICIPAL INTERVENTION]
-        VRPTW["VRPTW Crew Dispatch"]
-        REROUTE["Adaptive Traffic Rerouting"]
-        RES["Incident Resolution & State Sync"]
+    subgraph ACTION ["🚒 04. MUNICIPAL DISPATCH & RESOLUTION"]
+        VRPTW["<b>🚚 Autonomous VRPTW Dispatch</b><br/>Turn-by-Turn Waypoints & Route Polylines"]
+        REROUTE["<b>🚦 Traffic & Grid Management</b><br/>Dynamic Signal Adjustments & Corridor Rerouting"]
+        RES["<b>✅ Operational State Sync</b><br/>Sensor Normalization & City Health Verification"]
     end
 
-    CIT --> SB
-    IOT --> SB
-    INF --> FAST
-    ENV --> FAST
-    FAST --> SB
-    SB <--> WORKSPACE
+    CIT & IOT --> SB
+    INF & ENV --> FAST
+    FAST <--> SB
     ALGO <--> INT
-    CMD --> DEC
-    DEC --> VRPTW
-    DEC --> REROUTE
-    VRPTW --> RES
-    REROUTE --> RES
-    RES -.->|Updated City Health State| SB
+    SB <==> WORKSPACE
+    DEC --> VRPTW & REROUTE
+    VRPTW & REROUTE --> RES
+    RES -.->|Telemetry Normalization Feedback| SB
 ```
 
 ---
@@ -298,23 +298,24 @@ The following sequence illustrates CivicTwin's end-to-end operational chain duri
 
 ```mermaid
 sequenceDiagram 
-    participant C as Citizen
-    participant G as Citizen Gateway
-    participant AI as Intelligence Layer
-    participant GIS as Spatial Digital Twin
-    participant O as Operator / Decision Rail
-    participant R as Response Squad (VRPTW)
+    autonumber
+    actor C as 👥 Citizen
+    participant G as 📱 Citizen Gateway
+    participant AI as 🧠 Intelligence Layer
+    participant GIS as 🗺️ Spatial Digital Twin
+    participant O as 🚨 Decision Rail / Operator
+    participant R as 🚒 Response Squad (VRPTW)
 
-    C->>G: Reports major pipeline fracture & surface flooding
-    G->>G: Captures GPS coords (26.9124°N, 75.7873°E)
-    G->>AI: Forwards report + acoustic sensor telemetry
-    AI->>AI: Clusters corroborating reports within 500m (Reported by: 3)
-    AI->>GIS: Plots critical anomaly marker with pulsing radar ring
-    GIS->>O: Triggers priority alert on Decision Rail (Severity 8/10)
-    O->>R: Approves AI-recommended "DISPATCH CREW" action
-    R->>GIS: Calculates & renders optimal green corridor route polyline
-    R->>O: Crew arrives on-site & executes hydraulic clamp repair
-    O->>GIS: Telemetry normalizes (4.8 bar) & incident moves to "Resolved Today"
+    C->>G: 1. Reports major pipeline fracture & surface flooding
+    G->>G: 2. Captures precise GPS coordinates (26.9124°N, 75.7873°E)
+    G->>AI: 3. Forwards grievance + acoustic sensor telemetry
+    AI->>AI: 4. Clusters corroborating reports (500m radius, Count: 3)
+    AI->>GIS: 5. Plots critical anomaly marker with pulsing radar ring
+    GIS->>O: 6. Triggers priority incident alert (Severity 8/10)
+    O->>R: 7. Operator approves AI-recommended "DISPATCH CREW"
+    R->>GIS: 8. Calculates & renders optimal green route polyline
+    R->>O: 9. Crew arrives on-site & executes hydraulic clamp repair
+    O->>GIS: 10. Sensor reading normalizes (4.8 bar) & incident moves to "Resolved"
 ```
 
 1. **Signal Intake**: Acoustic pressure sensor `JP-W01` detects a pressure drop to 2.4 bar; a citizen concurrently submits a report with photo evidence via the Citizen Gateway.
@@ -418,13 +419,24 @@ To maintain technical transparency, system capabilities are classified as follow
 ## 10 — Roadmap & Future City Federation
 
 ```mermaid
-flowchart LR 
-    P1["PHASE 01<br/>JAIPUR METRO<br/>(ACTIVE LIVE)"] 
-    P2["PHASE 02<br/>NEW DELHI NODE<br/>(PROVISIONING)"] 
-    P3["PHASE 03<br/>MUMBAI & BENGALURU<br/>(EXPANSION)"] 
-    P4["PHASE 04<br/>FEDERATED<br/>TWIN NETWORK"] 
+flowchart TD
+    subgraph PHASE1 ["🟢 PHASE 01 — JAIPUR OPERATIONAL TWIN (ACTIVE LIVE)"]
+        P1["<b>Jaipur Metro Grid</b><br/>• Full Leaflet Spatial Digital Twin (144 IoT Sensors)<br/>• Contextual Decision Rail with 10-tier severity triage<br/>• Autonomous VRPTW Crew Routing & Turn-by-Turn Waypoints<br/>• x402 Micropayments Protocol on Algorand Testnet"]
+    end
 
-    P1 --> P2 --> P3 --> P4
+    subgraph PHASE2 ["🟡 PHASE 02 — FEDERATED MULTI-CITY REGISTRY (IN PROGRESS)"]
+        P2["<b>Multi-City Regional Provisioning</b><br/>• New Delhi, Mumbai Metro, and Bengaluru Node Onboarding<br/>• Cross-city anomaly propagation sync and state registry<br/>• Regional emergency escalation protocols"]
+    end
+
+    subgraph PHASE3 ["🔵 PHASE 03 — PREDICTIVE COMPUTER VISION & AI (PLANNED)"]
+        P3["<b>Edge AI & Spatial Diagnostics</b><br/>• Automated CCTV traffic-flow computer vision integration<br/>• Real-time road fracture and pothole edge detection<br/>• Predictive structural fatigue models"]
+    end
+
+    subgraph PHASE4 ["🟣 PHASE 04 — AUTONOMOUS MUNICIPAL SWARMS (VISION)"]
+        P4["<b>Decentralized Municipal Automation</b><br/>• Direct telemetry integration with municipal UAV swarms<br/>• Automated SCADA flood mitigation and pump grid activation<br/>• Decentralized sovereign municipal data governance"]
+    end
+
+    PHASE1 --> PHASE2 --> PHASE3 --> PHASE4
 ```
 
 - **Phase 01 — Jaipur Operational Twin (Active)**: Full GIS digital twin, decision rail, autonomous VRPTW dispatch, and x402 payment gate.
