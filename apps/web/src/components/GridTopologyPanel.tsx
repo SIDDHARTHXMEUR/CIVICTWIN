@@ -56,6 +56,23 @@ const createNodeIcon = (status: string) => {
   });
 };
 
+function MapUpdater() {
+  const map = useMap();
+  const focusedIncidentId = useStore(state => state.focusedIncidentId);
+  const incidents = useStore(state => state.incidents);
+  
+  useEffect(() => {
+    if (focusedIncidentId) {
+      const incident = incidents.find(i => i.id === focusedIncidentId);
+      if (incident && incident.lat && incident.lng) {
+        map.flyTo([incident.lat, incident.lng], 15, { duration: 1.5 });
+      }
+    }
+  }, [focusedIncidentId, incidents, map]);
+  
+  return null;
+}
+
 export default function GridTopologyPanel() {
   const nodes = useStore(state => state.nodes);
   const incidents = useStore(state => state.incidents);
@@ -226,6 +243,7 @@ export default function GridTopologyPanel() {
           attributionControl={false}
         >
           <TileLayer url={tileLayerUrl} />
+          <MapUpdater />
 
           {/* Spatial Anomaly Propagation Vector Line */}
           {hasAnomaly && (

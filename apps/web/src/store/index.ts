@@ -69,6 +69,8 @@ interface AppState {
   recalibrateNode: (nodeId: string) => void;
   isAuthenticated: boolean;
   setIsAuthenticated: (auth: boolean) => void;
+  focusedIncidentId: string | null;
+  setFocusedIncidentId: (id: string | null) => void;
 }
 
 const now = Date.now();
@@ -195,10 +197,12 @@ export const useStore = create<AppState>((set) => ({
   activeDomain: "all",
   theme: "light",
   isAuthenticated: false,
+  focusedIncidentId: null,
 
   setActiveDomain: (domain) => set({ activeDomain: domain }),
   toggleTheme: () => set((state) => ({ theme: state.theme === "dark" ? "light" : "dark" })),
   setIsAuthenticated: (auth: boolean) => set({ isAuthenticated: auth }),
+  setFocusedIncidentId: (id) => set({ focusedIncidentId: id }),
 
   triggerAnomaly: (nodeId, mockIncident) => {
     set((state) => {

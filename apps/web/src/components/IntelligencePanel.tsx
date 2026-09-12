@@ -16,6 +16,12 @@ export default function IntelligencePanel() {
     ? (activeIncidents[selectedIndex] || activeIncidents[0])
     : null;
 
+  React.useEffect(() => {
+    if (topAnomaly) {
+      useStore.getState().setFocusedIncidentId(topAnomaly.id);
+    }
+  }, [topAnomaly?.id]);
+
   return (
     <div className="beveled-3d-frame" style={{
       width: '260px',
@@ -79,7 +85,10 @@ export default function IntelligencePanel() {
                     {activeIncidents.map((_, idx) => (
                       <button
                         key={idx}
-                        onClick={() => setSelectedIndex(idx)}
+                        onClick={() => {
+                          setSelectedIndex(idx);
+                          useStore.getState().setFocusedIncidentId(activeIncidents[idx].id);
+                        }}
                         style={{
                           padding: '1px 5px',
                           fontSize: '9px',
