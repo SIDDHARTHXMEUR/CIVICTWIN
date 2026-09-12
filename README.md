@@ -2,19 +2,11 @@
 ### Municipal Urban Operational Layer & Spatial Digital Twin
 
 <p align="center">
-  <strong>See the city. Predict the risk. Act before it escalates.</strong>
+  <em>See the city. Predict the risk. Act before it escalates.</em>
 </p>
 
 <p align="center">
-  <a href="https://civictwin.vercel.app/"><img src="https://img.shields.io/badge/Live%20Demo-civictwin.vercel.app-0ea5e9?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
-  <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Repo" /></a>
-  <img src="https://img.shields.io/badge/License-MIT-emerald?style=for-the-badge" alt="License MIT" />
-  <img src="https://img.shields.io/badge/Architecture-Digital%20Twin-4f46e5?style=for-the-badge" alt="Digital Twin" />
-  <img src="https://img.shields.io/badge/Web3-Algorand%20x402-f59e0b?style=for-the-badge&logo=algorand&logoColor=white" alt="Algorand Testnet" />
-</p>
-
-<p align="center">
-  <a href="https://civictwin.vercel.app/"><strong>🌐 Live Deployment</strong></a> · 
+  <a href="https://civictwin.vercel.app/"><strong>🌐 Live Deployment</strong></a> &nbsp;&nbsp;|&nbsp;&nbsp; 
   <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>📂 GitHub Repository</strong></a>
 </p>
 
