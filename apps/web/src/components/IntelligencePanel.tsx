@@ -171,8 +171,9 @@ export default function IntelligencePanel() {
             </div>
           </div>
         )}
+      </div>
 
-        {/* Interaction Loop — pinned to bottom via marginTop: auto */}
+        {/* Interaction Loop — pinned to bottom */}
         <div style={{
           backgroundColor: isDark ? '#0b0c0e' : '#0a0a0a',
           padding: '10px 14px',
@@ -213,7 +214,6 @@ export default function IntelligencePanel() {
             })}
           </div>
         </div>
-      </div>
     </div>
   );
 }
