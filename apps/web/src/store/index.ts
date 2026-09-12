@@ -65,8 +65,9 @@ interface AppState {
   setActiveDomain: (domain: string) => void;
   toggleTheme: () => void;
   triggerAnomaly: (nodeId: string, mockIncident: Partial<Incident>) => void;
-  addCitizenReport: (report: { category: string; description: string; photoUrl?: string; location: string }) => { incident: Incident; merged: boolean };
-  resolveIncident: (incidentId: string) => void;
+  addCitizenReport: (report: { category: string; description: string; photoUrl?: string; location: string }) => Promise<{ incident: Incident; merged: boolean }>;
+  resolveIncident: (incidentId: string) => Promise<void>;
+  dispatchIncident: (incidentId: string) => Promise<void>;
   pingNode: (nodeId: string) => void;
   recalibrateNode: (nodeId: string) => void;
   isAuthenticated: boolean;
@@ -74,6 +75,7 @@ interface AppState {
   focusedIncidentId: string | null;
   setFocusedIncidentId: (id: string | null) => void;
   loadFromSupabase: () => Promise<void>;
+  loadFromSupabaseV2: () => Promise<void>;
   subscribeToRealtime: () => () => void;
   simulateAIPrediction: () => void;
   realtimeConnected: boolean;
@@ -197,7 +199,7 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
   return R * c;
 }
 
-export const useStore = create<AppState>((set) => ({
+export const useStore = create<AppState>((set, get) => ({
   nodes: initialNodes,
   kpis: initialKpis,
   incidents: initialIncidents,
@@ -216,14 +218,14 @@ export const useStore = create<AppState>((set) => ({
   clearNewIncidentAlert: () => set({ newIncidentAlert: null }),
 
   subscribeToRealtime: () => {
-    const channel = supabase
+    // Subscribe to civic_assets (legacy table) inserts
+    const channel1 = supabase
       .channel('civic-assets-realtime')
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'civic_assets' },
         (payload) => {
           const asset = payload.new as any;
-          const [lat, lng] = [asset.latitude ?? 26.9124, asset.longitude ?? 75.7873];
           const newIncident: Incident = {
             id: asset.id,
             category: asset.domain,
@@ -235,7 +237,8 @@ export const useStore = create<AppState>((set) => ({
             tab: asset.severity === 'critical' ? 'critical' : 'warnings',
             status: 'open',
             reportCount: 1,
-            lat, lng,
+            lat: asset.latitude ?? 26.9124,
+            lng: asset.longitude ?? 75.7873,
             updatedAt: Date.now(),
             actions: [
               { label: 'VERIFY', kind: 'primary' },
@@ -253,8 +256,86 @@ export const useStore = create<AppState>((set) => ({
         set({ realtimeConnected: status === 'SUBSCRIBED' });
       });
 
-    return () => { supabase.removeChannel(channel); };
+    // Subscribe to V2 incidents table (INSERT + UPDATE for lifecycle changes)
+    const channel2 = supabase
+      .channel('incidents-v2-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'incidents' },
+        (payload) => {
+          const row = payload.new as any;
+          const newIncident: Incident = {
+            id: row.id,
+            category: row.category,
+            title: row.title,
+            description: row.description || '',
+            severity: row.severity_score / 10,
+            impactPct: Math.round(row.severity_score * 0.9),
+            confidencePct: 88,
+            tab: (row.severity_band === 'critical' || row.severity_band === 'very_high') ? 'critical' : 'warnings',
+            status: 'open',
+            reportCount: row.report_count || 1,
+            lat: row.latitude,
+            lng: row.longitude,
+            updatedAt: Date.now(),
+            rootCause: row.root_cause,
+            recommendedAction: row.recommended_action,
+            actions: [
+              { label: 'VERIFY', kind: 'primary' },
+              { label: 'DISPATCH', kind: 'secondary' },
+            ],
+          };
+          set((state) => ({
+            incidents: [newIncident, ...state.incidents.filter(i => i.id !== row.id)],
+            newIncidentAlert: `🔴 NEW INCIDENT: ${row.title}`,
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'incidents' },
+        (payload) => {
+          const row = payload.new as any;
+          set((state) => ({
+            incidents: state.incidents.map(inc =>
+              inc.id === row.id
+                ? {
+                    ...inc,
+                    status: ['resolved', 'verified', 'closed'].includes(row.lifecycle_state) ? 'resolved' : 'open',
+                    reportCount: row.report_count || inc.reportCount,
+                    updatedAt: Date.now(),
+                  }
+                : inc
+            ),
+          }));
+        }
+      )
+      .subscribe();
+
+    // Subscribe to anomalies table (sensor-generated incidents)
+    const channel3 = supabase
+      .channel('anomalies-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'anomalies' },
+        (payload) => {
+          const row = payload.new as any;
+          if (row.severity === 'high' || row.severity === 'critical') {
+            set((state) => ({
+              newIncidentAlert: `⚡ SENSOR ANOMALY: ${row.description || 'Threshold exceeded'} — z=${row.z_score?.toFixed(2)}`,
+            }));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel1);
+      supabase.removeChannel(channel2);
+      supabase.removeChannel(channel3);
+    };
   },
+
 
   simulateAIPrediction: () => {
     const domains = ['infrastructure', 'mobility', 'environment'] as const;
@@ -308,58 +389,94 @@ export const useStore = create<AppState>((set) => ({
   },
 
   loadFromSupabase: async () => {
+    // Legacy loader — kept for backward compat with civic_assets table
     try {
       const { data: assets, error } = await supabase.from('civic_assets').select('*');
-      if (error) {
-        console.error("Error fetching civic assets:", error);
-        return;
+      if (error || !assets?.length) {
+        // Silently fall through to V2 loader
+        return useStore.getState().loadFromSupabaseV2();
       }
-      
-      const loadedNodes: CityNode[] = [];
-      const loadedIncidents: Incident[] = [];
-
-      assets.forEach((asset: any) => {
-        if (asset.type === 'sensor' || asset.type === 'infrastructure' || asset.type === 'node') {
-          loadedNodes.push({
-            id: asset.id,
-            name: asset.title,
-            lat: asset.latitude,
-            lng: asset.longitude,
-            domain: asset.domain as any,
-            status: asset.severity === 'critical' ? 'anomaly' : asset.severity === 'high' ? 'warning' : 'normal',
-            assetType: asset.type,
-            locationName: asset.description,
-            telemetryValue: asset.severity,
-          });
-        } else {
-          loadedIncidents.push({
-            id: asset.id,
-            category: asset.domain,
-            title: asset.title,
-            description: asset.description || '',
-            severity: asset.severity === 'critical' ? 9 : asset.severity === 'high' ? 7 : 4,
-            tab: asset.severity === 'critical' ? 'critical' : 'warnings',
-            status: asset.status === 'resolved' ? 'resolved' : 'open',
-            reportCount: 1,
-            lat: asset.latitude,
-            lng: asset.longitude,
-            updatedAt: new Date(asset.created_at).getTime(),
-            actions: [
-              { label: "VERIFY", kind: "primary" },
-              { label: "DISPATCH", kind: "secondary" },
-            ]
-          });
-        }
-      });
-
-      set((state) => ({
-        nodes: loadedNodes.length > 0 ? loadedNodes : state.nodes,
-        incidents: loadedIncidents.length > 0 ? loadedIncidents : state.incidents,
-      }));
+      const loadedIncidents: Incident[] = assets
+        .filter((a: any) => a.type !== 'sensor')
+        .map((asset: any) => ({
+          id: asset.id,
+          category: asset.domain,
+          title: asset.title,
+          description: asset.description || '',
+          severity: asset.severity === 'critical' ? 9 : asset.severity === 'high' ? 7 : 4,
+          tab: asset.severity === 'critical' ? 'critical' : 'warnings',
+          status: asset.status === 'resolved' ? 'resolved' : 'open',
+          reportCount: 1,
+          lat: asset.latitude,
+          lng: asset.longitude,
+          updatedAt: new Date(asset.created_at).getTime(),
+          actions: [{ label: "VERIFY", kind: "primary" as const }, { label: "DISPATCH", kind: "secondary" as const }],
+        }));
+      if (loadedIncidents.length > 0) {
+        set({ incidents: loadedIncidents });
+      }
     } catch (e) {
-      console.error("Failed to load from Supabase:", e);
+      console.error("Failed to load from civic_assets:", e);
+    }
+    // Always try V2 as well
+    return useStore.getState().loadFromSupabaseV2();
+  },
+
+  loadFromSupabaseV2: async () => {
+    try {
+      // Load full incidents from new V2 table
+      const { data: incidentRows, error: incErr } = await supabase
+        .from('incidents')
+        .select('*')
+        .order('severity_score', { ascending: false })
+        .limit(50);
+
+      if (!incErr && incidentRows && incidentRows.length > 0) {
+        const v2Incidents: Incident[] = incidentRows.map((row: any) => ({
+          id: row.id,
+          category: row.category,
+          title: row.title,
+          description: row.description || '',
+          severity: row.severity_score / 10, // normalize 0-100 → 0-10
+          impactPct: Math.round(row.severity_score * 0.9),
+          confidencePct: row.ai_confidence ? Math.round(row.ai_confidence * 100) : 88,
+          tab: row.severity_band === 'critical' || row.severity_band === 'very_high' ? 'critical' : 'warnings',
+          status: ['resolved', 'verified', 'closed'].includes(row.lifecycle_state) ? 'resolved' : 'open',
+          reportCount: row.report_count || 1,
+          lat: row.latitude,
+          lng: row.longitude,
+          updatedAt: new Date(row.updated_at || row.created_at).getTime(),
+          rootCause: row.root_cause,
+          recommendedAction: row.recommended_action,
+          actions: [{ label: "VERIFY", kind: "primary" as const }, { label: "DISPATCH", kind: "secondary" as const }],
+        }));
+        set({ incidents: v2Incidents });
+      }
+
+      // Load sensors from new V2 table
+      const { data: sensorRows, error: sErr } = await supabase
+        .from('sensors')
+        .select('*');
+
+      if (!sErr && sensorRows && sensorRows.length > 0) {
+        const v2Nodes: CityNode[] = sensorRows.map((row: any) => ({
+          id: row.node_id,
+          name: row.name,
+          lat: row.latitude,
+          lng: row.longitude,
+          domain: (row.sensor_type.includes('water') ? 'infrastructure' :
+                   row.sensor_type.includes('traffic') ? 'mobility' : 'environment') as any,
+          status: row.status === 'anomaly' ? 'anomaly' : row.status === 'offline' ? 'warning' : 'normal',
+          assetType: row.sensor_type,
+          locationName: row.name,
+        }));
+        set({ nodes: v2Nodes });
+      }
+    } catch (e) {
+      console.error("Failed V2 Supabase load:", e);
     }
   },
+
 
   triggerAnomaly: (nodeId, mockIncident) => {
     set((state) => {
@@ -397,7 +514,7 @@ export const useStore = create<AppState>((set) => ({
     });
   },
 
-  addCitizenReport: (report) => {
+  addCitizenReport: async (report) => {
     let lat = 26.9197;
     let lng = 75.7857;
     const match = report.location.match(/(\d+\.\d+)°\s*[NS],\s*(\d+\.\d+)°\s*[EW]/);
@@ -406,85 +523,130 @@ export const useStore = create<AppState>((set) => ({
       lng = parseFloat(match[2]);
     }
 
-    let mappedCategory = "physical-infrastructure";
-    if (report.category.includes("Traffic") || report.category.includes("Road")) mappedCategory = "mobility-gridlock";
-    if (report.category.includes("AQI") || report.category.includes("Garbage")) mappedCategory = "environmental-hazard";
+    let mappedCategory = "infrastructure";
+    if (report.category.includes("Traffic") || report.category.includes("Road")) mappedCategory = "mobility";
+    if (report.category.includes("AQI") || report.category.includes("Garbage")) mappedCategory = "environment";
 
-    let mergedIncident: Incident | null = null;
     let resultIncident: Incident | null = null;
     let isMerged = false;
 
-    set((state) => {
-      // Find matching incident
-      const existing = state.incidents.find(i => 
-        i.status === "open" && 
-        i.category === mappedCategory && 
-        i.lat && i.lng && 
-        getDistance(lat, lng, i.lat, i.lng) <= 500
-      );
+    // 1. Check local state for proximity merge (simplified for client-side demo)
+    const existing = get().incidents.find(i => 
+      i.status === "open" && 
+      i.category.includes(mappedCategory) && 
+      i.lat && i.lng && 
+      getDistance(lat, lng, i.lat, i.lng) <= 500
+    );
 
-      if (existing) {
-        mergedIncident = {
-          ...existing,
-          reportCount: (existing.reportCount || 1) + 1,
-          updatedAt: Date.now(),
-          severity: Math.min(10, existing.severity + 0.2),
-        };
-        resultIncident = mergedIncident;
-        isMerged = true;
-        
-        return {
-          incidents: state.incidents.map(i => i.id === existing.id ? mergedIncident! : i),
-        };
-      } else {
-        const targetNodeId = "JP-T04";
-        const newIncident: Incident = {
-          id: `INC-CIT-${Math.floor(Math.random() * 8999) + 1000}`,
-          category: mappedCategory,
-          title: `Citizen Report: ${report.category}`,
-          description: `${report.description} (${report.location})`,
-          severity: 8.9,
-          impactPct: 82,
-          confidencePct: 94,
-          tab: "critical",
-          linkedNodeId: targetNodeId,
-          actions: [
-            { label: "VERIFY TELEMETRY", kind: "primary" },
-            { label: "DISPATCH FIELD CREW", kind: "secondary" },
-          ],
-          status: "open",
-          rootCause: "Citizen reported issue pending spatial verification.",
-          recommendedAction: "Deploy municipal crew for field inspection.",
-          reportCount: 1,
-          lat, lng,
-          updatedAt: Date.now()
-        };
-        
-        resultIncident = newIncident;
-        isMerged = false;
+    let dbIncidentId = existing?.id;
 
-        const updatedNodes = state.nodes.map(node =>
-          node.id === targetNodeId ? { ...node, status: "anomaly" as NodeStatus, packetLoss: 6.2 } : node
-        );
-        const updatedKpis = state.kpis.map(kpi => {
-          if (kpi.id === "city-health") return { ...kpi, value: 65, deltaPct: -8.2, status: "alert" as const };
-          if (kpi.id === "mobility-flow") return { ...kpi, value: 52, deltaPct: -18.5, status: "alert" as const };
-          return kpi;
-        });
-        
-        return {
-          nodes: updatedNodes,
-          incidents: [newIncident, ...state.incidents],
-          interactionLoop: { stage: "act", relatedIncidentId: newIncident.id },
-          kpis: updatedKpis,
-        };
+    if (existing) {
+      isMerged = true;
+      resultIncident = {
+        ...existing,
+        reportCount: (existing.reportCount || 1) + 1,
+        updatedAt: Date.now(),
+        severity: Math.min(10, existing.severity + 0.2),
+      };
+      
+      // Attempt Supabase Update
+      if (!existing.id.startsWith('INC-')) {
+        await supabase.from('incidents').update({ 
+          report_count: resultIncident.reportCount,
+          severity_score: resultIncident.severity * 10
+        }).eq('id', existing.id);
       }
+    } else {
+      // Create new incident
+      const title = `Citizen Report: ${report.category}`;
+      const desc = `${report.description} (${report.location})`;
+      
+      const { data: incData, error: incErr } = await supabase.from('incidents').insert([{
+        title: title,
+        description: desc,
+        category: mappedCategory,
+        severity_score: 89,
+        severity_band: 'high',
+        lifecycle_state: 'reported',
+        latitude: lat,
+        longitude: lng,
+        source: 'citizen_report',
+        is_demo_data: true,
+      }]).select().single();
+
+      dbIncidentId = incData?.id || `INC-CIT-${Math.floor(Math.random() * 8999) + 1000}`;
+      
+      resultIncident = {
+        id: dbIncidentId!,
+        category: mappedCategory,
+        title: title,
+        description: desc,
+        severity: 8.9,
+        impactPct: 82,
+        confidencePct: 94,
+        tab: "critical",
+        linkedNodeId: "JP-T04",
+        actions: [
+          { label: "VERIFY TELEMETRY", kind: "primary" },
+          { label: "DISPATCH FIELD CREW", kind: "secondary" },
+        ],
+        status: "open",
+        rootCause: "Citizen reported issue pending spatial verification.",
+        recommendedAction: "Deploy municipal crew for field inspection.",
+        reportCount: 1,
+        lat, lng,
+        updatedAt: Date.now()
+      };
+    }
+
+    // Insert the report itself
+    if (dbIncidentId && !dbIncidentId.startsWith('INC-')) {
+      await supabase.from('incident_reports').insert([{
+        incident_id: dbIncidentId,
+        raw_text: report.description,
+        latitude: lat,
+        longitude: lng,
+        photo_urls: report.photoUrl ? [report.photoUrl] : [],
+      }]);
+    }
+
+    // Update local Zustand state
+    set((state) => {
+      const targetNodeId = "JP-T04";
+      const updatedNodes = isMerged ? state.nodes : state.nodes.map(node =>
+        node.id === targetNodeId ? { ...node, status: "anomaly" as NodeStatus, packetLoss: 6.2 } : node
+      );
+      
+      const newIncidents = isMerged 
+        ? state.incidents.map(i => i.id === existing?.id ? resultIncident! : i)
+        : [resultIncident!, ...state.incidents];
+
+      const updatedKpis = isMerged ? state.kpis : state.kpis.map(kpi => {
+        if (kpi.id === "city-health") return { ...kpi, value: 65, deltaPct: -8.2, status: "alert" as const };
+        if (kpi.id === "mobility-flow") return { ...kpi, value: 52, deltaPct: -18.5, status: "alert" as const };
+        return kpi;
+      });
+      
+      return {
+        nodes: updatedNodes,
+        incidents: newIncidents,
+        interactionLoop: { stage: "act", relatedIncidentId: resultIncident!.id },
+        kpis: updatedKpis,
+      };
     });
 
     return { incident: resultIncident!, merged: isMerged };
   },
 
-  resolveIncident: (incidentId) => {
+  resolveIncident: async (incidentId) => {
+    // Attempt Supabase Update
+    if (incidentId && !incidentId.startsWith('INC-')) {
+      await supabase.from('incidents').update({ 
+        lifecycle_state: 'resolved',
+        resolved_at: new Date().toISOString()
+      }).eq('id', incidentId);
+    }
+
     set((state) => {
       const incident = state.incidents.find(i => i.id === incidentId);
       if (!incident) return state;
@@ -504,6 +666,26 @@ export const useStore = create<AppState>((set) => ({
       });
       return { incidents: updatedIncidents, nodes: updatedNodes, interactionLoop: updatedLoop, kpis: updatedKpis };
     });
+  },
+
+  dispatchIncident: async (incidentId) => {
+    if (incidentId && !incidentId.startsWith('INC-')) {
+      await supabase.from('incidents').update({ 
+        lifecycle_state: 'dispatched',
+        dispatched_at: new Date().toISOString()
+      }).eq('id', incidentId);
+
+      // Create a dummy dispatch record
+      const teamsRes = await supabase.from('response_teams').select('id').limit(1).single();
+      if (teamsRes.data) {
+        await supabase.from('dispatches').insert([{
+          incident_id: incidentId,
+          team_id: teamsRes.data.id,
+          status: 'dispatched',
+          eta_minutes: 15
+        }]);
+      }
+    }
   },
 
   pingNode: (nodeId) => {

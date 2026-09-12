@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import type { CityNode } from '../store';
-import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, CircleMarker, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, CircleMarker, Polygon, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { JAIPUR_CENTER, JAIPUR_ZOOM } from '../config/mapConfig';
@@ -18,6 +18,15 @@ L.Icon.Default.mergeOptions({
 // Green = normal (small 8px, static, calm baseline)
 // Orange = warning (medium 12px, static)
 // Red-Orange (#ea3b1b) = anomaly/critical (large 18px, pulsing ring animation)
+
+const JAIPUR_WARDS = [
+  { id: 'Mansarovar', coords: [[26.88, 75.76], [26.92, 75.76], [26.92, 75.80], [26.88, 75.80]] as [number, number][], risk: 72 },
+  { id: 'Civil Lines', coords: [[26.91, 75.78], [26.94, 75.78], [26.94, 75.82], [26.91, 75.82]] as [number, number][], risk: 45 },
+  { id: 'Walled City', coords: [[26.92, 75.81], [26.93, 75.81], [26.93, 75.83], [26.92, 75.83]] as [number, number][], risk: 88 },
+  { id: 'Malviya Nagar', coords: [[26.85, 75.80], [26.88, 75.80], [26.88, 75.83], [26.85, 75.83]] as [number, number][], risk: 61 },
+  { id: 'Vaishali Nagar', coords: [[26.89, 75.72], [26.92, 75.72], [26.92, 75.75], [26.89, 75.75]] as [number, number][], risk: 53 }
+];
+
 const createNodeIcon = (status: string) => {
   const isAnomaly = status === 'anomaly' || status === 'critical';
   const isWarning = status === 'warning';
@@ -245,6 +254,28 @@ export default function GridTopologyPanel() {
         >
           <TileLayer url={tileLayerUrl} />
           <MapUpdater />
+
+          {/* Ward Risk Heatmap Polygons */}
+          {mapLayer === 'vector' && JAIPUR_WARDS.map(ward => (
+            <Polygon
+              key={ward.id}
+              positions={ward.coords}
+              pathOptions={{
+                color: ward.risk > 80 ? '#ea3b1b' : ward.risk > 60 ? '#f59e0b' : '#10b981',
+                weight: 2,
+                opacity: 0.6,
+                fillColor: ward.risk > 80 ? '#ea3b1b' : ward.risk > 60 ? '#f59e0b' : '#10b981',
+                fillOpacity: 0.15
+              }}
+            >
+              <Tooltip sticky>
+                <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', textAlign: 'center' }}>
+                  <strong>{ward.id.toUpperCase()} WARD</strong><br />
+                  Aggregate Risk Score: {ward.risk}/100
+                </div>
+              </Tooltip>
+            </Polygon>
+          ))}
 
           {/* Spatial Anomaly Propagation Vector Line */}
           {hasAnomaly && (

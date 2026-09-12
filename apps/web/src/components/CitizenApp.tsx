@@ -77,8 +77,8 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
     setTimeout(() => setStepIndex(2), 1400);
     setTimeout(() => setStepIndex(3), 2100);
 
-    setTimeout(() => {
-      const { incident, merged } = addCitizenReport({
+    setTimeout(async () => {
+      const { incident, merged } = await addCitizenReport({
         category,
         description,
         location,

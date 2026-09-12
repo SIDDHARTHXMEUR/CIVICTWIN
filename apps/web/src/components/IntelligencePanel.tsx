@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
 import { PaymentGate } from './PaymentGate';
+import { PredictiveFailureReport } from './PredictiveFailureReport';
 
 export default function IntelligencePanel() {
   const incidents = useStore(state => state.incidents);
   const resolveIncident = useStore(state => state.resolveIncident);
+  const dispatchIncident = useStore(state => state.dispatchIncident);
   const loopState = useStore(state => state.interactionLoop);
   const theme = useStore(state => state.theme);
   const isDark = theme === 'dark';
@@ -148,29 +150,44 @@ export default function IntelligencePanel() {
               <div style={{ fontSize: '9px', fontWeight: 800, color: '#ea3b1b', letterSpacing: '0.08em', fontFamily: '"JetBrains Mono", monospace' }}>
                 RECOMMENDED ACTION
               </div>
-              <PaymentGate resourceId={`incident-${topAnomaly.id}`} priceAmount="100000">
-                <div style={{ fontSize: '11px', color: isDark ? '#f3f4f6' : '#0a0a0a', lineHeight: 1.4, fontWeight: 500, marginBottom: '6px' }}>
-                  {topAnomaly.recommendedAction || "Isolate affected grid node and dispatch field unit."}
+              <div style={{ fontSize: '11px', color: isDark ? '#f3f4f6' : '#0a0a0a', lineHeight: 1.4, fontWeight: 500, marginBottom: '6px' }}>
+                {topAnomaly.recommendedAction || "Isolate affected grid node and dispatch field unit."}
+              </div>
+              <button
+                onClick={() => dispatchIncident(topAnomaly.id)}
+                style={{
+                  width: '100%',
+                  padding: '7px 10px',
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  backgroundColor: '#ea3b1b',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '0px',
+                  cursor: 'pointer',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                DISPATCH RESOLUTION →
+              </button>
+              <div style={{ marginTop: '8px', borderTop: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`, paddingTop: '8px' }}>
+                <div style={{ fontSize: '9px', fontWeight: 800, color: '#3b82f6', letterSpacing: '0.08em', fontFamily: '"JetBrains Mono", monospace', marginBottom: '6px' }}>
+                  AI PREDICTIVE FAILURE REPORT
                 </div>
-                <button
-                  onClick={() => resolveIncident(topAnomaly.id)}
-                  style={{
-                    width: '100%',
-                    padding: '7px 10px',
-                    fontSize: '10px',
-                    fontWeight: 800,
-                    fontFamily: '"JetBrains Mono", monospace',
-                    backgroundColor: '#ea3b1b',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '0px',
-                    cursor: 'pointer',
-                    letterSpacing: '0.04em',
-                  }}
+                <PaymentGate
+                  resourceId={`prediction-${topAnomaly.id}`}
+                  priceUsdc={0.1}
+                  description="AI Predictive Failure Report"
+                  isDark={isDark}
                 >
-                  DISPATCH RESOLUTION →
-                </button>
-              </PaymentGate>
+                  <PredictiveFailureReport
+                    incident={topAnomaly}
+                    txHash=""
+                    isDark={isDark}
+                  />
+                </PaymentGate>
+              </div>
             </div>
           </div>
         )}

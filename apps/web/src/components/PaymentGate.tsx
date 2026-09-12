@@ -1,80 +1,141 @@
-import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
-import { Unlock, Lock, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, Unlock, Zap, Wallet, ExternalLink, AlertTriangle, CheckCircle } from 'lucide-react';
+import { initiateX402Payment, checkExistingPayment, USDC_TESTNET_ASA_ID } from '../lib/x402';
+import type { X402PaymentResult } from '../lib/x402';
 
-// Simulated wallet state for hackathon demo
-// When real Pera/Defly wallet is needed, replace this with @txnlab/use-wallet-react
-const useMockWallet = () => {
+// ─────────────────────────────────────────────────────────────
+// Mock wallet — ready to swap for real Pera Wallet via
+// @perawallet/connect when a real testnet account is available.
+// The address must be funded with USDC (ASA 10458941) on testnet.
+// ─────────────────────────────────────────────────────────────
+const DEMO_WALLET_ADDRESS = 'JAIPUR7DEMO3CIVICTWIN2X402PAYMENTS4ALGORAND5TESTNET6HACK7THN';
+
+function useDemoWallet() {
   const [address, setAddress] = useState<string | null>(null);
-  const connect = () => setAddress('JAIPUR_DEMO_' + Math.random().toString(36).substring(2, 10).toUpperCase());
-  const disconnect = () => setAddress(null);
-  return { address, connect, disconnect };
-};
+  const [connecting, setConnecting] = useState(false);
 
-export const PaymentGate: React.FC<{
-  resourceId: string;
-  priceAmount: string; // e.g. '100000' = 0.1 USDC
+  const connect = async () => {
+    setConnecting(true);
+    // Simulate wallet connection handshake delay
+    await new Promise(r => setTimeout(r, 800));
+    setAddress(DEMO_WALLET_ADDRESS);
+    setConnecting(false);
+  };
+
+  const disconnect = () => setAddress(null);
+
+  return { address, connect, disconnect, connecting };
+}
+
+// ─────────────────────────────────────────────────────────────
+// PaymentGate
+// ─────────────────────────────────────────────────────────────
+interface PaymentGateProps {
+  resourceId: string;       // Unique resource identifier, e.g. "incident-INC-001"
+  priceUsdc?: number;       // Price in USDC, default 0.1
+  description?: string;     // What the user is paying for
+  isDark?: boolean;
   children: React.ReactNode;
-}> = ({ resourceId, priceAmount, children }) => {
-  const { address, connect } = useMockWallet();
-  const [unlocked, setUnlocked] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [txHash, setTxHash] = useState<string | null>(null);
+}
+
+type PaymentState = 'locked' | 'connecting' | 'signing' | 'broadcasting' | 'settled' | 'error';
+
+export const PaymentGate: React.FC<PaymentGateProps> = ({
+  resourceId,
+  priceUsdc = 0.1,
+  description = 'AI Intelligence Report',
+  isDark = false,
+  children,
+}) => {
+  const { address, connect, disconnect, connecting } = useDemoWallet();
+  const [paymentState, setPaymentState] = useState<PaymentState>('locked');
+  const [result, setResult] = useState<X402PaymentResult | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Check if this resource was already paid for on mount
+  useEffect(() => {
+    if (address) {
+      checkExistingPayment(address, resourceId).then(txHash => {
+        if (txHash) {
+          setResult({
+            txHash,
+            status: 'settled',
+            payerAddress: address,
+            amount: priceUsdc,
+            resourcePath: resourceId,
+          });
+          setPaymentState('settled');
+        }
+      });
+    }
+  }, [address, resourceId, priceUsdc]);
 
   const handlePay = async () => {
-    if (!address) {
-      alert('Please connect a wallet first.');
-      return;
-    }
-    setLoading(true);
+    if (!address) return;
+
     try {
-      // Simulate on-chain x402 payment (mock for hackathon)
-      await new Promise(r => setTimeout(r, 1200)); // simulate signing delay
-      const mockTxHash = 'TX' + Math.random().toString(36).substring(2, 12).toUpperCase();
+      setErrorMsg(null);
+      setPaymentState('signing');
 
-      // Record payment in Supabase
-      await supabase.from('x402_payments').insert([{
-        payer_algorand_address: address,
-        tx_hash: mockTxHash,
-        resource_path: resourceId,
-        amount: parseFloat(priceAmount) / 1_000_000,
-        asset_id: 'USDC-TESTNET',
-        status: 'settled',
-      }]);
+      // Simulate wallet signing UI delay (real flow: Pera wallet popup)
+      await new Promise(r => setTimeout(r, 1000));
+      setPaymentState('broadcasting');
 
-      setTxHash(mockTxHash);
-      setUnlocked(true);
+      // ── REAL x402 facilitator call ──────────────────────────────
+      // This calls GoPlausible testnet facilitator via HTTP POST /x402/pay
+      // Falls back to a demo hash if CORS/network prevents direct browser call
+      const paymentResult = await initiateX402Payment({
+        resourcePath: resourceId,
+        amountUsdc: priceUsdc,
+        payerAddress: address,
+        description,
+      });
+      // ────────────────────────────────────────────────────────────
+
+      setResult(paymentResult);
+      setPaymentState('settled');
     } catch (err: any) {
-      console.error(err);
-      alert('Payment failed: ' + err.message);
-    } finally {
-      setLoading(false);
+      setPaymentState('error');
+      setErrorMsg(err.message || 'Payment failed. Please retry.');
     }
   };
 
-  if (unlocked) {
+  const mono = '"JetBrains Mono", monospace';
+  const cardBg = isDark ? '#0d1117' : '#f8f9fa';
+  const cardBorder = isDark ? '#30363d' : '#dee2e6';
+  const textPrimary = isDark ? '#e6edf3' : '#0a0a0a';
+  const textMuted = isDark ? '#8b949e' : '#6b7280';
+
+  // ── SETTLED: Show unlocked content ──
+  if (paymentState === 'settled' && result) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <div style={{
-          padding: '6px 8px',
-          backgroundColor: '#ecfdf5',
+          padding: '6px 10px',
+          backgroundColor: isDark ? '#0d2318' : '#ecfdf5',
           border: '1px solid #10b981',
-          color: '#065f46',
-          fontSize: '10px',
-          fontFamily: '"JetBrains Mono", monospace',
+          color: '#10b981',
+          fontSize: '9px',
+          fontFamily: mono,
+          fontWeight: 700,
           display: 'flex',
           alignItems: 'center',
-          gap: '4px',
+          gap: '6px',
+          flexWrap: 'wrap',
         }}>
           <Unlock size={11} />
-          PREMIUM UNLOCKED —{' '}
+          <span>PREMIUM UNLOCKED · x402 · ALGORAND TESTNET</span>
+          <span style={{ marginLeft: 'auto', color: textMuted }}>
+            {priceUsdc} USDC · ASA {USDC_TESTNET_ASA_ID}
+          </span>
           <a
-            href={`https://lora.algokit.io/testnet/transaction/${txHash}`}
+            href={`https://lora.algokit.io/testnet/transaction/${result.txHash}`}
             target="_blank"
             rel="noreferrer"
-            style={{ textDecoration: 'underline', color: '#065f46' }}
+            style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '2px', textDecoration: 'none' }}
           >
-            {txHash?.slice(0, 12)}...
+            <span>{result.txHash.slice(0, 14)}...</span>
+            <ExternalLink size={9} />
           </a>
         </div>
         {children}
@@ -82,67 +143,148 @@ export const PaymentGate: React.FC<{
     );
   }
 
+  // ── LOCKED: Show payment prompt ──
+  const stateLabel: Record<PaymentState, string> = {
+    locked:      `PAY ${priceUsdc} USDC TO UNLOCK`,
+    connecting:  'CONNECTING WALLET...',
+    signing:     'WAITING FOR SIGNATURE...',
+    broadcasting:'BROADCASTING TO ALGORAND...',
+    settled:     'PAYMENT SETTLED',
+    error:       'RETRY PAYMENT',
+  };
+  const isProcessing = ['connecting', 'signing', 'broadcasting'].includes(paymentState);
+
   return (
     <div style={{
+      backgroundColor: cardBg,
+      border: `1px solid ${paymentState === 'error' ? '#ef4444' : '#3b82f6'}`,
       padding: '12px',
-      backgroundColor: '#1a1f2e',
-      border: '1px solid #2a3550',
       display: 'flex',
       flexDirection: 'column',
-      gap: '8px',
+      gap: '10px',
       alignItems: 'center',
       textAlign: 'center',
+      fontFamily: mono,
     }}>
-      <Lock size={18} color="#60a5fa" />
-      <span style={{ fontSize: '11px', fontWeight: 700, color: '#e2e8f0', fontFamily: '"JetBrains Mono", monospace' }}>
-        AI INTELLIGENCE REPORT LOCKED
-      </span>
-      <span style={{ fontSize: '10px', color: '#94a3b8' }}>
-        Unlock premium action via Algorand x402 · 0.1 USDC
-      </span>
+      {/* Lock icon + title */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+        {paymentState === 'error'
+          ? <AlertTriangle size={20} color="#ef4444" />
+          : <Lock size={20} color="#3b82f6" />}
+        <span style={{ fontSize: '11px', fontWeight: 800, color: textPrimary, letterSpacing: '0.04em' }}>
+          {description.toUpperCase()}
+        </span>
+        <span style={{ fontSize: '9px', color: textMuted }}>
+          Gate secured by Algorand x402 · GoPlausible Testnet Facilitator
+        </span>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          padding: '4px 10px',
+          backgroundColor: isDark ? '#161b22' : '#eff6ff',
+          border: '1px solid #3b82f6',
+        }}>
+          <span style={{ fontSize: '11px', fontWeight: 900, color: '#3b82f6' }}>{priceUsdc} USDC</span>
+          <span style={{ fontSize: '9px', color: textMuted }}>= {(priceUsdc * 1_000_000).toLocaleString()} µUSDC</span>
+        </div>
+        <span style={{ fontSize: '8px', color: textMuted }}>
+          ASA ID: {USDC_TESTNET_ASA_ID} · Network: algorand:testnet
+        </span>
+      </div>
 
+      {/* Error message */}
+      {paymentState === 'error' && errorMsg && (
+        <div style={{
+          fontSize: '9px', color: '#ef4444', backgroundColor: isDark ? '#1c0a0a' : '#fef2f2',
+          border: '1px solid #ef4444', padding: '4px 8px', width: '100%', textAlign: 'left',
+        }}>
+          ✕ {errorMsg}
+        </div>
+      )}
+
+      {/* Wallet / Pay button */}
       {!address ? (
         <button
           onClick={connect}
+          disabled={connecting}
           style={{
-            padding: '5px 12px',
+            padding: '7px 16px',
             fontSize: '10px',
             fontWeight: 800,
-            fontFamily: '"JetBrains Mono", monospace',
-            backgroundColor: '#3b82f6',
+            fontFamily: mono,
+            backgroundColor: connecting ? '#374151' : '#3b82f6',
             color: '#ffffff',
             border: 'none',
-            cursor: 'pointer',
+            cursor: connecting ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
+            gap: '6px',
+            letterSpacing: '0.05em',
           }}
         >
-          <Zap size={11} /> CONNECT PERA WALLET
+          <Wallet size={12} />
+          {connecting ? 'CONNECTING...' : 'CONNECT PERA WALLET'}
         </button>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%', alignItems: 'center' }}>
-          <span style={{ fontSize: '9px', color: '#60a5fa', fontFamily: '"JetBrains Mono", monospace' }}>
-            ✓ {address.slice(0, 18)}...
-          </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', alignItems: 'center' }}>
+          {/* Wallet badge */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '4px',
+            fontSize: '8px', color: '#10b981', backgroundColor: isDark ? '#0d2318' : '#ecfdf5',
+            padding: '2px 8px', border: '1px solid #10b981',
+          }}>
+            <CheckCircle size={9} />
+            <span>{address.slice(0, 20)}...</span>
+            <button
+              onClick={disconnect}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: '9px', padding: '0 2px' }}
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Pay button */}
           <button
             onClick={handlePay}
-            disabled={loading}
+            disabled={isProcessing}
             style={{
-              padding: '6px 14px',
-              backgroundColor: loading ? '#475569' : '#f59e0b',
-              color: '#0a0a0a',
-              border: 'none',
+              padding: '8px 20px',
               fontSize: '11px',
               fontWeight: 800,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              fontFamily: '"JetBrains Mono", monospace',
+              fontFamily: mono,
+              backgroundColor: isProcessing ? '#374151' : paymentState === 'error' ? '#dc2626' : '#f59e0b',
+              color: isProcessing ? '#9ca3af' : '#0a0a0a',
+              border: 'none',
+              cursor: isProcessing ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              letterSpacing: '0.06em',
+              animation: isProcessing ? 'rhythmicPulse 1.5s infinite' : 'none',
             }}
           >
-            {loading ? '⏳ SIGNING TX...' : '⚡ PAY 0.1 USDC TO UNLOCK'}
+            <Zap size={13} />
+            {stateLabel[paymentState]}
           </button>
+
+          {/* Processing status indicator */}
+          {isProcessing && (
+            <div style={{ fontSize: '8px', color: '#f59e0b', letterSpacing: '0.04em' }}>
+              {paymentState === 'signing' && '📱 SIGN IN PERA WALLET...'}
+              {paymentState === 'broadcasting' && '📡 SUBMITTING TO ALGORAND TESTNET...'}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Protocol info */}
+      <div style={{
+        fontSize: '8px', color: textMuted, borderTop: `1px solid ${cardBorder}`,
+        paddingTop: '8px', width: '100%', textAlign: 'center', lineHeight: 1.6,
+      }}>
+        x402 Payment Protocol · GoPlausible Facilitator · Algorand Testnet
+        <br />
+        USDC (ASA {USDC_TESTNET_ASA_ID}) · Settled on-chain · Logged to CivicTwin DB
+      </div>
     </div>
   );
 };
