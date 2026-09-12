@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Unlock, Lock } from 'lucide-react';
-import { ALGORAND_TESTNET_CAIP2, USDC_TESTNET_ASA_ID } from '@x402-avm/avm';
-import { PeraWalletConnect } from '@perawallet/connect';
-import { DeflyWalletConnect } from '@blockshake/defly-connect';
-import LuteConnect from 'lute-connect';
+import { USDC_TESTNET_ASA_ID } from '@x402-avm/avm';
 
 // MOCK useWallet for Hackathon due to peer dependency issues
 const useWallet = () => {
@@ -36,7 +33,6 @@ export const PaymentGate: React.FC<{
 
     setLoading(true);
     try {
-      const facilitatorUrl = import.meta.env.VITE_FACILITATOR_URL || 'https://testnet.goplausible.com';
       const receiverAddr = import.meta.env.VITE_AVM_RECEIVER_ADDRESS;
       
       if (!receiverAddr) {
@@ -44,15 +40,6 @@ export const PaymentGate: React.FC<{
       }
 
       // 1. Trigger x402 payment flow using the core client
-      // Construct payment request
-      const paymentRequest = {
-        amount: priceAmount,
-        assetId: USDC_TESTNET_ASA_ID,
-        payTo: receiverAddr,
-        resource: resourceId,
-        payer: activeAccount.address,
-      };
-
       // Create transaction via provider
       // In a full implementation, we'd use the paymentClient and facilitator to get a challenge and sign it.
       // Since @x402-avm/core might require specific adapter wiring, for this hackathon we simulate the x402
