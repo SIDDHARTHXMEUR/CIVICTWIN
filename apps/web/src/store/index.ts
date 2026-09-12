@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
+import { randomJaipurCoord } from '../config/mapConfig';
 
 export type NodeStatus = "normal" | "warning" | "anomaly";
 
@@ -73,6 +74,11 @@ interface AppState {
   focusedIncidentId: string | null;
   setFocusedIncidentId: (id: string | null) => void;
   loadFromSupabase: () => Promise<void>;
+  subscribeToRealtime: () => () => void;
+  simulateAIPrediction: () => void;
+  realtimeConnected: boolean;
+  newIncidentAlert: string | null;
+  clearNewIncidentAlert: () => void;
 }
 
 const now = Date.now();
@@ -200,11 +206,106 @@ export const useStore = create<AppState>((set) => ({
   theme: "light",
   isAuthenticated: false,
   focusedIncidentId: null,
+  realtimeConnected: false,
+  newIncidentAlert: null,
 
   setActiveDomain: (domain) => set({ activeDomain: domain }),
   toggleTheme: () => set((state) => ({ theme: state.theme === "dark" ? "light" : "dark" })),
   setIsAuthenticated: (auth: boolean) => set({ isAuthenticated: auth }),
   setFocusedIncidentId: (id) => set({ focusedIncidentId: id }),
+  clearNewIncidentAlert: () => set({ newIncidentAlert: null }),
+
+  subscribeToRealtime: () => {
+    const channel = supabase
+      .channel('civic-assets-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'civic_assets' },
+        (payload) => {
+          const asset = payload.new as any;
+          const [lat, lng] = [asset.latitude ?? 26.9124, asset.longitude ?? 75.7873];
+          const newIncident: Incident = {
+            id: asset.id,
+            category: asset.domain,
+            title: asset.title,
+            description: asset.description || '',
+            severity: asset.severity === 'critical' ? 9 : asset.severity === 'high' ? 7 : 4,
+            impactPct: asset.severity === 'critical' ? 88 : 60,
+            confidencePct: 94,
+            tab: asset.severity === 'critical' ? 'critical' : 'warnings',
+            status: 'open',
+            reportCount: 1,
+            lat, lng,
+            updatedAt: Date.now(),
+            actions: [
+              { label: 'VERIFY', kind: 'primary' },
+              { label: 'DISPATCH', kind: 'secondary' },
+            ],
+          };
+          set((state) => ({
+            incidents: [newIncident, ...state.incidents],
+            newIncidentAlert: `🔴 LIVE: ${asset.title}`,
+            interactionLoop: { stage: 'act', relatedIncidentId: asset.id },
+          }));
+        }
+      )
+      .subscribe((status) => {
+        set({ realtimeConnected: status === 'SUBSCRIBED' });
+      });
+
+    return () => { supabase.removeChannel(channel); };
+  },
+
+  simulateAIPrediction: () => {
+    const domains = ['infrastructure', 'mobility', 'environment'] as const;
+    const titles = [
+      'AI Predicted: Pipeline Pressure Anomaly',
+      'AI Predicted: Traffic Surge — Festival Route',
+      'AI Predicted: AQI Deterioration Detected',
+      'AI Predicted: Water Supply Imbalance',
+      'AI Predicted: Electrical Grid Overload Risk',
+    ];
+    const actions = [
+      ['REROUTE FLOW', 'ALERT CREW'],
+      ['DEPLOY TRAFFIC', 'NOTIFY TRANSIT'],
+      ['ISSUE AQI ALERT', 'ACTIVATE SENSORS'],
+    ];
+    const domain = domains[Math.floor(Math.random() * domains.length)];
+    const title = titles[Math.floor(Math.random() * titles.length)];
+    const [lat, lng] = randomJaipurCoord();
+    const domainActions = actions[Math.floor(Math.random() * actions.length)];
+    const confidence = 75 + Math.floor(Math.random() * 20);
+    const impact = 45 + Math.floor(Math.random() * 45);
+
+    const newIncident: Incident = {
+      id: `AI-${Date.now()}`,
+      category: domain,
+      title,
+      description: `AI urban simulation engine identified a high-probability anomaly pattern in the ${domain} layer. Confidence: ${confidence}%. Immediate operator review recommended.`,
+      severity: parseFloat((6 + Math.random() * 3).toFixed(1)),
+      impactPct: impact,
+      confidencePct: confidence,
+      tab: impact > 70 ? 'critical' : 'warnings',
+      linkedNodeId: undefined,
+      actions: domainActions.map((label, i) => ({ label, kind: i === 0 ? 'primary' : 'secondary' as any })),
+      status: 'open',
+      reportCount: 1,
+      lat, lng,
+      updatedAt: Date.now(),
+      rootCause: 'Detected via ML anomaly detection on sensor telemetry stream.',
+      recommendedAction: 'Deploy field inspection unit and verify telemetry readings.',
+    };
+
+    set((state) => ({
+      incidents: [newIncident, ...state.incidents],
+      newIncidentAlert: `🤖 AI: ${title}`,
+      interactionLoop: { stage: 'predict', relatedIncidentId: newIncident.id },
+      kpis: state.kpis.map(k => {
+        if (k.id === 'city-health') return { ...k, value: Math.max(k.value - 3, 40), deltaPct: -3.0, status: 'alert' as const };
+        return k;
+      }),
+    }));
+  },
 
   loadFromSupabase: async () => {
     try {

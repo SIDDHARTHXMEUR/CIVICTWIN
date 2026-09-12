@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import type { CityNode } from '../store';
-import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, CircleMarker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { JAIPUR_CENTER, JAIPUR_ZOOM } from '../config/mapConfig';
 
 // Fix Leaflet icon path issues with Vite
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -94,7 +95,7 @@ export default function GridTopologyPanel() {
 
   const anomalies = displayedNodes.filter(n => n.status === 'anomaly');
   const hasAnomaly = anomalies.length > 0;
-  const mapCenter: [number, number] = [26.9124, 75.7873];
+  const mapCenter: [number, number] = JAIPUR_CENTER;
 
   // Dynamic Tile URL selector
   let tileLayerUrl = isDark
@@ -237,7 +238,7 @@ export default function GridTopologyPanel() {
         <MapContainer
           key={`${isDark ? 'dark' : 'light'}-${mapLayer}`}
           center={mapCenter}
-          zoom={13}
+          zoom={JAIPUR_ZOOM}
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
           attributionControl={false}
@@ -318,6 +319,22 @@ export default function GridTopologyPanel() {
               </Marker>
             );
           })}
+
+          {/* Incident Heatmap Circles */}
+          {incidents.filter(i => i.status === 'open' && i.lat && i.lng).map(inc => (
+            <CircleMarker
+              key={`heat-${inc.id}`}
+              center={[inc.lat!, inc.lng!]}
+              radius={inc.id.startsWith('AI-') ? 28 : 20}
+              pathOptions={{
+                color: inc.id.startsWith('AI-') ? '#3b82f6' : '#ef4444',
+                fillColor: inc.id.startsWith('AI-') ? '#3b82f6' : '#ef4444',
+                fillOpacity: 0.12,
+                weight: 1.5,
+                opacity: 0.5,
+              }}
+            />
+          ))}
 
           <MapFlyEffect hasAnomaly={hasAnomaly} anomalies={anomalies} defaultCenter={mapCenter} />
         </MapContainer>
