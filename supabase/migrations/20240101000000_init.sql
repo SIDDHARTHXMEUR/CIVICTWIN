@@ -61,6 +61,6 @@ CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING
 
 -- 6. Insert Mock Data for Civic Assets
 INSERT INTO public.civic_assets (id, title, domain, type, severity, latitude, longitude, description) VALUES
-('11111111-1111-1111-1111-111111111111', 'Main St Water Main Break', 'infrastructure', 'anomaly', 'critical', 40.7128, -74.0060, 'Major rupture detected via acoustic sensors.'),
-('22222222-2222-2222-2222-222222222222', 'AQI Spike - Downtown', 'environment', 'sensor', 'high', 40.7138, -74.0050, 'PM2.5 exceeded threshold.'),
-('33333333-3333-3333-3333-333333333333', 'Traffic Light Sync Failure', 'mobility', 'report', 'medium', 40.7118, -74.0070, 'Multiple citizens reporting signal stuck on red.');
+('11111111-1111-1111-1111-111111111111', 'Main St Water Main Break', 'infrastructure', 'anomaly', 'critical', 26.9124, 75.7873, 'Major rupture detected via acoustic sensors.'),
+('22222222-2222-2222-2222-222222222222', 'AQI Spike - Downtown', 'environment', 'sensor', 'high', 26.9138, 75.7863, 'PM2.5 exceeded threshold.'),
+('33333333-3333-3333-3333-333333333333', 'Traffic Light Sync Failure', 'mobility', 'report', 'medium', 26.9118, 75.7853, 'Multiple citizens reporting signal stuck on red.');
