@@ -1,24 +1,39 @@
-/**
- * x402 Payment Client for CivicTwin
- * 
- * Implements the x402 payment protocol against the GoPlausible facilitator
- * on Algorand Testnet. This module handles the full payment flow:
- * 1. Request payment challenge from facilitator
- * 2. Create unsigned ASA transfer transaction
- * 3. Submit to facilitator for co-signing and broadcast
- * 4. Return verified transaction hash
- * 
- * Reference: https://x402.org / https://goplausible.com
+﻿/**
+ * x402 Payment Client — REAL IMPLEMENTATION
+ *
+ * Uses @x402-avm/core + @x402-avm/avm to execute genuine Algorand testnet
+ * x402 payments via the GoPlausible facilitator.
+ *
+ * Signer: demo account LHEA3T2WPKAQRRFVQZ5T3QVW5HRT5YZWDWJKYDBKVB7CBCK453WT3KNVS4
+ * Fund it at: https://lora.algokit.io/testnet/fund
  */
 
 import { supabase } from './supabase';
+import { x402Client } from '@x402-avm/core/client';
+import { x402HTTPClient } from '@x402-avm/core/http';
+import { ExactAvmScheme } from '@x402-avm/avm/exact/client';
+import { toClientAvmSigner } from '@x402-avm/avm';
 
-export const FACILITATOR_URL = import.meta.env.VITE_FACILITATOR_URL || 'https://testnet.goplausible.com';
-export const RECEIVER_ADDRESS = import.meta.env.VITE_AVM_RECEIVER_ADDRESS || '';
+// --- Configuration -----------------------------------------------------------
+export const FACILITATOR_URL =
+  import.meta.env.VITE_FACILITATOR_URL ||
+  'https://x402.goplausible.xyz/facilitator';
 
-// USDC on Algorand Testnet (ASA ID 10458941)
+export const RECEIVER_ADDRESS =
+  import.meta.env.VITE_AVM_RECEIVER_ADDRESS ||
+  'LHEA3T2WPKAQRRFVQZ5T3QVW5HRT5YZWDWJKYDBKVB7CBCK453WT3KNVS4';
+
+export const DEMO_SIGNER_ADDRESS =
+  import.meta.env.VITE_DEMO_SIGNER_ADDRESS || RECEIVER_ADDRESS;
+
+// USDC on Algorand Testnet
 export const USDC_TESTNET_ASA_ID = 10458941;
 
+// Algorand Testnet CAIP-2 network id (genesis hash)
+const ALGORAND_TESTNET_NETWORK =
+  'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=';
+
+// --- Types -------------------------------------------------------------------
 export interface X402PaymentResult {
   txHash: string;
   status: 'settled' | 'failed';
@@ -28,75 +43,105 @@ export interface X402PaymentResult {
 }
 
 export interface X402PaymentConfig {
-  resourcePath: string;       // e.g. "/civictwin/prediction-report/INC-001"
-  amountUsdc: number;         // e.g. 0.1 (will be converted to 100000 microUSDC)
-  payerAddress: string;       // Algorand address of the payer
-  description: string;        // Human readable, shown in UI
+  resourcePath: string;
+  amountUsdc: number;
+  payerAddress: string;
+  description: string;
 }
 
-/**
- * Calls the GoPlausible facilitator to initiate and settle an x402 payment.
- * The facilitator handles the USDC ASA transfer on Algorand Testnet.
- * 
- * Protocol flow:
- * POST /x402/pay → facilitator builds atomic group → broadcasts → returns txHash
- */
-export async function initiateX402Payment(config: X402PaymentConfig): Promise<X402PaymentResult> {
+// --- Signer factory ----------------------------------------------------------
+function buildDemoSigner() {
+  const pkBase64 = import.meta.env.VITE_AVM_PRIVATE_KEY_BASE64;
+  if (!pkBase64) {
+    throw new Error(
+      'VITE_AVM_PRIVATE_KEY_BASE64 is not set. Add it to .env and Vercel env vars.'
+    );
+  }
+  return toClientAvmSigner(pkBase64);
+}
+
+// --- x402 HTTP client (singleton) --------------------------------------------
+let _httpClient: x402HTTPClient | null = null;
+
+function getX402HTTPClient(): x402HTTPClient {
+  if (_httpClient) return _httpClient;
+  const signer = buildDemoSigner();
+  const coreClient = new x402Client().register(
+    ALGORAND_TESTNET_NETWORK,
+    new ExactAvmScheme(signer)
+  );
+  _httpClient = new x402HTTPClient(coreClient);
+  return _httpClient;
+}
+
+// --- Main payment function ---------------------------------------------------
+export async function initiateX402Payment(
+  config: X402PaymentConfig
+): Promise<X402PaymentResult> {
   const { resourcePath, amountUsdc, payerAddress, description } = config;
   const amountMicroUsdc = Math.round(amountUsdc * 1_000_000);
 
   if (!RECEIVER_ADDRESS) {
-    throw new Error('VITE_AVM_RECEIVER_ADDRESS is not configured. Set this environment variable.');
+    throw new Error('VITE_AVM_RECEIVER_ADDRESS is not configured.');
   }
 
-  // Step 1: Call GoPlausible facilitator to initiate payment
-  const facilitorPayload = {
-    version: 2,
-    scheme: 'exact',
-    network: 'algorand:SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=', // testnet genesis hash
-    payTo: RECEIVER_ADDRESS,
-    asset: USDC_TESTNET_ASA_ID.toString(),
-    amount: amountMicroUsdc.toString(),
-    resource: resourcePath,
-    payer: payerAddress,
-    memo: `CivicTwin: ${description}`,
+  // Step 1: Construct PaymentRequired (what a 402-protected endpoint would return)
+  const paymentRequired = {
+    x402Version: 2,
+    resource: {
+      url: `https://civictwin-web-silk.vercel.app${resourcePath}`,
+      description,
+    },
+    accepts: [
+      {
+        scheme: 'exact',
+        network: ALGORAND_TESTNET_NETWORK,
+        asset: `asa:${USDC_TESTNET_ASA_ID}`,
+        amount: amountMicroUsdc.toString(),
+        payTo: RECEIVER_ADDRESS,
+        maxTimeoutSeconds: 60,
+        extra: {},
+      },
+    ],
   };
 
-  let txHash: string;
+  // Step 2: Create signed payment payload using x402 client + ExactAvmScheme
+  const httpClient = getX402HTTPClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const paymentPayload = await httpClient.createPaymentPayload(paymentRequired as any);
 
-  try {
-    const facilitatorRes = await fetch(`${FACILITATOR_URL}/x402/pay`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(facilitorPayload),
-    });
+  // Step 3: Submit to GoPlausible facilitator for settlement on Algorand testnet
+  const settleRes = await fetch(`${FACILITATOR_URL}/settle`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...httpClient.encodePaymentSignatureHeader(paymentPayload),
+    },
+    body: JSON.stringify({
+      paymentPayload,
+      paymentRequirements: paymentRequired.accepts[0],
+    }),
+  });
 
-    if (!facilitatorRes.ok) {
-      const errText = await facilitatorRes.text();
-      throw new Error(`Facilitator error ${facilitatorRes.status}: ${errText}`);
-    }
-
-    const facilitatorData = await facilitatorRes.json();
-    txHash = facilitatorData.txHash || facilitatorData.tx_id || facilitatorData.transaction_id;
-
-    if (!txHash) {
-      throw new Error('Facilitator did not return a transaction hash.');
-    }
-  } catch (networkError: any) {
-    // If facilitator is unreachable (CORS/network in hackathon context),
-    // generate a verifiable-format demo hash and flag it clearly
-    if (networkError.message.includes('Failed to fetch') || networkError.message.includes('NetworkError')) {
-      console.warn('GoPlausible facilitator unreachable — using demo mode. In production, run via backend proxy.');
-      // Generate a realistic-looking testnet tx hash for demo purposes
-      txHash = 'DEMO' + Array.from({ length: 48 }, () => 
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'[Math.floor(Math.random() * 32)]
-      ).join('');
-    } else {
-      throw networkError;
-    }
+  if (!settleRes.ok) {
+    const errText = await settleRes.text();
+    throw new Error(`GoPlausible facilitator error ${settleRes.status}: ${errText}`);
   }
 
-  // Step 2: Log settled payment to Supabase x402_payments table
+  const settleData = await settleRes.json();
+  const txHash: string =
+    settleData.transaction ||
+    settleData.txHash ||
+    settleData.tx_id ||
+    settleData.txId;
+
+  if (!txHash) {
+    throw new Error(
+      `Facilitator returned no transaction hash. Response: ${JSON.stringify(settleData)}`
+    );
+  }
+
+  // Step 4: Log settled payment to Supabase
   const { error: dbError } = await supabase.from('x402_payments').insert([{
     payer_algorand_address: payerAddress,
     tx_hash: txHash,
@@ -105,25 +150,14 @@ export async function initiateX402Payment(config: X402PaymentConfig): Promise<X4
     asset_id: `ASA:${USDC_TESTNET_ASA_ID}`,
     status: 'settled',
   }]);
-
   if (dbError) {
-    console.error('Failed to log payment to Supabase:', dbError);
-    // Non-fatal — payment may have already settled on-chain
+    console.error('Supabase payment log error (non-fatal):', dbError);
   }
 
-  return {
-    txHash,
-    status: 'settled',
-    payerAddress,
-    amount: amountUsdc,
-    resourcePath,
-  };
+  return { txHash, status: 'settled', payerAddress, amount: amountUsdc, resourcePath };
 }
 
-/**
- * Check if a resource has already been paid for by querying Supabase.
- * This allows unlocking premium content without re-paying.
- */
+// --- Check existing payment --------------------------------------------------
 export async function checkExistingPayment(
   payerAddress: string,
   resourcePath: string
@@ -138,7 +172,6 @@ export async function checkExistingPayment(
       .order('created_at', { ascending: false })
       .limit(1)
       .single();
-    
     return data?.tx_hash || null;
   } catch {
     return null;

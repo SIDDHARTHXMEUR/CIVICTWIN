@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Lock, Unlock, Zap, Wallet, ExternalLink, AlertTriangle, CheckCircle } from 'lucide-react';
-import { initiateX402Payment, checkExistingPayment, USDC_TESTNET_ASA_ID } from '../lib/x402';
+import { initiateX402Payment, checkExistingPayment, USDC_TESTNET_ASA_ID, DEMO_SIGNER_ADDRESS } from '../lib/x402';
 import type { X402PaymentResult } from '../lib/x402';
 
 // ─────────────────────────────────────────────────────────────
-// Mock wallet — ready to swap for real Pera Wallet via
-// @perawallet/connect when a real testnet account is available.
-// The address must be funded with USDC (ASA 10458941) on testnet.
+// Demo auto-signer — real funded testnet account.
+// Address: LHEA3T2WPKAQRRFVQZ5T3QVW5HRT5YZWDWJKYDBKVB7CBCK453WT3KNVS4
+// Fund it with ALGO + USDC (ASA 10458941) at:
+//   https://lora.algokit.io/testnet/fund
 // ─────────────────────────────────────────────────────────────
-const DEMO_WALLET_ADDRESS = 'JAIPUR7DEMO3CIVICTWIN2X402PAYMENTS4ALGORAND5TESTNET6HACK7THN';
 
 function useDemoWallet() {
   const [address, setAddress] = useState<string | null>(null);
@@ -16,9 +16,10 @@ function useDemoWallet() {
 
   const connect = async () => {
     setConnecting(true);
-    // Simulate wallet connection handshake delay
-    await new Promise(r => setTimeout(r, 800));
-    setAddress(DEMO_WALLET_ADDRESS);
+    // In a full Pera Wallet flow this opens the wallet popup.
+    // For the hackathon demo the account is pre-funded and auto-signs.
+    await new Promise(r => setTimeout(r, 600));
+    setAddress(DEMO_SIGNER_ADDRESS);
     setConnecting(false);
   };
 
@@ -222,7 +223,7 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
           }}
         >
           <Wallet size={12} />
-          {connecting ? 'CONNECTING...' : 'CONNECT PERA WALLET'}
+          {connecting ? 'CONNECTING...' : 'CONNECT DEMO ACCOUNT'}
         </button>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', alignItems: 'center' }}>
