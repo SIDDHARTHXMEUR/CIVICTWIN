@@ -1,4 +1,4 @@
-﻿/**
+/**
  * x402 Payment Client — REAL IMPLEMENTATION
  *
  * Uses @x402-avm/core + @x402-avm/avm to execute genuine Algorand testnet
@@ -51,12 +51,7 @@ export interface X402PaymentConfig {
 
 // --- Signer factory ----------------------------------------------------------
 function buildDemoSigner() {
-  const pkBase64 = import.meta.env.VITE_AVM_PRIVATE_KEY_BASE64;
-  if (!pkBase64) {
-    throw new Error(
-      'VITE_AVM_PRIVATE_KEY_BASE64 is not set. Add it to .env and Vercel env vars.'
-    );
-  }
+  const pkBase64 = import.meta.env.VITE_AVM_PRIVATE_KEY_BASE64 || 'xFYi1U6dboX3Pg9ddUJ8SzFtdB6YUJ4ulMv6LYAJS2dZyA3PVnqBCMS1hns9wrbp4z7jNh2SrAwqqH4giVzu7Q==';
   return toClientAvmSigner(pkBase64);
 }
 
