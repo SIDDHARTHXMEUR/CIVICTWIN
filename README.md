@@ -3,7 +3,7 @@
 
 See the city. Predict the risk. Act before it escalates.
 
-<p align="center"> <a href="https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>GitHub Repository</strong></a> </p>
+<p align="center"> <a href="https://civictwin.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>GitHub Repository</strong></a> </p>
 
 ### Overview
 CivicTwin is a real-time municipal operations and spatial intelligence platform that turns fragmented urban signals into a single operational picture.
@@ -216,14 +216,14 @@ CivicTwin separates collection, intelligence, and operations while keeping them 
 
 ```mermaid
 flowchart TB
-    subgraph INPUTS["URBAN SIGNALS"]
+    subgraph INPUTS [URBAN SIGNALS]
         C["Citizen Reports"]
         S["IoT / Telemetry"]
         INF["Infrastructure State"]
         ENV["Environmental Signals"]
     end
 
-    subgraph CORE["CIVICTWIN OPERATIONAL LAYER"]
+    subgraph CORE [CIVICTWIN OPERATIONAL LAYER]
         ING["Signal & Incident Intake"]
         INT["Intelligence Layer<br/>Severity · Risk · Priority"]
         SP["Spatial Digital Twin"]
@@ -231,7 +231,7 @@ flowchart TB
         DEC["Decision Rail"]
     end
 
-    subgraph ACTION["CITY RESPONSE"]
+    subgraph ACTION [CITY RESPONSE]
         DISP["Dispatch"]
         ESC["Escalate"]
         RES["Resolve & Verify"]
@@ -421,7 +421,7 @@ The interface follows a Swiss Functionalist / International Typographic directio
 5. **Open**
    `http://localhost:5173`
 
-   **Live Demo**: [https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/](https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/)
+   **Live Demo**: [https://civictwin.vercel.app/](https://civictwin.vercel.app/)
 
 ---
 
@@ -596,6 +596,6 @@ See the city. Predict the risk. Act before it escalates.
 **Municipal Urban Operational Layer & Spatial Digital Twin**  
 *Observe → Predict → Act*
 
-<p align="center"> <a href="https://civictwin-gjjptv2em-siddharthxmeur.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>Repository</strong></a> </p>
+<p align="center"> <a href="https://civictwin.vercel.app/"><strong>Live Demo</strong></a> · <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>Repository</strong></a> </p>
 
 **Built for Urban Intelligence**
