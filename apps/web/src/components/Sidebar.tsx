@@ -156,8 +156,12 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                           fontSize: '8.5px',
                           fontFamily: '"JetBrains Mono", monospace',
                           fontWeight: 800,
-                          backgroundColor: hasCritical ? '#ea3b1b' : (isDark ? '#2a2f3d' : '#d5d0c3'),
-                          color: hasCritical ? '#ffffff' : (isDark ? '#9ca3af' : '#374151'),
+                          backgroundColor: badgeCount === 0 
+                            ? (isDark ? '#2a2f3d' : '#d5d0c3') 
+                            : (hasCritical ? '#ea3b1b' : '#4fc9dc'),
+                          color: badgeCount === 0 
+                            ? (isDark ? '#9ca3af' : '#374151') 
+                            : (hasCritical ? '#ffffff' : '#0a0a0a'),
                           padding: '1px 4px',
                           borderRadius: '0px',
                           minWidth: '12px',
