@@ -8,6 +8,10 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE EXTENSION IF NOT EXISTS postgis; -- Enable in Dashboard: Database → Extensions → PostGIS
 
+-- Fix for Supabase lint warning: RLS Disabled in Public for spatial_ref_sys
+ALTER TABLE IF EXISTS public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "spatial_ref_sys is viewable by everyone" ON public.spatial_ref_sys FOR SELECT USING (true);
+
 -- ============================================================
 -- WARDS
 -- ============================================================

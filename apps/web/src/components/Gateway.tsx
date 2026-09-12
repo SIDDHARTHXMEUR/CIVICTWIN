@@ -131,8 +131,8 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
     : incidents;
 
   const tileLayerUrl = isDark
-    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+    ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
   const openIncidentsCount = incidents.filter(i => i.status === 'open').length;
   const healthVal = Math.round(kpis.find(k => k.id === 'city-health')?.value || 72);
@@ -199,8 +199,8 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                     height: '44px',
                     padding: '0 12px',
                     fontSize: '11px',
-                    fontWeight: isActive ? 800 : 500,
-                    color: isActive ? (isDark ? '#ffffff' : '#0a0a0a') : '#6b7280',
+                    fontWeight: isActive ? 800 : 600,
+                    color: isActive ? (isDark ? '#ffffff' : '#0a0a0a') : (isDark ? '#cbd5e1' : '#1e293b'),
                     borderBottom: isActive ? '3px solid #4fc9dc' : '3px solid transparent',
                     backgroundColor: 'transparent',
                     borderLeft: 'none',
@@ -227,14 +227,14 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
             title="Search Nodes & Incidents"
           >
-            <Search size={14} color={isDark ? '#9ca3af' : '#0a0a0a'} />
+            <Search size={14} color={isDark ? '#cbd5e1' : '#0a0a0a'} />
           </button>
           <button
             onClick={() => setShowNotifDrawer(true)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', position: 'relative' }}
             title="System Notifications"
           >
-            <Bell size={14} color={isDark ? '#9ca3af' : '#0a0a0a'} />
+            <Bell size={14} color={isDark ? '#cbd5e1' : '#0a0a0a'} />
             {openIncidentsCount > 0 && (
               <span style={{
                 position: 'absolute', top: '2px', right: '2px',
@@ -247,7 +247,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
             title="Officer Authentication"
           >
-            <User size={14} color={isDark ? '#9ca3af' : '#0a0a0a'} />
+            <User size={14} color={isDark ? '#cbd5e1' : '#0a0a0a'} />
           </button>
 
           <button
@@ -336,7 +336,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                 fontFamily: '"JetBrains Mono", monospace',
                 fontWeight: 700,
                 letterSpacing: '0.08em',
-                color: isDark ? '#9ca3af' : '#6b7280',
+                color: isDark ? '#cbd5e1' : '#1e293b',
                 marginBottom: '3px',
                 textTransform: 'uppercase',
               }}>
@@ -378,7 +378,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
               {/* Subtext */}
               <p style={{
                 fontSize: '12px',
-                color: isDark ? '#9ca3af' : '#3a3a3a',
+                color: isDark ? '#cbd5e1' : '#111827',
                 margin: 0,
                 lineHeight: 1.3,
                 fontWeight: 600,
@@ -435,6 +435,37 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
               JAIPUR SPATIAL DIGITAL TWIN // PREVIEW
             </div>
 
+            {/* Map Legend */}
+            <div style={{
+              position: 'absolute',
+              bottom: '10px',
+              right: '10px',
+              zIndex: 1000,
+              backgroundColor: isDark ? 'rgba(11, 12, 14, 0.85)' : 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(4px)',
+              padding: '6px 10px',
+              border: `1px solid ${isDark ? '#2a2f3d' : '#e5e7eb'}`,
+              display: 'flex',
+              gap: '12px',
+              fontFamily: '"JetBrains Mono", monospace',
+              fontSize: '9px',
+              fontWeight: 700,
+              color: isDark ? '#f3f4f6' : '#0a0a0a',
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '8px', height: '8px', backgroundColor: '#ea3b1b', border: '1px solid #ffffff' }}></span>
+                CRITICAL
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '8px', height: '8px', backgroundColor: '#f59e0b', border: '1px solid #ffffff' }}></span>
+                WARNING
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ width: '8px', height: '8px', backgroundColor: '#10b981', border: '1px solid #ffffff' }}></span>
+                NORMAL
+              </span>
+            </div>
+
             {/* Non-interactive Leaflet Map Preview */}
             <MapContainer
               key={isDark ? 'gateway-map-dark' : 'gateway-map-light'}
@@ -467,7 +498,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '16px',
-          alignItems: 'start',
+          alignItems: 'stretch',
           width: '100%',
         }}>
           {/* Card 1: Citizen App */}
@@ -478,7 +509,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             display: 'flex',
             flexDirection: 'column',
             boxShadow: isDark ? '3px 3px 0px #2a2f3d' : '3px 3px 0px #0a0a0a',
-            height: 'auto',
+            height: '100%',
             boxSizing: 'border-box',
           }}>
             <div style={{
@@ -501,8 +532,9 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             </h2>
             <p style={{
               fontSize: '11px',
-              color: isDark ? '#9ca3af' : '#3a3a3a',
+              color: isDark ? '#cbd5e1' : '#111827',
               lineHeight: 1.35,
+              fontWeight: 500,
               margin: '0 0 8px 0',
               overflowWrap: 'break-word',
               wordBreak: 'break-word',
@@ -542,7 +574,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                 fontSize: '8px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontWeight: 800,
-                color: isDark ? '#6b7280' : '#6b7280',
+                color: isDark ? '#cbd5e1' : '#1e293b',
                 letterSpacing: '0.06em',
                 marginBottom: '5px',
               }}>
@@ -574,7 +606,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                 cursor: 'pointer',
                 textAlign: 'center',
                 boxShadow: isDark ? '2px 2px 0px #3a3d45' : '2px 2px 0px #0a0a0a',
-                marginTop: '14px',
+                marginTop: 'auto',
                 width: '100%',
                 boxSizing: 'border-box',
               }}
@@ -591,7 +623,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             display: 'flex',
             flexDirection: 'column',
             boxShadow: isDark ? '3px 3px 0px #2a2f3d' : '3px 3px 0px #0a0a0a',
-            height: 'auto',
+            height: '100%',
             boxSizing: 'border-box',
           }}>
             <div style={{
@@ -614,8 +646,9 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             </h2>
             <p style={{
               fontSize: '11px',
-              color: isDark ? '#9ca3af' : '#3a3a3a',
+              color: isDark ? '#cbd5e1' : '#111827',
               lineHeight: 1.35,
+              fontWeight: 500,
               margin: '0 0 8px 0',
               overflowWrap: 'break-word',
               wordBreak: 'break-word',
@@ -643,6 +676,9 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
               <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span style={{ color: '#ea3b1b', fontWeight: 800 }}>✓</span> Live Anomaly Simulation & Resolution Loop
               </li>
+              <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ color: '#ea3b1b', fontWeight: 800 }}>✓</span> x402 Payment-Gated AI Reports via Algorand Testnet
+              </li>
             </ul>
 
             {/* Municipal Card Gap Filler: LIVE SYSTEM METRICS Row */}
@@ -655,7 +691,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                 fontSize: '8px',
                 fontFamily: '"JetBrains Mono", monospace',
                 fontWeight: 800,
-                color: isDark ? '#6b7280' : '#6b7280',
+                color: isDark ? '#cbd5e1' : '#1e293b',
                 letterSpacing: '0.06em',
                 marginBottom: '5px',
               }}>
@@ -671,21 +707,21 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
               }}>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '11px', fontWeight: 800, fontFamily: '"JetBrains Mono", monospace', color: isDark ? '#ffffff' : '#0a0a0a' }}>{nodes.length}</div>
-                  <div style={{ fontSize: '7.5px', color: '#6b7280', fontFamily: '"JetBrains Mono", monospace' }}>NODES</div>
+                  <div style={{ fontSize: '7.5px', color: isDark ? '#cbd5e1' : '#1e293b', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace' }}>NODES</div>
                 </div>
                 <div style={{ width: '1px', backgroundColor: isDark ? '#2a2f3d' : '#0a0a0a' }}></div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: '11px', fontWeight: 800, fontFamily: '"JetBrains Mono", monospace', color: '#ea3b1b' }}>
                     {openIncidentsCount}
                   </div>
-                  <div style={{ fontSize: '7.5px', color: '#6b7280', fontFamily: '"JetBrains Mono", monospace' }}>ANOMALIES</div>
+                  <div style={{ fontSize: '7.5px', color: isDark ? '#cbd5e1' : '#1e293b', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace' }}>ANOMALIES</div>
                 </div>
                 <div style={{ width: '1px', backgroundColor: isDark ? '#2a2f3d' : '#0a0a0a' }}></div>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 800, fontFamily: '"JetBrains Mono", monospace', color: '#00a5e3' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 800, fontFamily: '"JetBrains Mono", monospace', color: isDark ? '#4fc9dc' : '#005073' }}>
                     {healthVal}%
                   </div>
-                  <div style={{ fontSize: '7.5px', color: '#6b7280', fontFamily: '"JetBrains Mono", monospace' }}>HEALTH INDEX</div>
+                  <div style={{ fontSize: '7.5px', color: isDark ? '#cbd5e1' : '#1e293b', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace' }}>HEALTH INDEX</div>
                 </div>
               </div>
             </div>
@@ -704,7 +740,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                 cursor: 'pointer',
                 textAlign: 'center',
                 boxShadow: isDark ? '2px 2px 0px #7f1d1d' : '2px 2px 0px #0a0a0a',
-                marginTop: '14px',
+                marginTop: 'auto',
                 width: '100%',
                 boxSizing: 'border-box',
               }}
@@ -726,7 +762,8 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
         padding: '0 clamp(24px, 5vw, 64px)',
         fontFamily: '"JetBrains Mono", monospace',
         fontSize: '10px',
-        color: isDark ? '#6b7280' : '#6b7280',
+        color: isDark ? '#cbd5e1' : '#1e293b',
+        fontWeight: 600,
         letterSpacing: '0.05em',
         flexShrink: 0,
         width: '100%',
@@ -734,11 +771,11 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
       }}>
         <div>SYSTEM STATUS: OPERATIONAL // 26.9124° N, 75.7873° E // v2.4</div>
         <div style={{ display: 'flex', gap: '16px' }}>
-          <a href="#" style={{ color: isDark ? '#6b7280' : '#6b7280', textDecoration: 'none' }}>PRIVACY</a>
+          <a href="#" style={{ color: isDark ? '#cbd5e1' : '#1e293b', textDecoration: 'none' }}>PRIVACY</a>
           <span>//</span>
-          <a href="#" style={{ color: isDark ? '#6b7280' : '#6b7280', textDecoration: 'none' }}>TERMS</a>
+          <a href="#" style={{ color: isDark ? '#cbd5e1' : '#1e293b', textDecoration: 'none' }}>TERMS</a>
           <span>//</span>
-          <a href="#" style={{ color: isDark ? '#6b7280' : '#6b7280', textDecoration: 'none' }}>STATUS</a>
+          <a href="#" style={{ color: isDark ? '#cbd5e1' : '#1e293b', textDecoration: 'none' }}>STATUS</a>
         </div>
       </footer>
 
@@ -781,7 +818,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             </div>
 
             <p style={{ fontSize: '11px', color: isDark ? '#9ca3af' : '#3a3a3a', fontFamily: '"JetBrains Mono", monospace', marginBottom: '16px', lineHeight: 1.4 }}>
-              Demo Environment — use the pre-filled credentials to continue.
+              Demo Environment — use the pre-filled credentials or enter any 4 digits to continue.
             </p>
 
             <form onSubmit={handleStaffLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import type { CityNode } from '../store';
-import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, CircleMarker, Polygon, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { JAIPUR_CENTER, JAIPUR_ZOOM } from '../config/mapConfig';
@@ -19,25 +19,13 @@ L.Icon.Default.mergeOptions({
 // Orange = warning (medium 12px, static)
 // Red-Orange (#ea3b1b) = anomaly/critical (large 18px, pulsing ring animation)
 
-const JAIPUR_WARDS = [
-  { id: 'Mansarovar', coords: [[26.85, 75.76], [26.88, 75.76], [26.88, 75.80], [26.85, 75.80]] as [number, number][], risk: 72 },
-  { id: 'Civil Lines', coords: [[26.91, 75.78], [26.94, 75.78], [26.94, 75.82], [26.91, 75.82]] as [number, number][], risk: 45 },
-  { id: 'Walled City', coords: [[26.92, 75.81], [26.93, 75.81], [26.93, 75.83], [26.92, 75.83]] as [number, number][], risk: 92 },
-  { id: 'Malviya Nagar', coords: [[26.85, 75.80], [26.88, 75.80], [26.88, 75.83], [26.85, 75.83]] as [number, number][], risk: 61 },
-  { id: 'Vaishali Nagar', coords: [[26.89, 75.72], [26.92, 75.72], [26.92, 75.76], [26.89, 75.76]] as [number, number][], risk: 53 },
-  { id: 'C-Scheme', coords: [[26.89, 75.78], [26.91, 75.78], [26.91, 75.81], [26.89, 75.81]] as [number, number][], risk: 38 },
-  { id: 'Tonk Road', coords: [[26.85, 75.78], [26.88, 75.78], [26.88, 75.82], [26.85, 75.82]] as [number, number][], risk: 68 },
-  { id: 'Amber-Jaigarh', coords: [[26.96, 75.83], [26.99, 75.83], [26.99, 75.87], [26.96, 75.87]] as [number, number][], risk: 75 },
-  { id: 'Jhotwara', coords: [[26.93, 75.73], [26.96, 75.73], [26.96, 75.77], [26.93, 75.77]] as [number, number][], risk: 42 },
-  { id: 'Sitapura', coords: [[26.81, 75.82], [26.84, 75.82], [26.84, 75.86], [26.81, 75.86]] as [number, number][], risk: 70 },
-  { id: 'Durgapura', coords: [[26.85, 75.76], [26.88, 75.76], [26.88, 75.80], [26.85, 75.80]] as [number, number][], risk: 35 },
-];
+// Wards removed in favor of precise radius mapping
 
-const createNodeIcon = (status: string) => {
-  const isAnomaly = status === 'anomaly' || status === 'critical';
-  const isWarning = status === 'warning';
+const createNodeIcon = (status: string, hasCriticalIncident: boolean, hasWarningIncident: boolean) => {
+  const isAnomaly = hasCriticalIncident;
+  const isWarning = hasWarningIncident || status === 'warning';
 
-  const dotColor = isAnomaly ? '#ea3b1b' : isWarning ? '#f59e0b' : '#10b981';
+  const dotColor = isAnomaly ? '#ea3b1b' : isWarning ? '#b45309' : '#64748b';
   const dotSize = isAnomaly ? 18 : isWarning ? 12 : 8;
   const containerSize = isAnomaly ? 32 : isWarning ? 20 : 14;
 
@@ -72,20 +60,47 @@ const createNodeIcon = (status: string) => {
   });
 };
 
-function MapUpdater() {
+function MapUpdater({ targetCoords }: { targetCoords: [number, number] | null }) {
   const map = useMap();
   const focusedIncidentId = useStore(state => state.focusedIncidentId);
   const incidents = useStore(state => state.incidents);
   
   useEffect(() => {
-    if (focusedIncidentId) {
+    if (targetCoords) {
+      map.flyTo(targetCoords, 16, { duration: 1.2 });
+    } else if (focusedIncidentId) {
       const incident = incidents.find(i => i.id === focusedIncidentId);
       if (incident && incident.lat && incident.lng) {
         map.flyTo([incident.lat, incident.lng], 15, { duration: 1.5 });
       }
     }
-  }, [focusedIncidentId, incidents, map]);
+  }, [focusedIncidentId, incidents, targetCoords, map]);
   
+  return null;
+}
+
+function MapResizeWatcher({ isFullscreen }: { isFullscreen: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 50);
+    const t2 = setTimeout(() => map.invalidateSize(), 150);
+    const t3 = setTimeout(() => map.invalidateSize(), 350);
+    const t4 = setTimeout(() => map.invalidateSize(), 600);
+
+    const handleResize = () => {
+      map.invalidateSize();
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      clearTimeout(t4);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [isFullscreen, map]);
+
   return null;
 }
 
@@ -95,27 +110,35 @@ export default function GridTopologyPanel() {
   const triggerAnomaly = useStore(state => state.triggerAnomaly);
   const pingNode = useStore(state => state.pingNode);
   const recalibrateNode = useStore(state => state.recalibrateNode);
+  const pingingNodes = useStore(state => state.pingingNodes);
+  const calibratingNodes = useStore(state => state.calibratingNodes);
   const activeDomain = useStore(state => state.activeDomain);
+  const optimalRoute = useStore(state => state.optimalRoute);
   const theme = useStore(state => state.theme);
   const isDark = theme === 'dark';
 
   // Interactive Map Layer State: 'vector' | 'satellite' | 'topo'
-  const [mapLayer, setMapLayer] = useState<'vector' | 'satellite' | 'topo'>('satellite');
+  const [mapLayer, setMapLayer] = useState<'vector' | 'satellite' | 'topo'>('vector');
   const [showAssetDirectory, setShowAssetDirectory] = useState(false);
   const [directoryDomainFilter, setDirectoryDomainFilter] = useState('all');
+  const [legendOpen, setLegendOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [targetSensorCoords, setTargetSensorCoords] = useState<[number, number] | null>(null);
 
   const displayedNodes = activeDomain === 'all' || activeDomain === 'intelligence'
     ? nodes
     : nodes.filter(n => n.domain === activeDomain);
 
   const anomalies = displayedNodes.filter(n => n.status === 'anomaly');
+  const warnings = displayedNodes.filter(n => n.status === 'warning');
+  const normalNodes = displayedNodes.filter(n => n.status === 'normal' || n.status === 'online' || !n.status);
   const hasAnomaly = anomalies.length > 0;
   const mapCenter: [number, number] = JAIPUR_CENTER;
 
   // Dynamic Tile URL selector
   let tileLayerUrl = isDark
-    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-    : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+    ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+    : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
   if (mapLayer === 'satellite') {
     tileLayerUrl = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
@@ -124,7 +147,17 @@ export default function GridTopologyPanel() {
   }
 
   return (
-    <div className="beveled-3d-frame" style={{
+    <div className="beveled-3d-frame" style={isFullscreen ? {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      zIndex: 999999,
+      backgroundColor: isDark ? '#161922' : '#f5f2e8',
+      display: 'flex',
+      flexDirection: 'column',
+    } : {
       flex: '1 1 0',
       backgroundColor: isDark ? '#161922' : '#f5f2e8',
       display: 'flex',
@@ -162,55 +195,41 @@ export default function GridTopologyPanel() {
           }}>
             JAIPUR GRID TOPOLOGY
           </span>
+
           {activeDomain !== 'all' && activeDomain !== 'intelligence' && (
             <button
               onClick={() => useStore.getState().setActiveDomain('all')}
-              title="Clear Filter"
+              title="Click to reset domain filter"
               style={{
                 fontSize: '9px',
                 fontFamily: '"JetBrains Mono", monospace',
-                color: '#0a0a0a',
-                backgroundColor: '#4fc9dc',
-                padding: '2px 6px',
-                border: `1px solid ${isDark ? '#4fc9dc' : '#0a0a0a'}`,
+                color: isDark ? '#4fc9dc' : '#0a0a0a',
+                backgroundColor: isDark ? 'rgba(79, 201, 220, 0.15)' : '#e0dbcb',
+                padding: '2px 8px',
+                border: `1px solid ${isDark ? '#4fc9dc' : '#c4beaf'}`,
                 borderRadius: '0px',
                 textTransform: 'uppercase',
-                marginLeft: '4px',
-                fontWeight: 800,
+                marginLeft: '6px',
+                fontWeight: 700,
                 cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
               }}
             >
-              FILTERED: {activeDomain} — SHOW ALL
+              <span>{activeDomain}</span>
+              <span style={{ opacity: 0.6 }}>✕</span>
             </button>
           )}
         </div>
 
-        {/* Map Layer Switcher & Live Badge & Telemetry Directory Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Telemetry Asset Directory Toggle */}
-          <button
-            onClick={() => setShowAssetDirectory(true)}
-            style={{
-              fontSize: '9px',
-              fontFamily: '"JetBrains Mono", monospace',
-              fontWeight: 800,
-              padding: '3px 8px',
-              backgroundColor: isDark ? '#1c202c' : '#4fc9dc',
-              color: isDark ? '#4fc9dc' : '#0a0a0a',
-              border: `1px solid ${isDark ? '#4fc9dc' : '#0a0a0a'}`,
-              borderRadius: '0px',
-              cursor: 'pointer',
-              letterSpacing: '0.04em',
-            }}
-          >
-            📡 TELEMETRY DIRECTORY ({nodes.length})
-          </button>
-
+        {/* Map Layer Switcher & Fullscreen & Live Indicator */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Layer Selector Buttons */}
           <div style={{ display: 'flex', border: `1px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`, borderRadius: '0px' }}>
             {[
-              { id: 'satellite', label: 'SATELLITE' },
               { id: 'vector', label: 'VECTOR' },
+              { id: 'satellite', label: 'SATELLITE' },
               { id: 'topo', label: 'TOPO' },
             ].map(layer => (
               <button
@@ -220,7 +239,7 @@ export default function GridTopologyPanel() {
                   fontSize: '8px',
                   fontFamily: '"JetBrains Mono", monospace',
                   fontWeight: 800,
-                  padding: '2px 6px',
+                  padding: '3px 7px',
                   border: 'none',
                   borderRadius: '0px',
                   backgroundColor: mapLayer === layer.id
@@ -236,6 +255,26 @@ export default function GridTopologyPanel() {
             ))}
           </div>
 
+          {/* Fullscreen Map Toggle */}
+          <button
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            title="Toggle Fullscreen GIS Map"
+            style={{
+              fontSize: '9px',
+              fontFamily: '"JetBrains Mono", monospace',
+              fontWeight: 800,
+              padding: '3px 8px',
+              backgroundColor: isFullscreen ? '#4fc9dc' : (isDark ? '#1c202c' : '#ffffff'),
+              color: isFullscreen ? '#0a0a0a' : (isDark ? '#f3f4f6' : '#1a1c17'),
+              border: `1px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
+              borderRadius: '0px',
+              cursor: 'pointer',
+              letterSpacing: '0.04em',
+            }}
+          >
+            {isFullscreen ? '⤢ EXIT' : '⤢ FULLSCREEN'}
+          </button>
+
           <span style={{
             fontSize: '9px', fontWeight: 800, color: '#fff',
             backgroundColor: hasAnomaly ? '#ea3b1b' : isDark ? '#2a2f3d' : '#0a0a0a',
@@ -249,9 +288,9 @@ export default function GridTopologyPanel() {
       </div>
 
       {/* Map */}
-      <div style={{ flex: 1, position: 'relative', minHeight: 0 }}>
+      <div style={{ flex: 1, position: 'relative', minHeight: 0, width: '100%', height: '100%' }}>
         <MapContainer
-          key={`${isDark ? 'dark' : 'light'}-${mapLayer}`}
+          key={`${isDark ? 'dark' : 'light'}-${mapLayer}-${isFullscreen ? 'fullscreen' : 'inline'}`}
           center={mapCenter}
           zoom={JAIPUR_ZOOM}
           style={{ height: '100%', width: '100%' }}
@@ -259,29 +298,23 @@ export default function GridTopologyPanel() {
           attributionControl={false}
         >
           <TileLayer url={tileLayerUrl} />
-          <MapUpdater />
+          <MapUpdater targetCoords={targetSensorCoords} />
+          <MapResizeWatcher isFullscreen={isFullscreen} />
 
-          {/* Ward Risk Heatmap Polygons */}
-          {mapLayer === 'vector' && JAIPUR_WARDS.map(ward => (
-            <Polygon
-              key={ward.id}
-              positions={ward.coords}
+          {/* Ward Risk Heatmap Polygons Removed */}
+
+          {/* AI Optimal Dispatch VRPTW Crew Route Polyline */}
+          {optimalRoute && optimalRoute.optimal_route_waypoints && (
+            <Polyline
+              positions={optimalRoute.optimal_route_waypoints.map((wp: any) => [wp.lat, wp.lng])}
               pathOptions={{
-                color: ward.risk > 80 ? '#ea3b1b' : ward.risk > 60 ? '#f59e0b' : '#10b981',
-                weight: 2,
-                opacity: 0.6,
-                fillColor: ward.risk > 80 ? '#ea3b1b' : ward.risk > 60 ? '#f59e0b' : '#10b981',
-                fillOpacity: 0.15
+                color: '#10b981',
+                weight: 4,
+                opacity: 0.9,
+                dashArray: '6, 6',
               }}
-            >
-              <Tooltip sticky>
-                <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '10px', textAlign: 'center' }}>
-                  <strong>{ward.id.toUpperCase()} WARD</strong><br />
-                  Aggregate Risk Score: {ward.risk}/100
-                </div>
-              </Tooltip>
-            </Polygon>
-          ))}
+            />
+          )}
 
           {/* Spatial Anomaly Propagation Vector Lines */}
           {hasAnomaly && (
@@ -310,16 +343,20 @@ export default function GridTopologyPanel() {
           )}
 
           {displayedNodes.map(node => {
-            const isAnomalyNode = node.status === 'anomaly';
+            const activeIncidents = incidents.filter(i => i.linkedNodeId === node.id && ['reported', 'classified', 'in_progress', 'open'].includes(i.status));
+            const hasCriticalIncident = activeIncidents.some(i => i.tab === 'critical');
+            const hasWarningIncident = activeIncidents.some(i => i.tab === 'warnings');
+            const isAnomalyNode = hasCriticalIncident || node.status === 'anomaly';
+            
             // Sync callout title to exact incident title from store
-            const linkedIncident = incidents.find(i => i.linkedNodeId === node.id && i.status === 'open') || incidents.find(i => i.status === 'open');
+            const linkedIncident = activeIncidents[0];
             const calloutTitle = linkedIncident ? linkedIncident.title : `${node.name} Anomaly`;
 
             return (
               <Marker
                 key={node.id}
                 position={[node.lat, node.lng]}
-                icon={createNodeIcon(node.status)}
+                icon={createNodeIcon(node.status, hasCriticalIncident, hasWarningIncident)}
                 eventHandlers={{
                   click: () => {
                     if (node.status !== 'anomaly') {
@@ -335,7 +372,7 @@ export default function GridTopologyPanel() {
                   }
                 }}
               >
-                {isAnomalyNode && (
+                {(isAnomalyNode && linkedIncident) && (
                   <Tooltip
                     permanent
                     direction="top"
@@ -372,22 +409,95 @@ export default function GridTopologyPanel() {
 
           {/* Incident Heatmap Circles */}
           {incidents.filter(i => i.status === 'open' && i.lat && i.lng).map(inc => (
-            <CircleMarker
+            <Circle
               key={`heat-${inc.id}`}
               center={[inc.lat!, inc.lng!]}
-              radius={inc.id.startsWith('AI-') ? 28 : 20}
+              radius={inc.id.startsWith('AI-') ? 1200 : 800} // Radius in meters
               pathOptions={{
                 color: inc.id.startsWith('AI-') ? '#3b82f6' : '#ef4444',
                 fillColor: inc.id.startsWith('AI-') ? '#3b82f6' : '#ef4444',
-                fillOpacity: 0.12,
+                fillOpacity: 0.15,
                 weight: 1.5,
-                opacity: 0.5,
+                opacity: 0.6,
               }}
             />
           ))}
 
           <MapFlyEffect hasAnomaly={hasAnomaly} anomalies={anomalies} defaultCenter={mapCenter} />
         </MapContainer>
+        
+        {/* Collapsible Map Legend Toggle */}
+        <div style={{
+          position: 'absolute',
+          bottom: '80px',
+          right: '10px',
+          zIndex: 800,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: '6px',
+        }}>
+          {/* Expanded Legend Panel */}
+          <div style={{
+            backgroundColor: isDark ? 'rgba(22,25,34,0.93)' : 'rgba(255,255,255,0.93)',
+            border: `1px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
+            padding: '10px 12px',
+            boxShadow: '2px 2px 0px rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(4px)',
+            minWidth: '160px',
+            transformOrigin: 'bottom right',
+            transform: legendOpen ? 'scaleY(1)' : 'scaleY(0)',
+            opacity: legendOpen ? 1 : 0,
+            maxHeight: legendOpen ? '200px' : '0px',
+            overflow: 'hidden',
+            transition: 'transform 0.2s ease, opacity 0.2s ease, max-height 0.2s ease',
+          }}>
+            <div style={{ fontSize: '8px', fontWeight: 800, fontFamily: '"JetBrains Mono", monospace', marginBottom: '7px', color: isDark ? '#9ca3af' : '#6b7280', letterSpacing: '0.06em' }}>
+              MAP LEGEND
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '10px', fontFamily: '"JetBrains Mono", monospace', color: isDark ? '#f3f4f6' : '#0a0a0a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <div style={{ width: '10px', height: '10px', backgroundColor: '#ea3b1b', border: '1px solid #ffffff', flexShrink: 0 }}></div>
+                <span>Critical Anomaly</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <div style={{ width: '10px', height: '10px', backgroundColor: '#f59e0b', border: '1px solid #ffffff', flexShrink: 0 }}></div>
+                <span>Warning</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <div style={{ width: '10px', height: '10px', backgroundColor: '#10b981', border: '1px solid #ffffff', flexShrink: 0 }}></div>
+                <span>Normal Node</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'rgba(239,68,68,0.3)', border: '1px solid #ef4444', flexShrink: 0 }}></div>
+                <span>Impact Radius</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Toggle Button */}
+          <button
+            onClick={() => setLegendOpen(o => !o)}
+            title="Toggle Map Legend"
+            style={{
+              width: '28px', height: '28px',
+              borderRadius: '0px',
+              backgroundColor: legendOpen ? '#4fc9dc' : isDark ? 'rgba(22,25,34,0.9)' : 'rgba(255,255,255,0.9)',
+              border: `1px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
+              color: legendOpen ? '#0a0a0a' : isDark ? '#9ca3af' : '#3a3a3a',
+              fontSize: '13px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 700,
+              boxShadow: '2px 2px 0px rgba(0,0,0,0.3)',
+              transition: 'background-color 0.15s ease',
+            }}
+          >
+            ⓘ
+          </button>
+        </div>
       </div>
 
       {/* Telemetry Asset Directory & Sensor Inspector Modal */}
@@ -473,24 +583,50 @@ export default function GridTopologyPanel() {
 
                     <div style={{ display: 'flex', gap: '6px', marginTop: '2px' }}>
                       <button
-                        onClick={() => pingNode(node.id)}
+                        onClick={() => {
+                          setTargetSensorCoords([node.lat, node.lng]);
+                          setShowAssetDirectory(false);
+                        }}
                         style={{
                           flex: 1, padding: '4px 8px', fontSize: '9px', fontWeight: 800,
-                          fontFamily: '"JetBrains Mono", monospace', backgroundColor: isDark ? '#2a2f3d' : '#e8e4d8',
-                          color: isDark ? '#ffffff' : '#0a0a0a', border: `1px solid ${isDark ? '#3a3d45' : '#0a0a0a'}`, cursor: 'pointer',
+                          fontFamily: '"JetBrains Mono", monospace',
+                          backgroundColor: isDark ? '#1c202c' : '#ffffff',
+                          color: '#4fc9dc',
+                          border: `1px solid ${isDark ? '#4fc9dc' : '#005073'}`, cursor: 'pointer',
+                          transition: 'all 0.15s',
                         }}
                       >
-                        ⚡ PING SENSOR
+                        📍 LOCATE
+                      </button>
+                      <button
+                        onClick={() => pingNode(node.id)}
+                        disabled={pingingNodes.has(node.id)}
+                        style={{
+                          flex: 1, padding: '4px 8px', fontSize: '9px', fontWeight: 800,
+                          fontFamily: '"JetBrains Mono", monospace',
+                          backgroundColor: pingingNodes.has(node.id) ? '#4fc9dc' : isDark ? '#2a2f3d' : '#e8e4d8',
+                          color: pingingNodes.has(node.id) ? '#0a0a0a' : isDark ? '#ffffff' : '#0a0a0a',
+                          border: `1px solid ${isDark ? '#3a3d45' : '#0a0a0a'}`, cursor: pingingNodes.has(node.id) ? 'wait' : 'pointer',
+                          opacity: pingingNodes.has(node.id) ? 0.85 : 1,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        {pingingNodes.has(node.id) ? '⟳ PINGING...' : '⚡ PING'}
                       </button>
                       <button
                         onClick={() => recalibrateNode(node.id)}
+                        disabled={calibratingNodes.has(node.id)}
                         style={{
                           flex: 1, padding: '4px 8px', fontSize: '9px', fontWeight: 800,
-                          fontFamily: '"JetBrains Mono", monospace', backgroundColor: isDark ? '#2a2f3d' : '#e8e4d8',
-                          color: isDark ? '#ffffff' : '#0a0a0a', border: `1px solid ${isDark ? '#3a3d45' : '#0a0a0a'}`, cursor: 'pointer',
+                          fontFamily: '"JetBrains Mono", monospace',
+                          backgroundColor: calibratingNodes.has(node.id) ? '#f59e0b' : isDark ? '#2a2f3d' : '#e8e4d8',
+                          color: calibratingNodes.has(node.id) ? '#0a0a0a' : isDark ? '#ffffff' : '#0a0a0a',
+                          border: `1px solid ${isDark ? '#3a3d45' : '#0a0a0a'}`, cursor: calibratingNodes.has(node.id) ? 'wait' : 'pointer',
+                          opacity: calibratingNodes.has(node.id) ? 0.85 : 1,
+                          transition: 'all 0.15s',
                         }}
                       >
-                        🛠 RECALIBRATE
+                        {calibratingNodes.has(node.id) ? '⟳ CALIBRATING...' : '🛠 CALIBRATE'}
                       </button>
                     </div>
                   </div>

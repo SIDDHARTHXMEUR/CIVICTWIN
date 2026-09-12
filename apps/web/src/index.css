@@ -38,10 +38,10 @@
   --color-on-background: #0a0a0a;
   --color-surface-variant: #e8e4d8;
 
-  /* Fonts */
-  --font-family-sans: "Space Grotesk", "Hanken Grotesk", sans-serif;
-  --font-family-display: "Space Grotesk", sans-serif;
-  --font-family-mono: "JetBrains Mono", monospace;
+  /* Mission Control Typography Suite */
+  --font-family-sans: "Plus Jakarta Sans", "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-family-display: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
+  --font-family-mono: "JetBrains Mono", "SF Mono", monospace;
 
   /* Border Radius - sharp everywhere */
   --radius: 0px;
@@ -94,13 +94,33 @@
 
 /* Reusable 3D Beveled Frame utility - refined bevel & highlights */
 .beveled-3d-frame {
-  border: 2px solid #111318 !important;
+  border: 1px solid #2a2f3d !important;
   border-radius: 0px !important;
   box-shadow: 
-    inset 1px 1px 0 rgba(255, 255, 255, 0.18),
-    inset -1px -1px 0 rgba(0, 0, 0, 0.5),
-    0 3px 10px rgba(0, 0, 0, 0.18) !important;
+    inset 1px 1px 0 rgba(255, 255, 255, 0.08),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.15) !important;
   position: relative;
+}
+
+/* Tabular Figures for All Monospace and Live Telemetry Numbers */
+code, kbd, samp, pre,
+[style*="JetBrains Mono"],
+.font-mono {
+  font-feature-settings: "tnum" 1, "zero" 1;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: 0.02em;
+}
+
+@keyframes markerPulse {
+  0% { transform: scale(0.85); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 0.2; }
+  100% { transform: scale(0.85); opacity: 0.8; }
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 body {
@@ -109,4 +129,5 @@ body {
   font-family: var(--font-family-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }

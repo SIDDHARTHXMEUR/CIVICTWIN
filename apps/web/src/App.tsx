@@ -7,25 +7,43 @@ import TopBar from './components/TopBar';
 import KpiStrip from './components/KpiStrip';
 import GridTopologyPanel from './components/GridTopologyPanel';
 import IntelligencePanel from './components/IntelligencePanel';
+import PaymentsPanel from './components/PaymentsPanel';
 import DecisionRail from './components/DecisionRail';
+
+import CommandPalette from './components/CommandPalette';
 
 export type AppView = 'gateway' | 'dashboard' | 'citizen';
 
 function App() {
   const [currentView, setCurrentView] = useState<AppView>('gateway');
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const theme = useStore(state => state.theme);
   const isAuthenticated = useStore(state => state.isAuthenticated);
   const newIncidentAlert = useStore(state => state.newIncidentAlert);
   const clearNewIncidentAlert = useStore(state => state.clearNewIncidentAlert);
   const realtimeConnected = useStore(state => state.realtimeConnected);
-  const simulateAIPrediction = useStore(state => state.simulateAIPrediction);
+  const activeDomain = useStore(state => state.activeDomain);
+  const simLatency = useStore(state => state.simLatency);
   const isDark = theme === 'dark';
+
+  // Listen for Ctrl+K globally to open palette
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Load data + subscribe to realtime on mount
   useEffect(() => {
     useStore.getState().loadFromSupabase();
     const unsubscribe = useStore.getState().subscribeToRealtime();
-    return () => { unsubscribe(); };
+    const stopTelemetry = useStore.getState().startTelemetrySimulation();
+    return () => { unsubscribe(); stopTelemetry(); };
   }, []);
 
   // Auto-dismiss alert after 6s
@@ -124,47 +142,50 @@ function App() {
         <TopBar onNavigate={(view) => setCurrentView(view)} />
         <KpiStrip />
         <div style={{ flex: 1, display: 'flex', gap: '6px', minHeight: 0, overflow: 'hidden' }}>
-          <GridTopologyPanel />
-          <IntelligencePanel />
+          {activeDomain === 'payments' ? (
+            <PaymentsPanel />
+          ) : (
+            <>
+              <GridTopologyPanel />
+              <IntelligencePanel />
+            </>
+          )}
         </div>
 
-        {/* Footer with Realtime Status + AI Predict Button */}
+        {/* Footer with Realtime Status & Live Command Activity Ticker */}
         <footer style={{
           height: '28px',
           backgroundColor: isDark ? '#12141a' : '#ffffff',
-          border: `1px solid ${isDark ? '#2a2f3d' : '#e5e7eb'}`,
+          border: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 12px',
           fontFamily: '"JetBrains Mono", monospace',
           fontSize: '10px',
-          color: isDark ? '#6b7280' : '#9ca3af',
+          color: isDark ? '#cbd5e1' : '#1e293b',
+          fontWeight: 600,
           letterSpacing: '0.05em',
           flexShrink: 0,
           gap: '12px',
+          overflow: 'hidden',
         }}>
-          <div>JAIPUR METRO NODE // v2.4 // 26.9124° N, 75.7873° E</div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <button
-              onClick={simulateAIPrediction}
-              style={{
-                padding: '2px 10px',
-                fontSize: '9px',
-                fontFamily: '"JetBrains Mono", monospace',
-                fontWeight: 800,
-                backgroundColor: '#3b82f6',
-                color: '#ffffff',
-                border: 'none',
-                cursor: 'pointer',
-                letterSpacing: '0.06em',
-              }}
-            >
-              🤖 SIMULATE AI PREDICTION
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: isDark ? '#4fc9dc' : '#005073', fontWeight: 800 }}>JAIPUR METRO NODE</span>
+            <span style={{ color: isDark ? '#94a3b8' : '#334155' }}>// 26.9124° N, 75.7873° E</span>
+          </div>
+
+          {/* Scrolling Live Operational Ticker */}
+          <div style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', color: isDark ? '#e2e8f0' : '#0f172a', fontWeight: 600, padding: '0 16px' }}>
+            <span style={{ animation: 'tickerScroll 20s linear infinite', display: 'inline-block' }}>
+              ⚡ TELEMETRY SYNCED // VRPTW ROUTING ENGINE ACTIVE // SUPABASE REALTIME LIVE // 144 SENSORS SCANNING // OPERATIONAL LAYER STABLE
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexShrink: 0, color: isDark ? '#cbd5e1' : '#1e293b' }}>
             <span>SYS_STABLE</span>
-            <span>LATENCY: 12ms</span>
-            <span style={{ color: realtimeConnected ? '#10b981' : '#f59e0b' }}>
+            <span>LATENCY: {simLatency}ms</span>
+            <span style={{ color: realtimeConnected ? '#10b981' : '#d97706', fontWeight: 800 }}>
               {realtimeConnected ? '● REALTIME LIVE' : '◌ CONNECTING...'}
             </span>
           </div>
@@ -172,7 +193,14 @@ function App() {
       </main>
 
       {/* 03: Right Decision Rail */}
-      <DecisionRail />
+      {activeDomain !== 'payments' && <DecisionRail />}
+
+      {/* Global Command Palette */}
+      <CommandPalette 
+        isOpen={isCommandPaletteOpen} 
+        onClose={() => setIsCommandPaletteOpen(false)} 
+        onNavigate={(view) => setCurrentView(view)} 
+      />
     </div>
   );
 }

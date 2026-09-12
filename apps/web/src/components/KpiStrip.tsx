@@ -1,5 +1,6 @@
 import { useStore } from '../store';
 import type { KpiMetric } from '../store';
+import { TelemetrySparkline } from './TelemetrySparkline';
 
 export default function KpiStrip() {
   const kpis = useStore(state => state.kpis);
@@ -21,24 +22,6 @@ export default function KpiStrip() {
   );
 }
 
-function Sparkline({ data, color }: { data: number[], color: string }) {
-  const max = Math.max(...data);
-  return (
-    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '28px', width: '56px' }}>
-      {data.map((val, i) => (
-        <div key={i} style={{
-          flex: 1,
-          height: `${(val / max) * 100}%`,
-          backgroundColor: color,
-          opacity: 0.7 + (i / data.length) * 0.3,
-          minHeight: '2px',
-          borderRadius: '0px',
-        }} />
-      ))}
-    </div>
-  );
-}
-
 function KpiCard({ kpi, isDark }: { kpi: KpiMetric, hasBorderLeft: boolean, isLast: boolean, isDark: boolean }) {
   const isAlert = kpi.status === 'alert';
   const isWarning = kpi.status === 'warning';
@@ -46,7 +29,8 @@ function KpiCard({ kpi, isDark }: { kpi: KpiMetric, hasBorderLeft: boolean, isLa
 
   const valueColor = isAlert ? '#ea3b1b' : isDark ? '#f3f4f6' : '#0a0a0a';
   const sparkColor = isAlert ? '#ea3b1b' : isWarning ? '#f59e0b' : isDark ? '#4fc9dc' : '#0a0a0a';
-  const trendColor = kpi.deltaPct > 0 ? '#10b981' : '#ea3b1b';
+  const trendColor = kpi.deltaPct > 0 ? '#10b981' : kpi.deltaPct < 0 ? '#ea3b1b' : '#6b7280';
+  const trendIcon = kpi.deltaPct > 0 ? '▲' : kpi.deltaPct < 0 ? '▼' : '▬';
 
   let badge = null;
   if (isGood && kpi.id === 'air-quality') {
@@ -64,14 +48,37 @@ function KpiCard({ kpi, isDark }: { kpi: KpiMetric, hasBorderLeft: boolean, isLa
       backgroundColor: isDark ? '#161922' : '#f5f2e8',
       fontFamily: '"Hanken Grotesk", sans-serif',
       borderRadius: '0px',
+      position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* Subtle top indicator bar */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '2px',
+        backgroundColor: isAlert ? '#ea3b1b' : isWarning ? '#f59e0b' : '#4fc9dc',
+        opacity: isAlert ? 1 : 0.6,
+      }} />
+
       {/* Label row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-        <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#9ca3af' : '#6b7280', letterSpacing: '0.08em', fontFamily: '"JetBrains Mono", monospace' }}>
-          {kpi.label.toUpperCase()}
-        </span>
-        <span style={{ fontSize: '10px', color: trendColor, fontFamily: '"JetBrains Mono", monospace', fontWeight: 700 }}>
-          {kpi.deltaPct > 0 ? '+' : ''}{kpi.deltaPct}% / {kpi.deltaWindow}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ 
+            width: '6px', 
+            height: '6px', 
+            backgroundColor: isAlert ? '#ea3b1b' : isWarning ? '#f59e0b' : '#10b981',
+            borderRadius: '50%',
+            display: 'inline-block',
+            boxShadow: isAlert ? '0 0 6px #ea3b1b' : 'none'
+          }} />
+          <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#cbd5e1' : '#1e293b', letterSpacing: '0.08em', fontFamily: '"JetBrains Mono", monospace' }}>
+            {kpi.label.toUpperCase()}
+          </span>
+        </div>
+        <span style={{ fontSize: '10px', color: trendColor, fontFamily: '"JetBrains Mono", monospace', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '2px' }}>
+          <span>{trendIcon}</span> {kpi.deltaPct > 0 ? '+' : ''}{kpi.deltaPct}% / {kpi.deltaWindow}
         </span>
       </div>
 
@@ -84,7 +91,7 @@ function KpiCard({ kpi, isDark }: { kpi: KpiMetric, hasBorderLeft: boolean, isLa
           {suffix}
           {badge && <div style={{ marginBottom: '4px' }}>{badge}</div>}
         </div>
-        <Sparkline data={kpi.history} color={sparkColor} />
+        <TelemetrySparkline data={kpi.history} color={sparkColor} isDark={isDark} width={75} height={32} />
       </div>
     </div>
   );

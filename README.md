@@ -7,7 +7,7 @@ See the city. Predict the risk. Act before it escalates.
 
 ### Overview
 CivicTwin is a real-time municipal operations and spatial intelligence platform that turns fragmented urban signals into a single operational picture.
-It brings together citizen reports, geographic context, infrastructure status, sensor telemetry, anomaly intelligence, severity prioritization, and municipal response workflows.
+It brings together citizen reports, geographic GIS context, infrastructure status, sensor telemetry, predictive anomaly intelligence, severity prioritization, autonomous VRPTW crew dispatch, and x402 micropayment resolution workflows.
 
 CivicTwin is the operational layer between what a city observes and what a city does.
 
@@ -17,15 +17,15 @@ CivicTwin is the operational layer between what a city observes and what a city 
 
 ### The Problem
 A city can have the right data and still respond slowly.
-A water leak may begin as a citizen complaint. A pressure sensor may detect an abnormal reading. A traffic signal may behave unexpectedly. An environmental sensor may report an AQI spike.
+A water leak begins as a citizen grievance. A pressure sensor detects an underground hydraulic drop. A traffic corridor experiences cascading gridlock. An environmental sensor reports an AQI surge.
 
-When these signals live in separate systems, the operator has to connect the dots manually.
+When these signals live in separate silos, operators must manually connect the dots.
 
 The operational chain becomes:
 ```
-Report → Verify → Locate → Prioritize → Dispatch → Resolve
+Report → Corroborate → Locate → Prioritize → Dispatch → Resolve → Verify
 ```
-CivicTwin brings that process into one spatial workspace.
+CivicTwin unites that entire lifecycle into a unified, high-density spatial workspace.
 
 **From fragmented signals to one operational picture**
 ```mermaid
@@ -38,7 +38,7 @@ T["CIVICTWIN<br/>Operational Layer"]
 R["Risk & Severity"] 
 M["Spatial Context"] 
 D["Decision Rail"] 
-A["Municipal Action"] 
+A["Municipal Action & Dispatch"] 
 
 C --> T 
 S --> T 
@@ -56,19 +56,26 @@ D --> A
 
 ## 📂 Repository Structure
 
-The project uses a clean monorepo architecture to separate concerns while keeping all related services together:
+The project uses a clean monorepo architecture separating frontend, backend services, and database schemas:
 
 ```
 CIVICTWIN/
 ├── apps/
-│   └── web/                 # Frontend: React, Vite, Zustand, Tailwind
+│   └── web/                 # Frontend: React 19, Vite, Zustand, Tailwind, Leaflet GIS
+│       ├── src/
+│       │   ├── components/  # All UI Modules (GIS Map, Decision Rail, Payments, etc.)
+│       │   ├── store/       # Zustand persistent store & telemetry simulation engine
+│       │   ├── config/      # Jaipur GIS center coordinates & map layer configs
+│       │   └── lib/         # Web3 Algorand Testnet, audio SFX, and API clients
 ├── services/
-│   └── api/                 # Backend: FastAPI, Python (AI prediction layers)
+│   └── api/                 # Backend: FastAPI, Python (AI prediction & VRPTW engines)
+│       ├── routers/         # Simulation & optimal route optimization routers
+│       └── main.py          # FastAPI application server entrypoint
 ├── supabase/
-│   └── migrations/          # Database schema and RLS policies
-├── infra/                   # Docker, seed data, and deployment configurations
-├── DESIGN_SYSTEM.md         # Comprehensive UI/UX guidelines
-├── README.md                # Project overview (this file)
+│   └── migrations/          # Declarative Postgres schema & Supabase Realtime policies
+├── infra/                   # Docker orchestration and deployment assets
+├── DESIGN_SYSTEM.md         # Comprehensive UI/UX & Tactical Neo-Brutalist Guidelines
+├── README.md                # Project documentation (this file)
 └── docker-compose.yml       # Local development orchestration
 ```
 
@@ -76,566 +83,266 @@ CIVICTWIN/
 
 ## 🚀 Quick Start (Local Development)
 
-This project can be run locally using the provided demo script, which starts both the FastAPI backend and provides instructions for the Vite frontend.
+Run the full CivicTwin stack locally:
 
 1. **Install dependencies:**
    Ensure you have `uv` (or `pip`) installed for Python, and `npm` for Node.js.
    ```bash
    cd apps/web && npm install
-   cd ../../services/api && uv pip install -r requirements.txt
+   cd ../../services/api && pip install -r requirements.txt
    ```
-2. **Run the local stack:**
+2. **Run the FastAPI Backend:**
    ```bash
-   # From the repository root
-   python run_demo.py
+   # From services/api/
+   uvicorn main:app --reload --port 8000
    ```
-   *This starts the FastAPI backend on `localhost:8000`.*
-3. **Run the frontend:**
+   *FastAPI server runs on `localhost:8000` (Swagger UI at `http://localhost:8000/docs`).*
+3. **Run the React Frontend:**
    ```bash
-   # In a new terminal, from the repository root
+   # From apps/web/
    npm run dev
    ```
-   *This starts the Vite React frontend on `localhost:5173`.*
+   *Vite development server runs on `http://localhost:5173`.*
 
 ---
 
-## 01 — Product Model
-CivicTwin is organized around one operational loop:
-`Observe → Predict → Act`
+## 01 — Comprehensive Feature Breakdown
 
-```mermaid
-flowchart LR 
-O["OBSERVE<br/><br/>Incidents<br/>Telemetry<br/>Infrastructure<br/>City Signals"] 
-P["PREDICT<br/><br/>Severity<br/>Risk<br/>Anomalies<br/>Priority"] 
-A["ACT<br/><br/>Dispatch<br/>Escalate<br/>Resolve<br/>Verify"] 
-
-O --> P --> A 
-A -.->|New city state| O
-```
-
-**Observe**: Build a live picture of what is happening across the city.  
-**Predict**: Turn incoming signals into severity, risk, corroboration, and operational priority.  
-**Act**: Put the next useful action directly in front of the operator.
-
-The interface is therefore centered on decisions, not data for its own sake.
+### 🗺️ 1. Leaflet Spatial Digital Twin (GIS Centerpiece)
+The Spatial Digital Twin is the geographic operating surface of CivicTwin:
+- **High-Precision City Topology**: Centered on the Jaipur Metro Grid (`26.9124° N, 75.7873° E`) with 144 connected IoT sensor nodes.
+- **Dynamic Severity Pin Encoding**:
+  - *Normal* (`#64748b` / `#10b981`): 8px static calm baseline marker.
+  - *Warning* (`#f59e0b`): 12px amber marker for elevated risk.
+  - *Critical Anomaly* (`#ea3b1b`): 18px red-orange marker with animated radar pulsing rings.
+- **Interactive Multi-Basemap Switching**: Toggle instantaneously between **Vector GIS**, **Satellite World Imagery** (ArcGIS), and **Topographic** elevation layers.
+- **Edge-to-Edge Fullscreen GIS Mode**: Dynamic resizing engine invoking `map.invalidateSize()` across animation intervals to guarantee 100% viewport coverage.
+- **Spatial Anomaly Propagation Vectors**: Visual dashed vector lines illustrating cascading failure drift (e.g. MI Road pressure surge → Ajmeri Gate traffic gridlock → Hawa Mahal corridor).
+- **Interactive Asset Inspection Popups**: Click any map marker to view live frequency, latency, packet loss, and trigger simulated diagnostic tests.
 
 ---
 
-## 02 — Core Capabilities
-
-### Spatial Digital Twin
-The Spatial Digital Twin is the geographic operating surface of CivicTwin.
-It provides spatial and operational context for:
-- incidents
-- infrastructure conditions
-- risk signals
-- sensor assets
-- operational status
-
-| Dimension | Operator context |
-| :--- | :--- |
-| **Location** | Where the event is happening |
-| **Severity** | How serious it is |
-| **Category** | What kind of event it is |
-| **Risk state** | Normal, emerging, or critical |
-| **Operational status** | Active, responding, or resolved |
-| **Telemetry** | What connected assets are reporting |
-
-The prototype supports **Satellite**, **Vector**, and **Topographic** map representations.
-
-### Citizen Incident Gateway
-Citizens can submit infrastructure issues directly into the municipal workflow.
-Supported categories include:
-- Water leakage and pipe fractures
-- Road hazards and drainage overflow
-- Traffic bottlenecks and signal desynchronization
-- Environmental anomalies such as AQI surges
-- Infrastructure failures
-
-**Reporting flow**
-```mermaid
-flowchart LR 
-A["Location"] --> B["Incident Type"] 
-B --> C["Severity"] 
-C --> D["Evidence"] 
-D --> E["Municipal Workflow"]
-```
-GPS-based location tagging reduces the gap between discovering a problem and creating a usable incident.
-
-**Intelligent Report Merging**
-Repeated reports can represent the same underlying event.
-CivicTwin can cluster identical reports within a 500 m radius, allowing the system to:
-- consolidate duplicate reports
-- increase corroboration count
-- preserve the underlying location
-- strengthen prioritization
-- reduce map clutter
-
-### AI Severity & Risk Intelligence
-Every incoming incident is evaluated by the intelligence layer.
-The product model considers:
-- Severity level
-- Impact estimate
-- Spatial relevance
-- Escalation priority
-- Recommended response strategy
-
-The intelligence layer is designed as decision support: it helps operators focus attention without removing the human from the response loop.
-
-```mermaid
-flowchart TD 
-I["Incoming Incident"] 
-C["Incident Context"] 
-S["Severity"] 
-R["Spatial Relevance"] 
-P["Priority"] 
-X["Recommended Action"] 
-
-I --> C 
-C --> S 
-C --> R 
-S --> P 
-R --> P 
-P --> X
-```
-
-### Municipal Command Center
-The Command Center is the main operational environment.
-Operators can monitor:
-- city-wide incident distribution
-- high-priority anomalies
-- spatial risk
-- sensor telemetry
-- emergency alerts
-- response actions
-- active incident counts
-
-The navigation layer also exposes live domain activity through dynamic incident-count badges.
-
-### Decision Rail
-The Decision Rail is where intelligence becomes action.
-Instead of forcing an operator through several screens to understand an alert and find the relevant control, CivicTwin surfaces contextual response actions beside the operational information.
-
-Alerts can expose:
-- corroboration metrics such as `REPORTED BY: 3`
-- relative timestamps
-- incident context
-- severity
-- response actions
-- resolution state
-
-Example actions:
-`DISPATCH CREW` · `NOTIFY TRANSIT` · `VERIFY TELEMETRY` · `ISOLATE GRID`
-
-**Decision path**
-```mermaid
-flowchart LR 
-A["Anomaly detected"] 
-B["Severity evaluated"] 
-C["Operator alerted"] 
-D["Action selected"] 
-E["Response dispatched"] 
-F["Incident resolved"] 
-
-A --> B --> C --> D --> E --> F
-```
-A **Resolved Today** log keeps recently cleared incidents visible without losing operational history.
-
-### Telemetry Asset Registry
-Municipal sensor assets can be inspected individually.
-
-| Metric | Purpose |
-| :--- | :--- |
-| **Frequency (Hz)** | Sensor reporting rate |
-| **Packet Loss (%)** | Communication reliability |
-| **Diagnostic Ping** | Device health and latency |
-| **Location** | Spatial context and substation node |
-| **Status** | Normal, Warning, or Anomaly |
-
-This connects the event on the map with the asset producing the signal.
+### 🚨 2. Decision Rail & Contextual Triage Engine
+The Decision Rail transforms incoming intelligence into instant operational action:
+- **Severity Meter Strips**: Visual 10-segment color-coded severity bars (1–10 scale) on every incident card.
+- **Root Cause & Telemetry Inspection Drawer**: Expandable analysis displaying underground hydraulic differentials, pressure spikes, and exact GPS coordinates.
+- **Tactical Action Buttons**: Single-click actions such as `DISPATCH CREW`, `REROUTE TRAFFIC`, `ISOLATE GRID`, and `NOTIFY TRANSIT`.
+- **Primary vs. Secondary Action Hierarchy**: Clear visual distinction between primary resolution triggers (vibrant fill) and secondary triage options (ghost outline).
+- **Card Hover Elevation**: Tactical micro-interaction providing 1px cyan highlight and elevation shift on hover.
+- **Resolved Today Log**: Keeps cleared incidents visible with relative timestamps (`Just now`, `5 min ago`) for complete auditability.
 
 ---
 
-## 03 — System Architecture
-CivicTwin separates collection, intelligence, and operations while keeping them connected through common spatial context.
+### 🚚 3. Autonomous VRPTW AI Crew Dispatch Routing
+CivicTwin incorporates an automated Vehicle Routing Problem with Time Windows (VRPTW) engine:
+- **FastAPI Routing Backend**: Algorithmic optimization endpoint (`/api/simulation/optimal-route`) calculating shortest emergency response paths.
+- **Live Polyline Navigation Path**: Renders the multi-stop dispatch route on the Leaflet GIS map with glowing neon drop shadows (`#10b981`).
+- **Turn-by-Turn Waypoints**: Generates precise GPS coordinate waypoints from municipal depots to incident hotspots.
+
+---
+
+### 💳 4. x402 Micropayment Protocol on Algorand Testnet
+CivicTwin pioneers machine-to-machine micropayments for decentralized urban data access:
+- **Payment-Gated AI Diagnostics**: 0.05 ALGO micropayment unlocks deep predictive infrastructure failure analysis.
+- **Algorand Testnet Transaction Signing**: Direct integration with Algorand indexers and testnet node gateways.
+- **Cryptographic Audit Ledger (`PaymentsPanel.tsx`)**: Transaction ledger tracking Tx Hashes, amounts, resource paths, and settled statuses.
+- **Operational Resolution Action Report**: Native tactical report generated post-settlement detailing crew assignments and estimated resolution timeframes.
+
+---
+
+### 📱 5. Citizen Incident Gateway (`CitizenApp.tsx`)
+A public-facing portal empowering citizens to submit infrastructure issues seamlessly:
+- **4-Step Submission Stepper**:
+  1. *Location*: Automatic GPS device geolocation tagging.
+  2. *Category*: Selection across Water, Mobility, Environment, Electrical, and Structural.
+  3. *Severity & Details*: User-reported severity slider and descriptive grievance input.
+  4. *Evidence*: Image upload and immediate municipal command handoff.
+- **Intelligent 500m Spatial Clustering**: Duplicate reports within 500 meters are automatically merged into parent incidents, updating `REPORTED BY: X` counters without cluttering the map.
+- **Public Status Tracker**: Citizens receive unique tracking IDs (`JP-W01-XXXX`) to monitor real-time municipal resolution progress.
+
+---
+
+### 📊 6. Live KPI Strip & Telemetry Sparklines
+Real-time urban health monitoring at the top of the command center:
+- **Core City Metrics**:
+  - *City Health Score* (0–100 scale) with alert thresholds.
+  - *Mobility Flow* (%) tracking corridor transit efficiency.
+  - *Air Quality Index* (AQI) monitoring particulate pollution.
+- **SVG Area Gradient Sparklines**: Gradient fill under trend lines with pulsing live endpoint indicators.
+- **Tabular Numerals (`font-variant-numeric: tabular-nums`)**: Eliminates horizontal jitter during live telemetry updates.
+- **Continuous 3-Second Simulation Loop**: Simulates sensor jitter, packet loss fluctuations, and diagnostic pings.
+
+---
+
+### 🌐 7. Federated Multi-City Twin Registry
+A scalable architecture designed for state-wide and national municipal cohorts:
+- **Active Jaipur Metro Node**: Full operational telemetry (`26.9124° N, 75.7873° E`).
+- **Upcoming City Provisioning Queue**: Interactive dropdown selector supporting **New Delhi** (28.84°N), **Mumbai Metro** (19.07°N), and **Bengaluru Tech** (12.97°N).
+- **Federated Node Extensibility**: Pre-configured schema to support cross-city mutual aid dispatch.
+
+---
+
+### ⌨️ 8. Global Tactical Command Palette (`Ctrl+K`)
+Keyboard-driven mission control navigation:
+- **Fuzzy Search**: Search across all 144 sensor assets, active critical incidents, and domain views.
+- **Emergency Shortcut Commands**: Trigger simulated grid anomalies, clear filters, and navigate to public or officer portals instantly.
+- **Top Bar Integration**: Quick `[COMMANDS Ctrl K]` button in the top bar for easy discoverability.
+
+---
+
+### 📄 9. Municipal Operational Briefing PDF Export
+Generate formal municipal reports with one click:
+- **Executive Summary**: City health score, unresolved incident count, and settled micropayments.
+- **Incident Matrix**: Tabular breakdown of incident IDs, severity scores, descriptions, and current lifecycle states.
+- **x402 Audit Log**: Full cryptographic transaction hash ledger for administrative accountability.
+
+---
+
+## 02 — Product Architecture & Data Flow
 
 ```mermaid
 flowchart TB
-    subgraph INPUTS [URBAN SIGNALS]
-        C["Citizen Reports"]
-        S["IoT / Telemetry"]
-        INF["Infrastructure State"]
-        ENV["Environmental Signals"]
+    subgraph INTAKE [URBAN SIGNALS & SENSORS]
+        CIT["Citizen Gateway Reports"]
+        IOT["144 IoT Telemetry Sensors"]
+        INF["Physical Infrastructure Grids"]
+        ENV["Environmental AQI Monitors"]
     end
 
-    subgraph CORE [CIVICTWIN OPERATIONAL LAYER]
-        ING["Signal & Incident Intake"]
-        INT["Intelligence Layer<br/>Severity · Risk · Priority"]
-        SP["Spatial Digital Twin"]
-        CMD["Municipal Command Center"]
-        DEC["Decision Rail"]
+    subgraph SERVICES [BACKEND & STORAGE]
+        SB[("Supabase Realtime Postgres")]
+        FAST["FastAPI AI & VRPTW Engine"]
+        ALGO["Algorand Testnet (x402 Micropayments)"]
     end
 
-    subgraph ACTION [CITY RESPONSE]
-        DISP["Dispatch"]
-        ESC["Escalate"]
-        RES["Resolve & Verify"]
+    subgraph WORKSPACE [CIVICTWIN COMMAND CENTER]
+        GIS["Leaflet Spatial Digital Twin"]
+        INT["Intelligence & Predictive Panel"]
+        CMD["Municipal Dashboard Shell"]
+        DEC["Decision Rail Triage Engine"]
+        PAL["Command Palette (Ctrl+K)"]
     end
 
-    C --> ING
-    S --> ING
-    INF --> ING
-    ENV --> ING
-    ING --> INT
-    ING --> SP
-    INT --> CMD
-    SP --> CMD
+    subgraph ACTION [MUNICIPAL INTERVENTION]
+        VRPTW["VRPTW Crew Dispatch"]
+        REROUTE["Adaptive Traffic Rerouting"]
+        RES["Incident Resolution & State Sync"]
+    end
+
+    CIT --> SB
+    IOT --> SB
+    INF --> FAST
+    ENV --> FAST
+    FAST --> SB
+    SB <--> WORKSPACE
+    ALGO <--> INT
     CMD --> DEC
-    DEC --> DISP
-    DEC --> ESC
-    DISP --> RES
-    ESC --> RES
-    RES -.->|Updated city state| SP
+    DEC --> VRPTW
+    DEC --> REROUTE
+    VRPTW --> RES
+    REROUTE --> RES
+    RES -.->|Updated City Health State| SB
 ```
-
-**Product layers**
-| Layer | Responsibility |
-| :--- | :--- |
-| **Citizen Layer** | Capture observations, location, incident type, and evidence |
-| **Intelligence Layer** | Evaluate severity, spatial relevance, risk, and priority |
-| **Municipal Layer** | Visualize, investigate, decide, dispatch, and resolve |
 
 ---
 
-## 04 — End-to-End Operational Workflow
+## 03 — End-to-End Operational Lifecycle
 
 ```mermaid
 flowchart TD 
-A["Citizen / Sensor<br/>detects event"] 
-B["Capture location<br/>+ incident data"] 
-C["Classify severity<br/>+ risk"] 
-D["Merge corroborating<br/>reports when applicable"] 
-E["Place event on<br/>Spatial Digital Twin"] 
-F["Prioritize in<br/>Command Center"] 
-G["Decision Rail<br/>surfaces next action"] 
-H["Dispatch / Escalate"] 
-I["Resolve incident"] 
-J["Verify updated<br/>city state"] 
+A["Citizen / IoT Sensor<br/>Detects Anomaly"] 
+B["Capture GPS Coords<br/>+ Telemetry Diagnostics"] 
+C["Classify Severity (1-10)<br/>+ Spatial Risk Vector"] 
+D["Cluster Corroborating<br/>Reports within 500m"] 
+E["Render on Leaflet<br/>Spatial Digital Twin"] 
+F["Surface on Decision Rail<br/>with Next Best Action"] 
+G["Autonomous VRPTW<br/>Crew Route Dispatch"] 
+H["Settled via x402<br/>Algorand Micropayment"] 
+I["Resolution Confirmed<br/>& Verified Live"] 
 
-A --> B --> C --> D --> E --> F --> G --> H --> I --> J 
-J -.->|Continuous monitoring| E
+A --> B --> C --> D --> E --> F --> G --> H --> I 
+I -.->|Continuous Monitoring| E
 ```
-`Detect → Understand → Locate → Prioritize → Act → Verify`
+`Detect → Locate → Prioritize → Dispatch → Settle → Verify`
 
 ---
 
-## 05 — Example Scenario: Water Infrastructure Failure
-Imagine a major water-main leak.
+## 04 — Application Modules Reference
 
-```mermaid
-sequenceDiagram 
-participant C as Citizen 
-participant G as Gateway 
-participant AI as Intelligence 
-participant T as Spatial Twin 
-participant O as Operator 
-participant R as Response Crew 
-
-C->>G: Report major water leak 
-G->>G: Capture GPS + incident details 
-G->>AI: Evaluate incident 
-AI->>AI: Assess severity + risk 
-AI->>T: Publish spatial incident 
-T->>O: Surface critical anomaly 
-O->>O: Review reports + telemetry 
-O->>R: Dispatch resolution crew 
-R->>O: Confirm resolution 
-O->>T: Update incident state 
-T->>O: Reflect updated city state
-```
-
-**Incident path**
-- **Report** — A citizen discovers a major water-main leak.
-- **Locate** — GPS attaches the incident location.
-- **Classify** — The report is categorized as a physical infrastructure issue.
-- **Assess** — The intelligence layer evaluates severity and risk.
-- **Visualize** — The event appears on the Spatial Digital Twin.
-- **Prioritize** — Corroboration and available telemetry strengthen the context.
-- **Act** — The Decision Rail presents an appropriate response.
-- **Resolve** — A response crew addresses the incident.
-- **Verify** — The incident and city state are updated.
-
-Prototype example coordinates:
-`26.9124, 75.7873`
-
----
-
-## 06 — Application Modules
-
-| Module | Responsibility |
-| :--- | :--- |
-| `Gateway.tsx` | Municipal access and incident gateway; role-based entry, public reporting, officer login, spatial preview, alerts, and global search |
-| `CitizenApp.tsx` | Citizen incident submission, classification, GPS tagging, severity triage, and Command Center handoff |
-| `App.tsx` | Main municipal operations environment |
-| `GridTopologyPanel.tsx` | Leaflet Spatial Digital Twin, basemap switching, incident markers, clustering, and telemetry assets |
-| `IntelligencePanel.tsx` | Observe → Predict → Act intelligence workflow and anomaly resolution |
-| `DecisionRail.tsx` | Contextual incident alerts and response controls |
-| `KpiStrip.tsx` | Operational KPI presentation |
-| `Sidebar.tsx` | Primary navigation and live domain indicators |
-| `TopBar.tsx` | Global operational controls and context |
-
----
-
-## 07 — Design System
-CivicTwin deliberately moves away from the familiar dark dashboard + neon gradient + glass card aesthetic.
-The interface follows a Swiss Functionalist / International Typographic direction built around hierarchy, grid discipline, restrained color, and operational clarity.
-
-**Visual language**
-- **Grid**: The city is treated as a structured information system.
-- **Typography**: Large editorial typography establishes hierarchy, while monospace typography handles operational labels, telemetry, and system data.
-- **Geometry**: Sharp edges and precise alignment make the interface feel closer to an instrument panel than a marketing dashboard.
-
-**Color as information**
-| Token | Value | Meaning |
+| Module | File Path | Core Responsibilities |
 | :--- | :--- | :--- |
-| **Civic Cyan** | `#4FC9DC` | Active / operational |
-| **Critical Red** | `#EA3B1B` | Critical / anomaly |
-| **Ink** | `#0A0A0A` | Structure / typography |
-| **Warm Sand** | `#F0EDE4` | Canvas |
-| **Card Surface** | `#F5F2E8` | Components |
-| **Inset Surface** | `#E8E4D8` | Nested content |
-
-**Design rules**
-- No unnecessary gradients.
-- No decorative glassmorphism.
-- Sharp 0px corners.
-- Strict grid discipline.
-- Minimal visual noise.
-- Color is semantic, not decorative.
-- Every component must communicate information or enable an action.
+| `Gateway.tsx` | `apps/web/src/components/` | Municipal landing, citizen vs. officer authentication, GIS map preview, system search |
+| `CitizenApp.tsx` | `apps/web/src/components/` | Citizen reporting stepper, automatic GPS tagging, severity selection, photo upload |
+| `App.tsx` | `apps/web/src/` | Main application shell, route views, realtime toast alerts, scrolling operational ticker |
+| `GridTopologyPanel.tsx` | `apps/web/src/components/` | Leaflet GIS digital twin, vector/satellite/topo layers, fullscreen mode, crew polylines |
+| `IntelligencePanel.tsx` | `apps/web/src/components/` | AI predictive failure reports, x402 payment gate, post-payment resolution action card |
+| `DecisionRail.tsx` | `apps/web/src/components/` | Critical & warning alerts, severity meter bars, root-cause drawer, rapid action buttons |
+| `KpiStrip.tsx` | `apps/web/src/components/` | High-impact telemetry metrics with SVG area gradient sparklines and delta percentages |
+| `PaymentsPanel.tsx` | `apps/web/src/components/` | Algorand transaction ledger, x402 status verification, explorer tx hash links |
+| `CommandPalette.tsx` | `apps/web/src/components/` | `Ctrl+K` modal for fuzzy searching nodes, incidents, and triggering municipal actions |
+| `Sidebar.tsx` | `apps/web/src/components/` | Domain navigation (Infrastructure, Mobility, Environment, Payments) with active count badges |
+| `TopBar.tsx` | `apps/web/src/components/` | Federated city switcher, briefing PDF export, dark/light theme toggle, user profile |
 
 ---
 
-## 08 — Technology Stack
+## 05 — Design System & Mission Control Typography
 
-| Area | Technology |
+CivicTwin follows a **Tactical Mission Control / Functionalist** design system built for high-stress municipal operations.
+
+### Typography Triad
+- **Display & Headers**: **`Space Grotesk`** (Weights: 600, 700, 800 | Tracking: `-0.02em`) — Geometric, authoritative architectural character for panel titles and brand identity.
+- **Body & Cards**: **`Plus Jakarta Sans`** (Weights: 400, 500, 600) — Humanist, ultra-crisp legibility across high-density incident cards.
+- **Telemetry & Numbers**: **`JetBrains Mono`** (Weights: 500, 700, 800 | Tabular Figures: `tnum 1`) — Monospace alignment for GPS coordinates, sparkline values, and Algorand transaction hashes.
+
+### Color Tokens
+| Token | Hex Value | Operational Meaning |
+| :--- | :--- | :--- |
+| **Civic Cyan** | `#4FC9DC` | Active selection, route polylines, and primary operational accents |
+| **Critical Red** | `#EA3B1B` | Anomaly nodes, critical severity (7–10), and emergency dispatch |
+| **Warning Amber** | `#F59E0B` | Elevated risk, warning telemetry (4–6), and cascade notices |
+| **Resolved Emerald** | `#10B981` | Settled micropayments, normal status (1–3), and verified nodes |
+| **Obsidian Slate** | `#0B0C0E` / `#161922` | Dark mode tactical background and card frames |
+| **Warm Sand** | `#F0EDE4` / `#F5F2E8` | Light mode canvas and component surfaces |
+
+---
+
+## 06 — Technology Stack
+
+| Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19 |
-| **Language** | TypeScript |
-| **Build** | Vite |
-| **Styling** | Tailwind CSS / Vanilla CSS |
-| **Icons** | Lucide React |
-| **Spatial Mapping** | Leaflet + React-Leaflet |
-| **Map Tiles** | CartoDB Satellite / Vector |
-| **State** | Zustand |
-| **Typography** | Hanken Grotesk + JetBrains Mono |
+| **Frontend Framework** | React 19, TypeScript |
+| **Build & Dev Tools** | Vite v8, Tailwind CSS, PostCSS |
+| **State & Store** | Zustand (Persistent store & active telemetry simulation loops) |
+| **GIS Mapping** | Leaflet, React-Leaflet, CartoDB & ArcGIS Tile Layers |
+| **Backend API** | FastAPI (Python 3.12, Uvicorn, Pydantic) |
+| **Database & Realtime** | Supabase Postgres (Realtime broadcast channels & RLS) |
+| **Blockchain / Web3** | Algorand Testnet (x402 Micropayments & TX Hash verification) |
+| **Icons & Typography** | Lucide React, Space Grotesk, Plus Jakarta Sans, JetBrains Mono |
 
 ---
 
-## 09 — Getting Started
-
-**Prerequisites**
-- Node.js v18.0.0+
-- npm v9.0.0+
-- Modern web browser
-
-**Run locally**
-1. **Clone**
-   ```bash
-   git clone https://github.com/SIDDHARTHXMEUR/CIVICTWIN.git
-   cd CIVICTWIN
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment**
-   The current prototype is designed to run without external API keys.
-   If `.env.example` is present:
-   ```bash
-   cp .env.example .env
-   ```
-
-4. **Start**
-   ```bash
-   npm run dev
-   ```
-
-5. **Open**
-   `http://localhost:5173`
-
-   **Live Demo**: [https://civictwin.vercel.app/](https://civictwin.vercel.app/)
-
----
-
-## 10 — Access Model
-CivicTwin separates public reporting from municipal operations.
+## 07 — Roadmap & Multi-City Expansion
 
 ```mermaid
 flowchart LR 
-C["CITIZEN"] 
-CA["Citizen Access<br/><br/>Report → Locate<br/>Describe → Submit"] 
-O["MUNICIPAL OFFICER"] 
-OA["Officer Access<br/><br/>Authenticate → Monitor<br/>Analyze → Prioritize<br/>Dispatch → Resolve"] 
-CT["CIVICTWIN"] 
-
-C --> CA --> CT 
-O --> OA --> CT
-```
-
-**Citizen**
-`REPORT → LOCATION → INCIDENT DETAILS → SUBMIT`
-
-**Municipal officer**
-`AUTHENTICATE → MONITOR → ANALYZE → PRIORITIZE → DISPATCH → RESOLVE`
-
----
-
-## 11 — Performance Principles
-The prototype prioritizes responsiveness because an operational interface should not slow down the person using it.
-- Lightweight Leaflet spatial rendering
-- Selective Zustand subscriptions
-- Avoidance of unnecessary re-renders
-- Minimal visual overhead
-- Fast tab switching
-- Reduced navigation between information and action
-
-The operator should spend time making decisions, not finding the screen that contains the decision.
-
----
-
-## 12 — Project Structure
-```text
-CIVICTWIN/ 
-├── apps/ 
-│   └── web/ 
-│       ├── src/ 
-│       │   ├── components/ 
-│       │   │   ├── Gateway.tsx 
-│       │   │   ├── CitizenApp.tsx 
-│       │   │   ├── GridTopologyPanel.tsx 
-│       │   │   ├── IntelligencePanel.tsx 
-│       │   │   ├── DecisionRail.tsx 
-│       │   │   ├── KpiStrip.tsx 
-│       │   │   ├── Sidebar.tsx 
-│       │   │   └── TopBar.tsx 
-│       │   ├── store/ 
-│       │   │   └── index.ts 
-│       │   ├── App.tsx 
-│       │   └── index.css 
-│       ├── package.json 
-│       └── vite.config.ts 
-├── .env.example 
-├── .gitignore 
-├── README.md 
-└── package.json
-```
-
----
-
-## 13 — Roadmap
-The current prototype establishes the operational foundation. The longer-term direction is to evolve CivicTwin from incident response toward predictive urban operations.
-
-```mermaid
-flowchart LR 
-P1["01<br/>OPERATIONAL<br/>FOUNDATION"] 
-P2["02<br/>INTELLIGENCE"] 
-P3["03<br/>CITY<br/>INTEGRATION"] 
-P4["04<br/>PREDICTIVE<br/>CITY"] 
+P1["01<br/>JAIPUR METRO<br/>(LIVE)"] 
+P2["02<br/>NEW DELHI<br/>(PROVISIONING)"] 
+P3["03<br/>MUMBAI METRO<br/>(EXPANSION)"] 
+P4["04<br/>FEDERATED<br/>TWIN NETWORK"] 
 
 P1 --> P2 --> P3 --> P4
 ```
 
-**Phase 01 — Operational Foundation**
-Current
-- Incident management
-- Spatial Digital Twin
-- Citizen reporting
-- Municipal Command Center
-- Telemetry asset directory
-
-**Phase 02 — Intelligence**
-- Predictive infrastructure-failure scoring
-- Automated incident clustering
-- Dynamic risk forecasting
-
-**Phase 03 — City Integration**
-Potential integrations:
-- Municipal IoT streams
-- Traffic-camera computer vision
-- Water-grid telemetry
-- Public grievance systems
-
-**Phase 04 — Predictive City**
-```mermaid
-flowchart LR 
-S["SENSE"] --> U["UNDERSTAND"] 
-U --> P["PREDICT"] 
-P --> I["INTERVENE"] 
-I --> V["VERIFY"] 
-V -.->|Continuous learning| S
-```
-The goal is to move from reactive incident handling toward proactive infrastructure intervention.
+- **Phase 01 — Jaipur Operational Twin (Active)**: Full GIS digital twin, decision rail, autonomous VRPTW dispatch, and x402 payment gate.
+- **Phase 02 — Multi-City Federated Registry**: Cross-city node telemetry sync and automated regional emergency escalation.
+- **Phase 03 — Predictive Computer Vision**: Live CCTV traffic-flow computer vision integration and automated road fracture detection.
+- **Phase 04 — Autonomous Municipal Swarms**: Direct integration with municipal UAVs, smart water pumps, and SCADA traffic light grids.
 
 ---
 
-## 14 — Impact
-CivicTwin is designed around four practical outcomes:
+## 08 — Vision
 
-| Goal | Operational effect |
-| :--- | :--- |
-| **Faster** | Reduce the path from incident discovery to dispatch |
-| **Smarter** | Use severity and risk to focus attention where it matters |
-| **More transparent** | Maintain a visible incident lifecycle from report to resolution |
-| **More predictive** | Surface emerging conditions before they become larger failures |
-
-One city. One operational picture. One path from signal to action.
-
----
-
-## 15 — Current Status
-**Status:** Active Development · Hackathon Prototype
-
-The current prototype demonstrates the complete operational loop:
-
-```mermaid
-flowchart LR 
-A["Citizen"] 
-B["Spatial Twin"] 
-C["Intelligence"] 
-D["Decision"] 
-E["Dispatch"] 
-F["Resolution"] 
-
-A --> B --> C --> D --> E --> F
-```
-
-The prototype is focused on demonstrating the product workflow and operational experience. A production deployment would require additional infrastructure, integrations, security controls, data governance, and validation.
-
----
-
-## 16 — Why CivicTwin
-Most civic technology starts with a portal.
-Most dashboards start with data.
-CivicTwin starts with the decision.
-
-The product connects:
-`people → places → signals → intelligence → action`
-
-A city does not need another screen showing that something is wrong.
-It needs a system that helps the right person understand what is wrong, where it is, how urgent it is, and what should happen next.
-That is the role CivicTwin is designed to fill.
-
----
-
-## 17 — Vision
-Cities already generate enormous amounts of data. The missing layer is often not another data source — it is the operational interface that connects those signals to decisions.
-
-CivicTwin is being built to become that layer.
-
-See the city. Predict the risk. Act before it escalates.
+Cities already generate enormous volumes of data. The missing layer is not another dashboard — it is the **operational workspace** connecting those signals directly to decisions and immediate actions.
 
 **CivicTwin**  
 **Municipal Urban Operational Layer & Spatial Digital Twin**  

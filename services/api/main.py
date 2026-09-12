@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from database import engine, Base, SessionLocal, ensure_schema_compatibility
 import models
-from routers import auth, reports, incidents, infrastructure, geocode
+from routers import auth, reports, incidents, infrastructure, geocode, simulation, routing
 from realtime import manager
 
 # Auto-create tables
@@ -16,7 +16,7 @@ ensure_schema_compatibility()
 
 app = FastAPI(
     title="CivicTwin API",
-    description="AI Urban Intelligence Layer for Responsive Cities — NIT Delhi Region",
+    description="AI Urban Intelligence Layer for Responsive Cities — Spatial Digital Twin Engine",
     version="1.0.0"
 )
 
@@ -36,6 +36,8 @@ app.include_router(reports.router)
 app.include_router(incidents.router)
 app.include_router(infrastructure.router)
 app.include_router(geocode.router)
+app.include_router(simulation.router)
+app.include_router(routing.router)
 
 @app.websocket("/ws/incidents")
 async def websocket_incidents(websocket: WebSocket):
@@ -53,7 +55,7 @@ def root():
     return {
         "status": "online",
         "service": "CivicTwin AI Engine",
-        "location": "NIT Delhi Region",
+        "location": "Jaipur Metro Node (26.9124° N, 75.7873° E)",
         "docs": "/docs"
     }
 
@@ -64,7 +66,7 @@ def startup_seed_check():
     try:
         inc_count = db.query(models.Incident).count()
         if inc_count == 0:
-            print("Auto-seeding sample NIT Delhi reports and incidents on startup...")
+            print("Auto-seeding sample Jaipur municipal reports and incidents on startup...")
             try:
                 # Add seed directory to sys.path
                 seed_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "infra", "seed_data"))

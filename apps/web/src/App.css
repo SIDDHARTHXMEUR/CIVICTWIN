@@ -182,3 +182,35 @@
     border-right-color: var(--border);
   }
 }
+
+/* Live Footer Ticker Scroll Animation */
+@keyframes tickerScroll {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Alert Toast Pulse Animation */
+@keyframes rhythmicPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.015); }
+}
+
+/* Intelligence Panel Scanning Line */
+@keyframes scanline {
+  0% { transform: translateY(-100%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
+/* Shimmer effect for KPI cards */
+@keyframes kpiShimmer {
+  0% { left: -30%; }
+  100% { left: 130%; }
+}
+
+/* Severity bar fill animation */
+@keyframes severityFill {
+  0% { width: 0%; }
+  100% { width: var(--severity-width, 80%); }
+}

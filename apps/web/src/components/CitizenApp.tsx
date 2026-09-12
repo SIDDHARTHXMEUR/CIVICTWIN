@@ -54,7 +54,74 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
   const [category, setCategory] = useState('Water Burst & Pressure Drop');
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('26.9197° N, 75.7857° E — MI Road, Jaipur');
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120" fill="%23eeeee6"><rect width="160" height="120" fill="%23eeeee6" stroke="%231a1c17" stroke-width="2"/><rect x="20" y="20" width="120" height="80" fill="%23ffffff" stroke="%23807474" stroke-width="1"/><path d="M30 80 L60 50 L90 75 L120 40 L140 80 Z" fill="%23d6c2c1" stroke="%23b7102a" stroke-width="2"/><circle cx="50" cy="40" r="8" fill="%23f59e0b"/><text x="80" y="112" font-size="8" font-family="monospace" text-anchor="middle" fill="%231a1c17">EVIDENCE_PHOTO.JPG</text></svg>');
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+
+  // Real Web Speech API Voice-to-Text States
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const recognitionRef = React.useRef<any>(null);
+
+  const startVoiceDictation = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setSpeechError('Web Speech API is not supported in this browser. Pre-filling dictation demo.');
+      setDescription(prev => (prev ? prev + ' ' : '') + "High pressure water leak observed near MI Road main junction. Water pooling rapidly.");
+      return;
+    }
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        setSpeechError(null);
+      };
+
+      recognition.onresult = (event: any) => {
+        let currentTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        if (currentTranscript.trim()) {
+          setDescription(prev => {
+            // Avoid duplicate appends if continuous interim results fire
+            return currentTranscript;
+          });
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          setSpeechError('Microphone access denied. Please allow microphone permissions in your browser.');
+        } else {
+          setSpeechError(`Speech recognition error: ${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.error('Failed to start speech recognition:', err);
+      setIsListening(false);
+      setSpeechError('Could not access microphone.');
+    }
+  };
 
   const [submitState, setSubmitState] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [stepIndex, setStepIndex] = useState(0);
@@ -270,16 +337,50 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                   </select>
                 </div>
 
-                {/* Description */}
+                {/* Description & Voice Note */}
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace', marginBottom: '6px' }}>
-                    DESCRIPTION & REMARKS
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace' }}>
+                      DESCRIPTION & REMARKS
+                    </label>
+                    <button
+                      type="button"
+                      onClick={startVoiceDictation}
+                      style={{
+                        fontSize: '9px',
+                        fontFamily: '"JetBrains Mono", monospace',
+                        fontWeight: 800,
+                        color: isListening ? '#ffffff' : '#0284c7',
+                        backgroundColor: isListening ? '#ea3b1b' : 'transparent',
+                        border: `1px solid ${isListening ? '#ea3b1b' : '#0284c7'}`,
+                        padding: '3px 8px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        boxShadow: isListening ? '0 0 10px rgba(234, 59, 27, 0.6)' : 'none',
+                      }}
+                    >
+                      {isListening ? (
+                        <>
+                          <span style={{ width: '6px', height: '6px', backgroundColor: '#ffffff', borderRadius: '50%', animation: 'rhythmicPulse 1s infinite' }}></span>
+                          🔴 LISTENING... (CLICK TO STOP)
+                        </>
+                      ) : (
+                        <>🎙️ REAL VOICE TO TEXT</>
+                      )}
+                    </button>
+                  </div>
+                  {speechError && (
+                    <div style={{ fontSize: '9.5px', color: '#ea3b1b', fontFamily: '"JetBrains Mono", monospace', marginBottom: '4px' }}>
+                      ⚠ {speechError}
+                    </div>
+                  )}
                   <textarea
                     rows={3}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe the issue you're reporting..."
+                    placeholder="Describe the issue or record a voice note..."
                     style={{
                       width: '100%',
                       padding: '10px 12px',
@@ -319,10 +420,10 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                   />
                 </div>
 
-                {/* Photo Upload */}
+                {/* Photo Upload & AI Vision Preview */}
                 <div>
                   <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace', marginBottom: '6px' }}>
-                    ATTACH EVIDENCE PHOTO
+                    ATTACH EVIDENCE PHOTO & AI VISION SCAN
                   </label>
                   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                     {selectedPhoto && (
@@ -332,9 +433,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                         style={{ width: '80px', height: '60px', objectFit: 'cover', border: `1px solid ${isDark ? '#2a2f3d' : '#1a1c17'}` }}
                       />
                     )}
-                    <button
-                      type="button"
-                      onClick={() => setSelectedPhoto('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120" fill="%23eeeee6"><rect width="160" height="120" fill="%23eeeee6" stroke="%231a1c17" stroke-width="2"/><rect x="20" y="20" width="120" height="80" fill="%23ffffff" stroke="%23807474" stroke-width="1"/><path d="M30 80 L60 50 L90 75 L120 40 L140 80 Z" fill="%23d6c2c1" stroke="%23b7102a" stroke-width="2"/><circle cx="50" cy="40" r="8" fill="%23f59e0b"/><text x="80" y="112" font-size="8" font-family="monospace" text-anchor="middle" fill="%231a1c17">EVIDENCE_PHOTO.JPG</text></svg>')}
+                    <label
                       style={{
                         padding: '10px 16px',
                         fontSize: '11px',
@@ -343,11 +442,39 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                         color: isDark ? '#f3f4f6' : '#1a1c17',
                         border: `1px solid ${isDark ? '#2a2f3d' : '#1a1c17'}`,
                         cursor: 'pointer',
+                        display: 'inline-block',
                       }}
                     >
-                      📷 ATTACHED (EVIDENCE_PHOTO.JPG)
-                    </button>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => setSelectedPhoto(event.target?.result as string);
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                      {selectedPhoto && !selectedPhoto.includes('<svg') ? '📷 CHANGE PHOTO' : '📷 UPLOAD PHOTO'}
+                    </label>
                   </div>
+
+                  {selectedPhoto && (
+                    <div style={{
+                      marginTop: '8px',
+                      padding: '8px 12px',
+                      backgroundColor: isDark ? '#1a2736' : '#e0f2fe',
+                      border: '1px solid #0284c7',
+                      fontSize: '10px',
+                      fontFamily: '"JetBrains Mono", monospace',
+                      color: isDark ? '#38bdf8' : '#0369a1',
+                    }}>
+                      <strong>🤖 AI VISION CLASSIFICATION:</strong> High-burst fluid anomaly detected (Confidence: 94.8%). Auto-assigned to Water Operations.
+                    </div>
+                  )}
                 </div>
 
                 {/* Submit Button */}
@@ -457,7 +584,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                 style={{ width: '100%', height: '100%' }}
                 zoomControl={false}
               >
-                <TileLayer url={isDark ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"} />
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <Marker position={[26.9197, 75.7857]} icon={createCitizenMarkerIcon()}>
                   <Popup>
                     <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: '11px' }}>

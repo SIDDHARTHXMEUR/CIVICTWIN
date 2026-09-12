@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import { 
   LayoutGrid, 
@@ -10,15 +10,17 @@ import {
   Plus, 
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Banknote
 } from 'lucide-react';
 
 const navItems = [
   { id: 'all',            idx: '01', label: 'OVERVIEW',       icon: LayoutGrid },
-  { id: 'infrastructure', idx: '02', label: 'INFRASTRUCTURE', icon: Radio },
-  { id: 'mobility',       idx: '03', label: 'MOBILITY',       icon: Activity },
-  { id: 'environment',    idx: '04', label: 'ENVIRONMENT',    icon: Leaf },
-  { id: 'intelligence',   idx: '05', label: 'INTELLIGENCE',   icon: BrainCircuit },
+  { id: 'payments',       idx: '02', label: 'PAYMENTS',       icon: Banknote },
+  { id: 'infrastructure', idx: '03', label: 'INFRASTRUCTURE', icon: Radio },
+  { id: 'mobility',       idx: '04', label: 'MOBILITY',       icon: Activity },
+  { id: 'environment',    idx: '05', label: 'ENVIRONMENT',    icon: Leaf },
+  { id: 'intelligence',   idx: '06', label: 'INTELLIGENCE',   icon: BrainCircuit },
 ];
 
 interface SidebarProps {
@@ -27,10 +29,16 @@ interface SidebarProps {
 
 export default function Sidebar({ onNavigate }: SidebarProps) {
   const incidents = useStore(state => state.incidents);
+  const payments = useStore(state => state.payments);
+  const fetchPayments = useStore(state => state.fetchPayments);
   const activeDomain = useStore(state => state.activeDomain);
   const setActiveDomain = useStore(state => state.setActiveDomain);
   const theme = useStore(state => state.theme);
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    fetchPayments();
+  }, [fetchPayments]);
 
   const isDark = theme === 'dark';
 
@@ -107,15 +115,20 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
             const isActive = activeDomain === item.id;
             const IconComponent = item.icon;
 
-            const openIncidents = incidents.filter(i => i.status === 'open');
-            let domainIncidents = openIncidents;
-            if (item.id === 'infrastructure') domainIncidents = openIncidents.filter(i => i.category.includes('infrastructure'));
-            else if (item.id === 'mobility') domainIncidents = openIncidents.filter(i => i.category.includes('mobility'));
-            else if (item.id === 'environment') domainIncidents = openIncidents.filter(i => i.category.includes('environment'));
-            else if (item.id === 'intelligence') domainIncidents = openIncidents;
+            const openIncidents = incidents.filter(i => ['reported', 'classified', 'in_progress', 'open'].includes(i.status));
+            let badgeCount = 0;
+            let hasCritical = false;
 
-            const badgeCount = domainIncidents.length;
-            const hasCritical = domainIncidents.some(i => i.tab === 'critical');
+            if (item.id === 'all' || item.id === 'intelligence') {
+              badgeCount = openIncidents.length;
+              hasCritical = openIncidents.some(i => i.tab === 'critical');
+            } else if (item.id === 'payments') {
+              badgeCount = payments.filter(p => p.status === 'settled').length || payments.length;
+            } else {
+              const domainIncidents = openIncidents.filter(i => i.category.toLowerCase().includes(item.id.toLowerCase()));
+              badgeCount = domainIncidents.length;
+              hasCritical = domainIncidents.some(i => i.tab === 'critical');
+            }
 
             return (
               <div 

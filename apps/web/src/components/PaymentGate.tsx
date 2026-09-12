@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Lock, Unlock, Zap, Wallet, ExternalLink, AlertTriangle, CheckCircle } from 'lucide-react';
 import { initiateX402Payment, checkExistingPayment, USDC_TESTNET_ASA_ID, DEMO_SIGNER_ADDRESS } from '../lib/x402';
 import type { X402PaymentResult } from '../lib/x402';
+import { useStore } from '../store';
 
 // ─────────────────────────────────────────────────────────────
 // Demo auto-signer — real funded testnet account.
@@ -95,6 +96,19 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
 
       setResult(paymentResult);
       setPaymentState('settled');
+
+      // Optimistic update: push settled payment into Zustand store immediately
+      // so IntelligencePanel's isPaid check unlocks Dispatch Resolution instantly
+      useStore.getState().addPayment({
+        id: `local-${Date.now()}`,
+        payer_algorand_address: address,
+        tx_hash: paymentResult.txHash,
+        resource_path: resourceId,
+        amount: priceUsdc,
+        asset_id: `ASA:${USDC_TESTNET_ASA_ID}`,
+        status: 'settled',
+        created_at: new Date().toISOString(),
+      });
     } catch (err: any) {
       setPaymentState('error');
       setErrorMsg(err.message || 'Payment failed. Please retry.');
@@ -158,49 +172,60 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
   return (
     <div style={{
       backgroundColor: cardBg,
-      border: `1px solid ${paymentState === 'error' ? '#ef4444' : '#3b82f6'}`,
-      padding: '12px',
+      border: `1px solid ${paymentState === 'error' ? '#ef4444' : isDark ? '#30363d' : '#e5e7eb'}`,
       display: 'flex',
       flexDirection: 'column',
-      gap: '10px',
-      alignItems: 'center',
-      textAlign: 'center',
+      textAlign: 'left',
       fontFamily: mono,
+      width: '100%',
+      boxSizing: 'border-box'
     }}>
-      {/* Lock icon + title */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
-        {paymentState === 'error'
-          ? <AlertTriangle size={20} color="#ef4444" />
-          : <Lock size={20} color="#3b82f6" />}
-        <span style={{ fontSize: '11px', fontWeight: 800, color: textPrimary, letterSpacing: '0.04em' }}>
+      {/* Header Band */}
+      <div style={{
+        backgroundColor: paymentState === 'error' ? '#ef4444' : '#0a0a0a',
+        padding: '10px 14px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        color: '#ffffff',
+        borderBottom: `2px solid ${paymentState === 'error' ? '#dc2626' : '#ea3b1b'}`
+      }}>
+        {paymentState === 'error' ? <AlertTriangle size={14} /> : <Lock size={14} />}
+        <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.04em', fontFamily: '"Space Grotesk", sans-serif' }}>
           {description.toUpperCase()}
-        </span>
-        <span style={{ fontSize: '9px', color: textMuted }}>
-          Gate secured by Algorand x402 · GoPlausible Testnet Facilitator
-        </span>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '6px',
-          padding: '4px 10px',
-          backgroundColor: isDark ? '#161b22' : '#eff6ff',
-          border: '1px solid #3b82f6',
-        }}>
-          <span style={{ fontSize: '11px', fontWeight: 900, color: '#3b82f6' }}>{priceUsdc} USDC</span>
-          <span style={{ fontSize: '9px', color: textMuted }}>= {(priceUsdc * 1_000_000).toLocaleString()} µUSDC</span>
-        </div>
-        <span style={{ fontSize: '8px', color: textMuted }}>
-          ASA ID: {USDC_TESTNET_ASA_ID} · Network: algorand:testnet
         </span>
       </div>
 
-      {/* Error message */}
-      {paymentState === 'error' && errorMsg && (
-        <div style={{
-          fontSize: '9px', color: '#ef4444', backgroundColor: isDark ? '#1c0a0a' : '#fef2f2',
-          border: '1px solid #ef4444', padding: '4px 8px', width: '100%', textAlign: 'left',
-        }}>
-          ✕ {errorMsg}
+      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* Narrative Subtitle */}
+        <div style={{ fontSize: '10px', color: textPrimary, lineHeight: 1.4, fontFamily: '"Space Grotesk", sans-serif', fontWeight: 500 }}>
+          Premium municipal intelligence — billed per report via your department's Algorand treasury account.
         </div>
-      )}
+
+        {/* Pricing Pill */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '4px 10px',
+            backgroundColor: isDark ? '#161b22' : '#eff6ff',
+            border: '1px solid #3b82f6',
+            borderRadius: '0px'
+          }}>
+            <span style={{ fontSize: '11px', fontWeight: 900, color: '#3b82f6' }}>{priceUsdc} USDC</span>
+            <span style={{ fontSize: '9px', color: textMuted }}>= {(priceUsdc * 1_000_000).toLocaleString()} µUSDC</span>
+          </div>
+        </div>
+
+        {/* Error message */}
+        {paymentState === 'error' && errorMsg && (
+          <div style={{
+            fontSize: '10px', color: '#ffffff', backgroundColor: '#ef4444',
+            padding: '6px 10px', width: '100%', boxSizing: 'border-box',
+            fontWeight: 700
+          }}>
+            ✕ {errorMsg}
+          </div>
+        )}
 
       {/* Wallet / Pay button */}
       {!address ? (
@@ -208,22 +233,25 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
           onClick={connect}
           disabled={connecting}
           style={{
-            padding: '7px 16px',
-            fontSize: '10px',
+            padding: '10px 16px',
+            fontSize: '11px',
             fontWeight: 800,
             fontFamily: mono,
-            backgroundColor: connecting ? '#374151' : '#3b82f6',
+            backgroundColor: connecting ? '#374151' : '#ea3b1b',
             color: '#ffffff',
             border: 'none',
             cursor: connecting ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '6px',
+            justifyContent: 'center',
+            gap: '8px',
             letterSpacing: '0.05em',
+            width: '100%',
+            transition: 'background-color 0.2s',
           }}
         >
-          <Wallet size={12} />
-          {connecting ? 'CONNECTING...' : 'CONNECT DEMO ACCOUNT'}
+          <Wallet size={14} />
+          {connecting ? 'CONNECTING...' : 'AUTHORIZE MUNICIPAL PAYMENT'}
         </button>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', width: '100%', alignItems: 'center' }}>
@@ -234,7 +262,8 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
             padding: '2px 8px', border: '1px solid #10b981',
           }}>
             <CheckCircle size={9} />
-            <span>{address.slice(0, 20)}...</span>
+            <span style={{ fontWeight: 700 }}>Jaipur Water Dept.</span>
+            <span style={{ opacity: 0.7 }}>({address.slice(0, 8)}...)</span>
             <button
               onClick={disconnect}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6b7280', fontSize: '9px', padding: '0 2px' }}
@@ -280,11 +309,13 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
       {/* Protocol info */}
       <div style={{
         fontSize: '8px', color: textMuted, borderTop: `1px solid ${cardBorder}`,
-        paddingTop: '8px', width: '100%', textAlign: 'center', lineHeight: 1.6,
+        padding: '10px 14px', width: '100%', textAlign: 'left', lineHeight: 1.6,
+        backgroundColor: isDark ? '#161922' : '#f5f2e8',
+        boxSizing: 'border-box'
       }}>
-        x402 Payment Protocol · GoPlausible Facilitator · Algorand Testnet
-        <br />
+        x402 Payment Protocol · GoPlausible Facilitator · Algorand Testnet<br />
         USDC (ASA {USDC_TESTNET_ASA_ID}) · Settled on-chain · Logged to CivicTwin DB
+      </div>
       </div>
     </div>
   );

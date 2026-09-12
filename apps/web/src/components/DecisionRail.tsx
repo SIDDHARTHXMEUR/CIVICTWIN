@@ -14,7 +14,9 @@ function getRelativeTime(timestamp: number) {
 
 export default function DecisionRail() {
   const incidents = useStore(state => state.incidents);
-  const resolveIncident = useStore(state => state.resolveIncident);
+  const executeIncidentAction = useStore(state => state.executeIncidentAction);
+  const setFocusedIncidentId = useStore(state => state.setFocusedIncidentId);
+  const focusedIncidentId = useStore(state => state.focusedIncidentId);
   const theme = useStore(state => state.theme);
   const isDark = theme === 'dark';
 
@@ -22,25 +24,31 @@ export default function DecisionRail() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const activeDomain = useStore(state => state.activeDomain);
-  const openIncidents = incidents.filter(i => i.status === 'open' && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
-  const resolvedIncidents = incidents.filter(i => i.status === 'resolved' && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
+  const openIncidents = incidents.filter(i => ['reported', 'classified', 'in_progress', 'open'].includes(i.status) && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
+  const resolvedIncidents = incidents.filter(i => ['resolved', 'verified'].includes(i.status) && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
   const criticalIncidents = openIncidents.filter(i => i.tab === 'critical');
   const warningIncidents = openIncidents.filter(i => i.tab === 'warnings');
-
   const activeTabIncidents = openIncidents.filter(i => i.tab === activeTab);
+
+  const optimalRoute = useStore(state => state.optimalRoute);
+  const fetchOptimalRoute = useStore(state => state.fetchOptimalRoute);
 
   const handleActionClick = (actionLabel: string, incidentId: string, isPrimary: boolean) => {
     setToastMessage(`✓ COMMAND EXECUTED: ${actionLabel.toUpperCase()} // TELEMETRY SYNCED`);
     setTimeout(() => setToastMessage(null), 3500);
 
-    if (isPrimary) {
-      setTimeout(() => resolveIncident(incidentId), 800);
+    const inc = incidents.find(i => i.id === incidentId);
+    if (inc) {
+      fetchOptimalRoute(inc.id, inc.lat || 26.9124, inc.lng || 75.7873, inc.category, String(inc.severity));
     }
+
+    // Call the synchronous optimistic action (no setTimeout delay)
+    executeIncidentAction(incidentId, actionLabel, isPrimary);
   };
 
   return (
     <aside className="beveled-3d-frame" style={{
-      width: '260px',
+      width: '300px',
       backgroundColor: isDark ? '#12141a' : '#f5f2e8',
       display: 'flex',
       flexDirection: 'column',
@@ -162,14 +170,18 @@ export default function DecisionRail() {
             NO ACTIVE {activeTab.toUpperCase()} ALERTS
           </div>
         ) : (
-          activeTabIncidents.map(incident => (
-            <AlertCard
-              key={incident.id}
-              incident={incident}
-              onAction={(label, isPrimary) => handleActionClick(label, incident.id, isPrimary)}
-              isDark={isDark}
-            />
-          ))
+          <>
+            {activeTabIncidents.map(incident => (
+              <AlertCard
+                key={incident.id}
+                incident={incident}
+                onAction={(label, isPrimary) => handleActionClick(label, incident.id, isPrimary)}
+                onFocus={() => setFocusedIncidentId(incident.id)}
+                isFocused={focusedIncidentId === incident.id}
+                isDark={isDark}
+              />
+            ))}
+          </>
         )}
 
         {/* Predictive model card shown on warnings tab */}
@@ -222,31 +234,52 @@ export default function DecisionRail() {
   );
 }
 
-function AlertCard({ incident, onAction, isDark }: {
+function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
   incident: Incident;
   onAction: (label: string, isPrimary: boolean) => void;
+  onFocus?: () => void;
+  isFocused?: boolean;
   isDark: boolean;
 }) {
   const isCritical = incident.tab === 'critical';
+  const [showDetails, setShowDetails] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const headerBg = isCritical ? '#ea3b1b' : '#d97706';
+  const accentColor = isCritical ? '#ea3b1b' : '#f59e0b';
+  const headerBg = isDark ? '#1c202c' : '#2a2f3d';
   const tagText = isCritical ? '⚠ PHYSICAL INFRASTRUCTURE' : '⚡ MOBILITY GRIDLOCK';
+  const severityVal = incident.severity || (isCritical ? 8 : 4);
 
   return (
-    <div className="beveled-3d-frame" style={{
-      backgroundColor: isDark ? '#161922' : '#f5f2e8',
-      borderRadius: '0px',
-      overflow: 'hidden',
-    }}>
-      {/* Card Header */}
-      <div style={{
-        backgroundColor: headerBg,
-        padding: '8px 10px',
+    <div
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="beveled-3d-frame"
+      style={{
+        backgroundColor: isDark ? '#161922' : '#f5f2e8',
         borderRadius: '0px',
-      }}>
+        overflow: 'hidden',
+        flexShrink: 0,
+        outline: isFocused ? `2px solid #4fc9dc` : isHovered ? `1px solid ${isDark ? '#4fc9dc' : '#0a0a0a'}` : 'none',
+        outlineOffset: '-1px',
+        transform: isHovered ? 'translateX(-2px)' : 'none',
+        transition: 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), outline 0.15s ease, box-shadow 0.15s ease',
+        boxShadow: isHovered ? '0 4px 12px rgba(0,0,0,0.15)' : 'none',
+      }}
+    >
+      {/* Card Header — click to focus map */}
+      <div
+        onClick={onFocus}
+        style={{
+          backgroundColor: headerBg,
+          borderLeft: `4px solid ${accentColor}`,
+          padding: '8px 10px',
+          borderRadius: '0px',
+          cursor: 'crosshair',
+        }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <div style={{ fontSize: '8px', fontWeight: 800, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.08em', marginBottom: '2px', fontFamily: '"JetBrains Mono", monospace' }}>
+            <div style={{ fontSize: '8px', fontWeight: 800, color: accentColor, letterSpacing: '0.08em', marginBottom: '2px', fontFamily: '"JetBrains Mono", monospace' }}>
               {tagText}
             </div>
             <div style={{ fontSize: '12px', fontWeight: 800, color: '#ffffff', lineHeight: 1.2, fontFamily: '"Space Grotesk", sans-serif' }}>
@@ -268,15 +301,97 @@ function AlertCard({ incident, onAction, isDark }: {
             }}>
               REPORTED BY: {incident.reportCount}
             </div>
+            {incident.status !== 'reported' && incident.status !== 'open' && (
+              <div style={{ 
+                fontSize: '8px', 
+                fontWeight: 800, 
+                backgroundColor: accentColor, 
+                color: '#ffffff', 
+                padding: '2px 4px', 
+                marginTop: '4px',
+                fontFamily: '"JetBrains Mono", monospace' 
+              }}>
+                {incident.status.replace('_', ' ').toUpperCase()}
+              </div>
+            )}
           </div>
+        </div>
+      </div>
+
+      {/* Severity Meter Bar */}
+      <div style={{
+        padding: '6px 10px 0 10px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: '6px',
+      }}>
+        <span style={{ fontSize: '8px', fontFamily: '"JetBrains Mono", monospace', fontWeight: 800, color: isDark ? '#cbd5e1' : '#1e293b' }}>
+          SEVERITY {severityVal}/10
+        </span>
+        <div style={{ display: 'flex', gap: '3px', flex: 1, maxWidth: '120px' }}>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                flex: 1,
+                height: '4px',
+                backgroundColor: i < severityVal 
+                  ? (severityVal >= 7 ? '#ea3b1b' : severityVal >= 4 ? '#f59e0b' : '#10b981')
+                  : (isDark ? '#2a2f3d' : '#e5e7eb'),
+                borderRadius: '0px',
+              }}
+            />
+          ))}
         </div>
       </div>
 
       {/* Card Body */}
       <div style={{ padding: '8px 10px' }}>
-        <p style={{ fontSize: '10px', color: isDark ? '#9ca3af' : '#4e4444', lineHeight: 1.5, marginBottom: '8px' }}>
+        <p style={{ fontSize: '10px', color: isDark ? '#cbd5e1' : '#111827', fontWeight: 500, lineHeight: 1.5, marginBottom: '8px' }}>
           {incident.description}
         </p>
+
+        {/* Expandable Root Cause / Sensor Info */}
+        <div style={{ marginBottom: '8px' }}>
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              fontSize: '8px',
+              fontFamily: '"JetBrains Mono", monospace',
+              color: isDark ? '#4fc9dc' : '#005073',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px',
+            }}
+          >
+            <span>{showDetails ? '▼ HIDE ROOT CAUSE' : '▶ VIEW ROOT CAUSE & TELEMETRY'}</span>
+          </button>
+          {showDetails && (
+            <div style={{
+              marginTop: '4px',
+              padding: '6px',
+              backgroundColor: isDark ? '#1c202c' : '#ffffff',
+              border: `1px solid ${isDark ? '#2a2f3d' : '#e5e7eb'}`,
+              fontSize: '8.5px',
+              fontFamily: '"JetBrains Mono", monospace',
+              color: isDark ? '#e2e8f0' : '#1e293b',
+            }}>
+              <div><strong>ROOT CAUSE:</strong> {incident.rootCause || 'Underground pressure sensor spike + hydraulic differential.'}</div>
+              {incident.lat && incident.lng && (
+                <div style={{ marginTop: '2px', color: isDark ? '#94a3b8' : '#334155' }}>
+                  GPS: {incident.lat.toFixed(4)}°N, {incident.lng.toFixed(4)}°E
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
         <div style={{ display: 'flex', gap: '6px' }}>
           {incident.actions.map((action, idx) => (
             <button
@@ -301,12 +416,29 @@ function AlertCard({ incident, onAction, isDark }: {
                 borderRadius: '0px',
                 cursor: 'pointer',
                 border: action.kind === 'primary'
-                  ? `1px solid ${headerBg}`
+                  ? `1px solid ${accentColor}`
                   : `1px solid ${isDark ? '#2a2f3d' : '#d2c3c3'}`,
                 backgroundColor: action.kind === 'primary'
-                  ? headerBg
+                  ? accentColor
                   : isDark ? '#1c202c' : '#ffffff',
                 color: action.kind === 'primary' ? '#ffffff' : isDark ? '#f3f4f6' : '#1a1c17',
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (action.kind !== 'primary') {
+                  e.currentTarget.style.borderColor = isDark ? '#4fc9dc' : '#0a0a0a';
+                  e.currentTarget.style.color = isDark ? '#4fc9dc' : '#0a0a0a';
+                } else {
+                  e.currentTarget.style.opacity = '0.9';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (action.kind !== 'primary') {
+                  e.currentTarget.style.borderColor = isDark ? '#2a2f3d' : '#d2c3c3';
+                  e.currentTarget.style.color = isDark ? '#f3f4f6' : '#1a1c17';
+                } else {
+                  e.currentTarget.style.opacity = '1';
+                }
               }}
             >
               {action.label}
@@ -323,7 +455,8 @@ function PredictiveCard({ isDark, onAction }: { isDark: boolean; onAction: (lbl:
     <div className="beveled-3d-frame" style={{
       backgroundColor: isDark ? '#161922' : '#fafaf1',
       borderRadius: '0px',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      flexShrink: 0,
     }}>
       <div style={{
         backgroundColor: isDark ? '#1c202c' : '#eeeee6',
@@ -381,7 +514,8 @@ function InsightsCard({ isDark }: { isDark: boolean }) {
       backgroundColor: isDark ? '#082f49' : '#e0f2fe',
       padding: '10px',
       borderRadius: '0px',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      flexShrink: 0,
     }}>
       <div style={{ fontSize: '8px', fontWeight: 800, color: isDark ? '#7dd3fc' : '#0369a1', letterSpacing: '0.08em', marginBottom: '4px', fontFamily: '"JetBrains Mono", monospace' }}>
         💡 SYSTEM OPTIMIZATION INSIGHT
