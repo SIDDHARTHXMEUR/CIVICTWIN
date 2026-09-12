@@ -129,21 +129,26 @@ export default function GridTopologyPanel() {
           }}>
             JAIPUR GRID TOPOLOGY
           </span>
-          {activeDomain !== 'all' && (
-            <span style={{
-              fontSize: '9px',
-              fontFamily: '"JetBrains Mono", monospace',
-              color: '#0a0a0a',
-              backgroundColor: '#4fc9dc',
-              padding: '2px 6px',
-              border: `1px solid ${isDark ? '#4fc9dc' : '#0a0a0a'}`,
-              borderRadius: '0px',
-              textTransform: 'uppercase',
-              marginLeft: '4px',
-              fontWeight: 800,
-            }}>
-              [{activeDomain}]
-            </span>
+          {activeDomain !== 'all' && activeDomain !== 'intelligence' && (
+            <button
+              onClick={() => useStore.getState().setActiveDomain('all')}
+              title="Clear Filter"
+              style={{
+                fontSize: '9px',
+                fontFamily: '"JetBrains Mono", monospace',
+                color: '#0a0a0a',
+                backgroundColor: '#4fc9dc',
+                padding: '2px 6px',
+                border: `1px solid ${isDark ? '#4fc9dc' : '#0a0a0a'}`,
+                borderRadius: '0px',
+                textTransform: 'uppercase',
+                marginLeft: '4px',
+                fontWeight: 800,
+                cursor: 'pointer',
+              }}
+            >
+              FILTERED: {activeDomain} — SHOW ALL
+            </button>
           )}
         </div>
 

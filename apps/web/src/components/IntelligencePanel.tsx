@@ -8,7 +8,8 @@ export default function IntelligencePanel() {
   const theme = useStore(state => state.theme);
   const isDark = theme === 'dark';
 
-  const activeIncidents = incidents.filter(i => i.status === 'open');
+  const activeDomain = useStore(state => state.activeDomain);
+  const activeIncidents = incidents.filter(i => i.status === 'open' && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const topAnomaly = activeIncidents.length > 0

@@ -21,8 +21,9 @@ export default function DecisionRail() {
   const [activeTab, setActiveTab] = useState<'critical' | 'warnings' | 'insights'>('critical');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const openIncidents = incidents.filter(i => i.status === 'open');
-  const resolvedIncidents = incidents.filter(i => i.status === 'resolved');
+  const activeDomain = useStore(state => state.activeDomain);
+  const openIncidents = incidents.filter(i => i.status === 'open' && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
+  const resolvedIncidents = incidents.filter(i => i.status === 'resolved' && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
   const criticalIncidents = openIncidents.filter(i => i.tab === 'critical');
   const warningIncidents = openIncidents.filter(i => i.tab === 'warnings');
 
