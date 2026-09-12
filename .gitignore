@@ -34,3 +34,13 @@ dist-ssr
 # Vite & Cache
 .vite
 .cache
+
+# Python
+__pycache__/
+*.py[cod]
+*.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.ruff_cache/

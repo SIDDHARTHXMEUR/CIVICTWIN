@@ -54,6 +54,51 @@ D --> A
 
 ---
 
+## 📂 Repository Structure
+
+The project uses a clean monorepo architecture to separate concerns while keeping all related services together:
+
+```
+CIVICTWIN/
+├── apps/
+│   └── web/                 # Frontend: React, Vite, Zustand, Tailwind
+├── services/
+│   └── api/                 # Backend: FastAPI, Python (AI prediction layers)
+├── supabase/
+│   └── migrations/          # Database schema and RLS policies
+├── infra/                   # Docker, seed data, and deployment configurations
+├── DESIGN_SYSTEM.md         # Comprehensive UI/UX guidelines
+├── README.md                # Project overview (this file)
+└── docker-compose.yml       # Local development orchestration
+```
+
+---
+
+## 🚀 Quick Start (Local Development)
+
+This project can be run locally using the provided demo script, which starts both the FastAPI backend and provides instructions for the Vite frontend.
+
+1. **Install dependencies:**
+   Ensure you have `uv` (or `pip`) installed for Python, and `npm` for Node.js.
+   ```bash
+   cd apps/web && npm install
+   cd ../../services/api && uv pip install -r requirements.txt
+   ```
+2. **Run the local stack:**
+   ```bash
+   # From the repository root
+   python run_demo.py
+   ```
+   *This starts the FastAPI backend on `localhost:8000`.*
+3. **Run the frontend:**
+   ```bash
+   # In a new terminal, from the repository root
+   npm run dev
+   ```
+   *This starts the Vite React frontend on `localhost:5173`.*
+
+---
+
 ## 01 — Product Model
 CivicTwin is organized around one operational loop:
 `Observe → Predict → Act`
