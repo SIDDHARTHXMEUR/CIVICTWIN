@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: civictwin-postgres
+    environment:
+      POSTGRES_USER: civictwin
+      POSTGRES_PASSWORD: civictwin_secret_password
+      POSTGRES_DB: civictwin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U civictwin -d civictwin"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: civictwin-redis
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: .
+      dockerfile: services/api/Dockerfile
+    container_name: civictwin-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://civictwin:civictwin_secret_password@postgres:5432/civictwin
+      - REDIS_URL=redis://redis:6379/0
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - JWT_SECRET=${JWT_SECRET:-civictwin_super_secret_jwt_key_2026}
+      - DEDUP_RADIUS_M=300
+      - DEDUP_WINDOW_HOURS=168
+      - DEDUP_THRESHOLD=0.72
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  worker:
+    build:
+      context: .
+      dockerfile: services/worker/Dockerfile
+    container_name: civictwin-worker
+    environment:
+      - DATABASE_URL=postgresql://civictwin:civictwin_secret_password@postgres:5432/civictwin
+      - REDIS_URL=redis://redis:6379/0
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    depends_on:
+      - redis
+      - postgres
+
+  citizen-app:
+    build:
+      context: ./apps/citizen-app
+    container_name: civictwin-citizen-app
+    ports:
+      - "3000:3000"
+
+  authority-dashboard:
+    build:
+      context: ./apps/authority-dashboard
+    container_name: civictwin-authority-dashboard
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres_data:

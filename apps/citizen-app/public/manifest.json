@@ -1,0 +1,9 @@
+{
+  "name": "CivicTwin Citizen Portal",
+  "short_name": "CivicTwin",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F172A",
+  "theme_color": "#0F172A",
+  "description": "Report urban civic issues instantly to NIT Delhi municipal authorities."
+}
