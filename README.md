@@ -1,5 +1,5 @@
 # CivicTwin
-### Municipal Urban Operational Layer & Spatial Digital Twin
+### Municipal Urban Operational Layer, Spatial Digital Twin & Algorand x402 Micropayments
 
 <p align="center">
   <em>See the city. Predict the risk. Act before it escalates.</em>
@@ -13,12 +13,13 @@
 ---
 
 > [!IMPORTANT]
-> **CivicTwin** is an open-source municipal operations and spatial intelligence platform that unifies fragmented urban telemetry, public grievances, and GIS spatial layers into a single real-time operational layer.
+> **CivicTwin** is an open-source municipal operations and spatial intelligence platform that unifies fragmented urban telemetry, public grievances, and GIS spatial layers into a single real-time operational layer — built with **Algorand Testnet x402 micropayments** for decentralized machine-to-machine AI failure diagnostics and immutable audit trails.
 
 ---
 
 ## 📑 Table of Contents
 - [Executive Overview](#-executive-overview)
+- [Algorand Blockchain Integration](#-algorand-blockchain--x402-protocol)
 - [The Problem: Fragmented City Signals](#-the-problem-fragmented-city-signals)
 - [Repository Architecture](#-repository-architecture)
 - [Quick Start Guide](#-quick-start-guide)
@@ -51,9 +52,20 @@ When critical urban infrastructure breaks, municipal operators lose critical min
 2. **Predicts Failure Cascades**: Evaluates spatial anomaly propagation and severity with transparent, rule-based scoring (1–10 scale).
 3. **Surfaces Contextual Decisions**: Recommends immediate tactical interventions through an actionable **Decision Rail**.
 4. **Dispatches Autonomous Crews**: Computes shortest-path emergency routes using simulated **Vehicle Routing with Time Windows (VRPTW)**.
-5. **Enforces Cryptographic Auditability**: Demonstrates machine-to-machine operational reports gated by **x402 micropayments** on Algorand Testnet.
+5. **Algorand Decentralized Settlement**: Implements **x402 machine-to-machine micropayments** directly on **Algorand Testnet** for trustless, cryptographic diagnostic data monetization and audit logging.
 
 > *"Urban data is only valuable when it directly empowers an operator to make a faster, higher-confidence decision."*
+
+---
+
+## ⛓️ Algorand Blockchain & x402 Protocol
+
+CivicTwin leverages **Algorand** as its decentralized settlement layer for sovereign urban intelligence:
+
+- **Algorand Testnet Settlement**: High-throughput, low-latency transaction finality (~3.3 seconds) perfectly matched for municipal machine-to-machine (M2M) telemetry verification.
+- **x402 HTTP Paywall Standard**: Enables automated API consumers, autonomous vehicles, and private utilities to purchase high-value predictive failure reports with sub-cent `0.05 ALGO` micropayments.
+- **Cryptographic Auditability**: Every unlocked failure diagnostic generates an immutable on-chain transaction hash (`TxID`), providing tamper-proof municipal accountability without intermediary fees.
+- **Non-Custodial Wallet Integration**: Seamless support for Pera Wallet and direct Algorand node / indexer signing via `@x402-avm/core`.
 
 ---
 
