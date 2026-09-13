@@ -6,10 +6,8 @@
 </p>
 
 <p align="center">
-  <a href="https://civictwin-web-silk.vercel.app/"><img src="https://img.shields.io/badge/Live%20Demo-CivicTwin%20Web-4FC9DC?style=for-the-badge&logo=vercel" alt="Live Demo" /></a> &nbsp;&nbsp;
-  <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github" alt="GitHub Repository" /></a> &nbsp;&nbsp;
-  <img src="https://img.shields.io/badge/Algorand-Testnet%20x402-000000?style=for-the-badge&logo=algorand" alt="Algorand" /> &nbsp;&nbsp;
-  <img src="https://img.shields.io/badge/Version-2.4.0%20Latest-10B981?style=for-the-badge" alt="Version 2.4.0" />
+  <a href="https://civictwin-web-silk.vercel.app/"><strong>🌐 CivicTwin Web</strong></a> &nbsp;&nbsp;|&nbsp;&nbsp; 
+  <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>📂 GitHub Repository</strong></a>
 </p>
 
 ---
@@ -335,7 +333,7 @@ flowchart TD
 The following sequence illustrates CivicTwin's end-to-end operational chain during an underground water-main rupture:
 
 ```mermaid
-sequenceDiagram 
+sequenceDiagram
     autonumber
     actor C as 👥 Citizen
     participant G as 📱 Citizen Gateway
@@ -344,16 +342,16 @@ sequenceDiagram
     participant AI as 🧠 Intelligence Dossier (Algorand x402)
     participant R as 🚒 Multi-Agency Response Squad
 
-    C->>G: 1. Reports pipeline fracture & surface flooding
-    G->>G: 2. Captures GPS coordinates (26.9124°N, 75.7873°E)
+    C->>G: 1. Reports pipeline fracture and surface flooding
+    G->>G: 2. Captures GPS coordinates (26.9124 N, 75.7873 E)
     G->>GIS: 3. Corroborates with SCADA sensor JP-W01 (pressure drops to 2.4 bar)
-    GIS->>O: 4. Triggers Critical Alert (Severity 9.2/10) with Cause & Playbook
+    GIS->>O: 4. Triggers Critical Alert (Severity 9.2/10) with Cause and Playbook
     O->>O: 5. Free Action: Operator isolates grid segment via valve V-14
     O->>AI: 6. Settle 0.1 USDC on Algorand to run heavy 120-min cascade simulation
-    AI->>AI: 7. Computes ₹2.41 Cr risk, hashes state (SHA-256), anchors to Algorand Testnet
+    AI->>AI: 7. Computes INR 2.41 Cr risk, hashes state (SHA-256), anchors to Algorand Testnet
     AI->>R: 8. Executes Automated Multi-Agency Dispatch with live VRPTW navigation
-    R->>GIS: 9. Repair squad arrives, fixes main; sensor reading normalizes to 4.8 bar
-    GIS->>O: 10. Incident moves to "Resolved" with permanent on-chain audit record
+    R->>GIS: 9. Repair squad arrives, fixes main, and sensor reading normalizes to 4.8 bar
+    GIS->>O: 10. Incident moves to Resolved with permanent on-chain audit record
 ```
 
 ---
