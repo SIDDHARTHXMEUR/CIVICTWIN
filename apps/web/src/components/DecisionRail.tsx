@@ -60,7 +60,7 @@ export default function DecisionRail() {
     }}>
       {/* Action Dispatch Toast Notification */}
       {toastMessage && (
-        <div style={{
+        <div className="toast-pop" style={{
           position: 'absolute',
           top: '-42px',
           right: '0px',
@@ -73,9 +73,8 @@ export default function DecisionRail() {
           fontWeight: 800,
           border: '1px solid #ffffff',
           borderRadius: '0px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)',
           whiteSpace: 'nowrap',
-          animation: 'slideUpFade 0.3s ease-out',
         }}>
           {toastMessage}
         </div>
@@ -107,8 +106,8 @@ export default function DecisionRail() {
             DECISION RAIL
           </span>
         </div>
-        <div style={{ fontSize: '10px', color: '#6b7280', fontFamily: '"JetBrains Mono", monospace', marginTop: '4px' }}>
-          AI Incident Alerts & Triage
+        <div style={{ fontSize: '10px', color: isDark ? '#94a3b8' : '#1e293b', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace', marginTop: '4px' }}>
+          AI Incident Alerts &amp; Triage
         </div>
       </div>
 
@@ -116,21 +115,22 @@ export default function DecisionRail() {
       <div style={{ display: 'flex', borderBottom: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`, backgroundColor: isDark ? '#161922' : '#e8e4d8' }}>
         {[
           { key: 'critical', label: 'CRITICAL', icon: '⚠', count: criticalIncidents.length, color: '#ea3b1b' },
-          { key: 'warnings', label: 'WARNINGS', icon: '⚡', count: warningIncidents.length, color: '#f59e0b' },
-          { key: 'insights', label: 'INSIGHTS', icon: '💡', count: 1, color: isDark ? '#4fc9dc' : '#0090b8' },
+          { key: 'warnings', label: 'WARNINGS', icon: '⚡', count: warningIncidents.length, color: '#d97706' },
+          { key: 'insights', label: 'INSIGHTS', icon: '💡', count: 1, color: isDark ? '#4fc9dc' : '#0284c7' },
         ].map((tab) => {
           const isActive = activeTab === tab.key;
           return (
             <div 
               key={tab.key} 
               onClick={() => setActiveTab(tab.key as 'critical' | 'warnings' | 'insights')}
+              className="btn-tactile"
               style={{
                 flex: 1,
-                padding: '8px 2px',
+                padding: '9px 4px',
                 textAlign: 'center',
-                fontSize: '9px',
-                fontWeight: isActive ? 800 : 600,
-                color: isActive ? tab.color : '#9ca3af',
+                fontSize: '10px',
+                fontWeight: 800,
+                color: isActive ? tab.color : isDark ? '#94a3b8' : '#334155',
                 borderBottom: isActive ? `2px solid ${tab.color}` : '2px solid transparent',
                 cursor: 'pointer',
                 letterSpacing: '0.04em',
@@ -138,7 +138,7 @@ export default function DecisionRail() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '3px',
+                gap: '4px',
                 transition: 'all 0.15s ease',
               }}
             >
@@ -146,12 +146,14 @@ export default function DecisionRail() {
               <span>{tab.label}</span>
               {tab.count > 0 && (
                 <span style={{
-                  fontSize: '8px',
+                  fontSize: '9px',
+                  fontWeight: 800,
                   fontFamily: '"JetBrains Mono", monospace',
-                  backgroundColor: isActive ? tab.color : isDark ? '#2a2f3d' : '#eeeee6',
-                  color: isActive ? '#ffffff' : '#6b7280',
-                  padding: '0 4px',
+                  backgroundColor: isActive ? tab.color : isDark ? '#2a2f3d' : '#d5d0c3',
+                  color: isActive ? '#ffffff' : isDark ? '#f3f4f6' : '#0f172a',
+                  padding: '1px 5px',
                   borderRadius: '0px',
+                  transition: 'background-color 0.15s ease, color 0.15s ease',
                 }}>
                   {tab.count}
                 </span>
@@ -171,10 +173,11 @@ export default function DecisionRail() {
           </div>
         ) : (
           <>
-            {activeTabIncidents.map(incident => (
+            {activeTabIncidents.map((incident, idx) => (
               <AlertCard
                 key={incident.id}
                 incident={incident}
+                index={idx}
                 onAction={(label, isPrimary) => handleActionClick(label, incident.id, isPrimary)}
                 onFocus={() => setFocusedIncidentId(incident.id)}
                 isFocused={focusedIncidentId === incident.id}
@@ -228,14 +231,18 @@ export default function DecisionRail() {
           fontFamily: '"JetBrains Mono", monospace',
         }}>AI</div>
         <span style={{ fontSize: '10px', color: '#6b7280', fontFamily: '"JetBrains Mono", monospace' }}>Engine Online</span>
-        <span style={{ marginLeft: 'auto', width: '6px', height: '6px', borderRadius: '0px', backgroundColor: '#10b981', flexShrink: 0 }}></span>
+        <div style={{ marginLeft: 'auto', position: 'relative', width: '8px', height: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span className="beacon-ring" style={{ backgroundColor: '#10b981' }} />
+          <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0, boxShadow: '0 0 6px #10b981' }}></span>
+        </div>
       </div>
     </aside>
   );
 }
 
-function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
+function AlertCard({ incident, index, onAction, onFocus, isFocused, isDark }: {
   incident: Incident;
+  index: number;
   onAction: (label: string, isPrimary: boolean) => void;
   onFocus?: () => void;
   isFocused?: boolean;
@@ -254,7 +261,7 @@ function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="beveled-3d-frame"
+      className={`beveled-3d-frame card-interactive fade-slide-in stagger-${(index % 6) + 1}`}
       style={{
         backgroundColor: isDark ? '#161922' : '#f5f2e8',
         borderRadius: '0px',
@@ -271,43 +278,64 @@ function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
       <div
         onClick={onFocus}
         style={{
-          backgroundColor: headerBg,
+          backgroundColor: isDark ? '#1c202c' : '#ffffff',
           borderLeft: `4px solid ${accentColor}`,
-          padding: '8px 10px',
+          borderBottom: `1px solid ${isDark ? '#2a2f3d' : '#e5e7eb'}`,
+          padding: '10px',
           borderRadius: '0px',
           cursor: 'crosshair',
         }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <div>
-            <div style={{ fontSize: '8px', fontWeight: 800, color: accentColor, letterSpacing: '0.08em', marginBottom: '2px', fontFamily: '"JetBrains Mono", monospace' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+          <div style={{ flex: 1 }}>
+            <div style={{
+              fontSize: '9.5px',
+              fontWeight: 800,
+              color: accentColor,
+              letterSpacing: '0.06em',
+              marginBottom: '3px',
+              fontFamily: '"JetBrains Mono", monospace'
+            }}>
               {tagText}
             </div>
-            <div style={{ fontSize: '12px', fontWeight: 800, color: '#ffffff', lineHeight: 1.2, fontFamily: '"Space Grotesk", sans-serif' }}>
+            <div style={{
+              fontSize: '13px',
+              fontWeight: 800,
+              color: isDark ? '#f3f4f6' : '#0a0a0a',
+              lineHeight: 1.3,
+              fontFamily: '"Space Grotesk", sans-serif'
+            }}>
               {incident.title}
             </div>
           </div>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '8px', color: 'rgba(255,255,255,0.8)', fontFamily: '"JetBrains Mono", monospace' }}>
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{
+              fontSize: '9.5px',
+              fontWeight: 700,
+              color: isDark ? '#94a3b8' : '#475569',
+              fontFamily: '"JetBrains Mono", monospace'
+            }}>
               {getRelativeTime(incident.updatedAt)}
             </div>
             <div style={{ 
-              fontSize: '8px', 
+              fontSize: '9px', 
               fontWeight: 800, 
-              backgroundColor: 'rgba(255,255,255,0.2)', 
-              color: '#ffffff', 
-              padding: '2px 4px', 
+              backgroundColor: isDark ? '#2a2f3d' : '#f1f5f9', 
+              color: isDark ? '#f3f4f6' : '#1e293b', 
+              border: `1px solid ${isDark ? '#374151' : '#cbd5e1'}`,
+              padding: '2px 5px', 
               marginTop: '4px',
-              fontFamily: '"JetBrains Mono", monospace' 
+              fontFamily: '"JetBrains Mono", monospace',
+              display: 'inline-block',
             }}>
               REPORTED BY: {incident.reportCount}
             </div>
             {incident.status !== 'reported' && incident.status !== 'open' && (
               <div style={{ 
-                fontSize: '8px', 
+                fontSize: '8.5px', 
                 fontWeight: 800, 
                 backgroundColor: accentColor, 
                 color: '#ffffff', 
-                padding: '2px 4px', 
+                padding: '2px 5px', 
                 marginTop: '4px',
                 fontFamily: '"JetBrains Mono", monospace' 
               }}>
@@ -320,13 +348,13 @@ function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
 
       {/* Severity Meter Bar */}
       <div style={{
-        padding: '6px 10px 0 10px',
+        padding: '8px 10px 0 10px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        gap: '6px',
+        gap: '8px',
       }}>
-        <span style={{ fontSize: '8px', fontFamily: '"JetBrains Mono", monospace', fontWeight: 800, color: isDark ? '#cbd5e1' : '#1e293b' }}>
+        <span style={{ fontSize: '9.5px', fontFamily: '"JetBrains Mono", monospace', fontWeight: 800, color: isDark ? '#f3f4f6' : '#0f172a' }}>
           SEVERITY {severityVal}/10
         </span>
         <div style={{ display: 'flex', gap: '3px', flex: 1, maxWidth: '120px' }}>
@@ -335,10 +363,10 @@ function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
               key={i}
               style={{
                 flex: 1,
-                height: '4px',
+                height: '5px',
                 backgroundColor: i < severityVal 
                   ? (severityVal >= 7 ? '#ea3b1b' : severityVal >= 4 ? '#f59e0b' : '#10b981')
-                  : (isDark ? '#2a2f3d' : '#e5e7eb'),
+                  : (isDark ? '#2a2f3d' : '#e2e8f0'),
                 borderRadius: '0px',
               }}
             />
@@ -346,63 +374,90 @@ function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
         </div>
       </div>
 
-      {/* Card Body */}
-      <div style={{ padding: '8px 10px' }}>
-        <p style={{ fontSize: '10px', color: isDark ? '#cbd5e1' : '#111827', fontWeight: 500, lineHeight: 1.5, marginBottom: '8px' }}>
+      {/* Card Body — Sleek, High-Contrast Problem, Root Cause, and Playbook Solution */}
+      <div style={{ padding: '10px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {/* 1. Problem Description */}
+        <div style={{
+          fontSize: '11px',
+          color: isDark ? '#f3f4f6' : '#0f172a',
+          fontWeight: 500,
+          lineHeight: 1.45,
+        }}>
           {incident.description}
-        </p>
-
-        {/* Expandable Root Cause / Sensor Info */}
-        <div style={{ marginBottom: '8px' }}>
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              fontSize: '8px',
-              fontFamily: '"JetBrains Mono", monospace',
-              color: isDark ? '#4fc9dc' : '#005073',
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '3px',
-            }}
-          >
-            <span>{showDetails ? '▼ HIDE ROOT CAUSE' : '▶ VIEW ROOT CAUSE & TELEMETRY'}</span>
-          </button>
-          {showDetails && (
-            <div style={{
-              marginTop: '4px',
-              padding: '6px',
-              backgroundColor: isDark ? '#1c202c' : '#ffffff',
-              border: `1px solid ${isDark ? '#2a2f3d' : '#e5e7eb'}`,
-              fontSize: '8.5px',
-              fontFamily: '"JetBrains Mono", monospace',
-              color: isDark ? '#e2e8f0' : '#1e293b',
-            }}>
-              <div><strong>ROOT CAUSE:</strong> {incident.rootCause || 'Underground pressure sensor spike + hydraulic differential.'}</div>
-              {incident.lat && incident.lng && (
-                <div style={{ marginTop: '2px', color: isDark ? '#94a3b8' : '#334155' }}>
-                  GPS: {incident.lat.toFixed(4)}°N, {incident.lng.toFixed(4)}°E
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        <div style={{ display: 'flex', gap: '6px' }}>
+        {/* 2. Root Cause / Sensor Trigger Row */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '6px',
+          fontSize: '9.5px',
+          lineHeight: 1.4,
+          padding: '6px 8px',
+          backgroundColor: isDark ? '#1a1f2c' : '#f0f9ff',
+          borderLeft: `3px solid ${isDark ? '#4fc9dc' : '#0284c7'}`,
+          borderTop: `1px solid ${isDark ? '#2a2f3d' : '#e0f2fe'}`,
+          borderRight: `1px solid ${isDark ? '#2a2f3d' : '#e0f2fe'}`,
+          borderBottom: `1px solid ${isDark ? '#2a2f3d' : '#e0f2fe'}`,
+        }}>
+          <span style={{
+            fontWeight: 800,
+            color: isDark ? '#4fc9dc' : '#0369a1',
+            fontFamily: '"JetBrains Mono", monospace',
+            whiteSpace: 'nowrap',
+          }}>
+            CAUSE:
+          </span>
+          <span style={{ color: isDark ? '#f1f5f9' : '#0f172a', fontWeight: 500 }}>
+            {incident.rootCause || 'Telemetry threshold exceeded standard operational baseline with acoustic/pressure drift.'}
+            {incident.lat && incident.lng && (
+              <span style={{ display: 'inline-block', marginLeft: '5px', color: isDark ? '#94a3b8' : '#475569', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace' }}>
+                [{incident.lat.toFixed(3)}°N, {incident.lng.toFixed(3)}°E]
+              </span>
+            )}
+          </span>
+        </div>
+
+        {/* 3. Recommended Solution Row */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: '6px',
+          fontSize: '9.5px',
+          lineHeight: 1.4,
+          padding: '6px 8px',
+          backgroundColor: isDark ? '#12231b' : '#ecfdf5',
+          borderLeft: `3px solid #10b981`,
+          borderTop: `1px solid ${isDark ? '#1e3a2b' : '#d1fae5'}`,
+          borderRight: `1px solid ${isDark ? '#1e3a2b' : '#d1fae5'}`,
+          borderBottom: `1px solid ${isDark ? '#1e3a2b' : '#d1fae5'}`,
+        }}>
+          <span style={{
+            fontWeight: 800,
+            color: '#059669',
+            fontFamily: '"JetBrains Mono", monospace',
+            whiteSpace: 'nowrap',
+          }}>
+            PLAYBOOK:
+          </span>
+          <span style={{ color: isDark ? '#a7f3d0' : '#065f46', fontWeight: 600 }}>
+            {incident.recommendedAction || (incident.actions?.[0]?.label ? `Execute ${incident.actions[0].label}` : 'Isolate affected grid node and deploy emergency team.')}
+          </span>
+        </div>
+
+        {/* Manual Command Playbook Actions */}
+        <div style={{ display: 'flex', gap: '6px', marginTop: '3px' }}>
           {incident.actions.map((action, idx) => (
             <button
               key={idx}
               onClick={() => onAction(action.label, action.kind === 'primary')}
+              className="btn-tactile"
               style={{
                 flex: 1,
-                padding: '6px 4px',
-                fontSize: '8.5px',
+                padding: '7px 6px',
+                fontSize: '9.5px',
                 fontWeight: 800,
-                letterSpacing: '0.02em',
+                letterSpacing: '0.04em',
                 lineHeight: 1.2,
                 whiteSpace: 'normal',
                 wordBreak: 'break-word',
@@ -410,38 +465,24 @@ function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minHeight: '28px',
+                minHeight: '30px',
                 boxSizing: 'border-box',
                 fontFamily: '"JetBrains Mono", monospace',
                 borderRadius: '0px',
                 cursor: 'pointer',
                 border: action.kind === 'primary'
                   ? `1px solid ${accentColor}`
-                  : `1px solid ${isDark ? '#2a2f3d' : '#d2c3c3'}`,
+                  : `1px solid ${isDark ? '#374151' : '#94a3b8'}`,
                 backgroundColor: action.kind === 'primary'
                   ? accentColor
                   : isDark ? '#1c202c' : '#ffffff',
-                color: action.kind === 'primary' ? '#ffffff' : isDark ? '#f3f4f6' : '#1a1c17',
+                color: action.kind === 'primary'
+                  ? '#ffffff'
+                  : isDark ? '#f3f4f6' : '#0f172a',
                 transition: 'all 0.15s ease',
               }}
-              onMouseEnter={(e) => {
-                if (action.kind !== 'primary') {
-                  e.currentTarget.style.borderColor = isDark ? '#4fc9dc' : '#0a0a0a';
-                  e.currentTarget.style.color = isDark ? '#4fc9dc' : '#0a0a0a';
-                } else {
-                  e.currentTarget.style.opacity = '0.9';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (action.kind !== 'primary') {
-                  e.currentTarget.style.borderColor = isDark ? '#2a2f3d' : '#d2c3c3';
-                  e.currentTarget.style.color = isDark ? '#f3f4f6' : '#1a1c17';
-                } else {
-                  e.currentTarget.style.opacity = '1';
-                }
-              }}
             >
-              {action.label}
+              {action.label.toUpperCase()}
             </button>
           ))}
         </div>
@@ -452,7 +493,7 @@ function AlertCard({ incident, onAction, onFocus, isFocused, isDark }: {
 
 function PredictiveCard({ isDark, onAction }: { isDark: boolean; onAction: (lbl: string) => void }) {
   return (
-    <div className="beveled-3d-frame" style={{
+    <div className="beveled-3d-frame card-interactive fade-slide-in" style={{
       backgroundColor: isDark ? '#161922' : '#fafaf1',
       borderRadius: '0px',
       overflow: 'hidden',
@@ -477,6 +518,7 @@ function PredictiveCard({ isDark, onAction }: { isDark: boolean; onAction: (lbl:
         </p>
         <button
           onClick={() => onAction('REROUTE LOGISTICS')}
+          className="btn-tactile"
           style={{
             width: '100%',
             padding: '6px 4px',
@@ -510,7 +552,7 @@ function PredictiveCard({ isDark, onAction }: { isDark: boolean; onAction: (lbl:
 
 function InsightsCard({ isDark }: { isDark: boolean }) {
   return (
-    <div className="beveled-3d-frame" style={{
+    <div className="beveled-3d-frame card-interactive fade-slide-in" style={{
       backgroundColor: isDark ? '#082f49' : '#e0f2fe',
       padding: '10px',
       borderRadius: '0px',

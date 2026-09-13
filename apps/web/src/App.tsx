@@ -109,11 +109,11 @@ function App() {
       {newIncidentAlert && (
         <div
           onClick={clearNewIncidentAlert}
+          className="toast-pop btn-tactile"
           style={{
             position: 'fixed',
             top: '16px',
             left: '50%',
-            transform: 'translateX(-50%)',
             zIndex: 99999,
             backgroundColor: newIncidentAlert.startsWith('🤖') ? '#1e3a5f' : '#7f1d1d',
             color: '#ffffff',
@@ -123,9 +123,8 @@ function App() {
             fontWeight: 800,
             letterSpacing: '0.06em',
             border: newIncidentAlert.startsWith('🤖') ? '1px solid #3b82f6' : '1px solid #ef4444',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
+            boxShadow: newIncidentAlert.startsWith('🤖') ? '0 8px 32px rgba(59, 130, 246, 0.4)' : '0 8px 32px rgba(239, 68, 68, 0.4)',
             cursor: 'pointer',
-            animation: 'rhythmicPulse 1.5s ease-in-out infinite',
             maxWidth: '600px',
             textAlign: 'center',
           }}
@@ -185,9 +184,22 @@ function App() {
           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexShrink: 0, color: isDark ? '#cbd5e1' : '#1e293b' }}>
             <span>SYS_STABLE</span>
             <span>LATENCY: {simLatency}ms</span>
-            <span style={{ color: realtimeConnected ? '#10b981' : '#d97706', fontWeight: 800 }}>
-              {realtimeConnected ? '● REALTIME LIVE' : '◌ CONNECTING...'}
-            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ position: 'relative', width: '8px', height: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {realtimeConnected && <span className="beacon-ring" style={{ backgroundColor: '#10b981' }} />}
+                <span style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: realtimeConnected ? '#10b981' : '#d97706',
+                  boxShadow: realtimeConnected ? '0 0 6px #10b981' : 'none',
+                  transition: 'background-color 0.3s ease'
+                }} />
+              </div>
+              <span style={{ color: realtimeConnected ? '#10b981' : '#d97706', fontWeight: 800 }}>
+                {realtimeConnected ? 'REALTIME LIVE' : 'CONNECTING...'}
+              </span>
+            </div>
           </div>
         </footer>
       </main>

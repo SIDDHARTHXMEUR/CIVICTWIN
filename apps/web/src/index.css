@@ -131,3 +131,151 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
+/* Site-wide high contrast for small and muted text in light theme */
+html:not(.dark) [style*="color: #6b7280"],
+html:not(.dark) [style*="color: #9ca3af"],
+html:not(.dark) [style*="color: #8b949e"],
+html:not(.dark) .text-slate-400,
+html:not(.dark) .text-gray-400,
+html:not(.dark) .text-gray-500 {
+  color: #374151 !important;
+}
+
+html:not(.dark) [style*="color: rgba(255,255,255,0.8)"] {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Ensure small 8-11px labels are crisp and readable in light theme */
+html:not(.dark) .text-xs,
+html:not(.dark) [style*="font-size: 8px"],
+html:not(.dark) [style*="font-size: 8.5px"],
+html:not(.dark) [style*="font-size: 9px"],
+html:not(.dark) [style*="font-size: 9.5px"],
+html:not(.dark) [style*="font-size: 10px"],
+html:not(.dark) [style*="font-size: 11px"] {
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Mission-Control Motion & Transition System
+   ========================================================================== */
+
+/* 1. Tactile Interactive Elements */
+.btn-tactile {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s ease,
+              border-color 0.15s ease;
+  will-change: transform;
+}
+.btn-tactile:hover {
+  transform: translateY(-1px);
+}
+.btn-tactile:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+/* 2. Interactive Mission Cards */
+.card-interactive {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.22s ease;
+  will-change: transform, box-shadow;
+}
+.card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), inset 1px 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+/* 3. Staggered Entrance Animations */
+@keyframes fadeSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-slide-in {
+  animation: fadeSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.stagger-1 { animation-delay: 0.04s; }
+.stagger-2 { animation-delay: 0.08s; }
+.stagger-3 { animation-delay: 0.12s; }
+.stagger-4 { animation-delay: 0.16s; }
+.stagger-5 { animation-delay: 0.20s; }
+.stagger-6 { animation-delay: 0.24s; }
+
+/* 4. Live Telemetry Beacon Ring Pulse */
+@keyframes beaconRing {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.85;
+  }
+  60% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+.beacon-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  animation: beaconRing 2s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+  pointer-events: none;
+}
+
+/* 5. Toast Pop In / Out */
+@keyframes toastPop {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -12px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+.toast-pop {
+  animation: toastPop 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* 6. Sparkline SVG Path Draw */
+@keyframes drawPath {
+  from {
+    stroke-dashoffset: 400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.sparkline-draw {
+  stroke-dasharray: 400;
+  animation: drawPath 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 7. Subtle Row Hover Slide */
+.row-interactive {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s ease,
+              border-color 0.15s ease;
+}
+.row-interactive:hover {
+  transform: translateX(3px);
+}
+

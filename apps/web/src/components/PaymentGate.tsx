@@ -36,6 +36,7 @@ interface PaymentGateProps {
   resourceId: string;       // Unique resource identifier, e.g. "incident-INC-001"
   priceUsdc?: number;       // Price in USDC, default 0.1
   description?: string;     // What the user is paying for
+  subtitle?: string;        // Optional tailored narrative subtitle
   isDark?: boolean;
   children: React.ReactNode;
 }
@@ -45,7 +46,8 @@ type PaymentState = 'locked' | 'connecting' | 'signing' | 'broadcasting' | 'sett
 export const PaymentGate: React.FC<PaymentGateProps> = ({
   resourceId,
   priceUsdc = 0.1,
-  description = 'AI Intelligence Report',
+  description = 'M2M COMPUTE SETTLEMENT // ALGORAND x402',
+  subtitle,
   isDark = false,
   children,
 }) => {
@@ -98,7 +100,6 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
       setPaymentState('settled');
 
       // Optimistic update: push settled payment into Zustand store immediately
-      // so IntelligencePanel's isPaid check unlocks Dispatch Resolution instantly
       useStore.getState().addPayment({
         id: `local-${Date.now()}`,
         payer_algorand_address: address,
@@ -126,20 +127,20 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         <div style={{
-          padding: '6px 10px',
+          padding: '8px 12px',
           backgroundColor: isDark ? '#0d2318' : '#ecfdf5',
           border: '1px solid #10b981',
           color: '#10b981',
-          fontSize: '9px',
+          fontSize: '10px',
           fontFamily: mono,
           fontWeight: 700,
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
+          gap: '8px',
           flexWrap: 'wrap',
         }}>
-          <Unlock size={11} />
-          <span>PREMIUM UNLOCKED · x402 · ALGORAND TESTNET</span>
+          <Unlock size={12} />
+          <span>COMPUTE SETTLED · AUDIT ANCHORED · ALGORAND TESTNET</span>
           <span style={{ marginLeft: 'auto', color: textMuted }}>
             {priceUsdc} USDC · ASA {USDC_TESTNET_ASA_ID}
           </span>
@@ -147,10 +148,10 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
             href={`https://lora.algokit.io/testnet/transaction/${result.txHash}`}
             target="_blank"
             rel="noreferrer"
-            style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '2px', textDecoration: 'none' }}
+            style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px', textDecoration: 'none' }}
           >
-            <span>{result.txHash.slice(0, 14)}...</span>
-            <ExternalLink size={9} />
+            <span>Tx: {result.txHash.slice(0, 10)}...</span>
+            <ExternalLink size={10} />
           </a>
         </div>
         {children}
@@ -160,12 +161,12 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
 
   // ── LOCKED: Show payment prompt ──
   const stateLabel: Record<PaymentState, string> = {
-    locked:      `PAY ${priceUsdc} USDC TO UNLOCK`,
+    locked:      `SETTLE COMPUTE (${priceUsdc} USDC)`,
     connecting:  'CONNECTING WALLET...',
     signing:     'WAITING FOR SIGNATURE...',
-    broadcasting:'BROADCASTING TO ALGORAND...',
-    settled:     'PAYMENT SETTLED',
-    error:       'RETRY PAYMENT',
+    broadcasting:'SETTLING ON ALGORAND...',
+    settled:     'COMPUTE SETTLED',
+    error:       'RETRY SETTLEMENT',
   };
   const isProcessing = ['connecting', 'signing', 'broadcasting'].includes(paymentState);
 
@@ -191,15 +192,19 @@ export const PaymentGate: React.FC<PaymentGateProps> = ({
         borderBottom: `2px solid ${paymentState === 'error' ? '#dc2626' : '#ea3b1b'}`
       }}>
         {paymentState === 'error' ? <AlertTriangle size={14} /> : <Lock size={14} />}
-        <span style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '0.04em', fontFamily: '"Space Grotesk", sans-serif' }}>
+        <span style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em', fontFamily: '"Space Grotesk", sans-serif' }}>
           {description.toUpperCase()}
         </span>
       </div>
 
       <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
         {/* Narrative Subtitle */}
-        <div style={{ fontSize: '10px', color: textPrimary, lineHeight: 1.4, fontFamily: '"Space Grotesk", sans-serif', fontWeight: 500 }}>
-          Premium municipal intelligence — billed per report via your department's Algorand treasury account.
+        <div style={{ fontSize: '11px', color: textPrimary, lineHeight: 1.5, fontFamily: '"Space Grotesk", sans-serif', fontWeight: 500 }}>
+          {subtitle || (
+            <>
+              Paying settles machine-to-machine compute for automated dispatch execution &amp; cryptographic audit anchoring.
+            </>
+          )}
         </div>
 
         {/* Pricing Pill */}

@@ -62,6 +62,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
         title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        className="btn-tactile"
         style={{
           position: 'absolute',
           right: '-12px',
@@ -135,6 +136,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                 key={item.id} 
                 onClick={() => setActiveDomain(item.id)}
                 title={isCollapsed ? `${item.label} (${badgeCount} incidents)` : undefined}
+                className="row-interactive"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -178,7 +180,8 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
                           padding: '1px 4px',
                           borderRadius: '0px',
                           minWidth: '12px',
-                          textAlign: 'center'
+                          textAlign: 'center',
+                          transition: 'background-color 0.2s ease, color 0.2s ease',
                         }}>
                           {badgeCount}
                         </span>
@@ -206,6 +209,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
           <button
             onClick={() => onNavigate('citizen')}
             title={isCollapsed ? "Citizen Portal" : undefined}
+            className="btn-tactile"
             style={{
               width: '100%',
               padding: isCollapsed ? '8px 0' : '7px 8px',
@@ -232,6 +236,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         <button 
           onClick={() => setActiveDomain('all')}
           title={isCollapsed ? "Deploy Node" : undefined}
+          className="btn-tactile"
           style={{
             width: '100%',
             padding: isCollapsed ? '8px 0' : '7px 8px',
@@ -257,6 +262,7 @@ export default function Sidebar({ onNavigate }: SidebarProps) {
         <div 
           onClick={() => onNavigate?.('gateway')}
           title={isCollapsed ? "Exit / Gateway" : undefined}
+          className="btn-tactile"
           style={{ 
             fontSize: '9px', 
             color: isDark ? '#9ca3af' : '#807474', 

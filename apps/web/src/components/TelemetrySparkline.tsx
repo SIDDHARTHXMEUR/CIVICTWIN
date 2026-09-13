@@ -48,20 +48,46 @@ export function TelemetrySparkline({
         <path
           d={areaD}
           fill={`url(#${gradId})`}
+          style={{ transition: 'd 0.3s ease' }}
         />
         <path
+          className="sparkline-draw"
           d={pathD}
           fill="none"
           stroke={color}
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          style={{ transition: 'stroke 0.3s ease' }}
         />
-        {/* Active live data pulse point with glow */}
+        {/* Expanding radar pulse ring */}
         <circle
           cx={lastPoint[0]}
           cy={lastPoint[1]}
-          r="4"
+          r="3"
+          fill="none"
+          stroke={color}
+          strokeWidth="1.5"
+          opacity="0.8"
+        >
+          <animate
+            attributeName="r"
+            values="3;8;3"
+            dur="2s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="opacity"
+            values="0.8;0;0.8"
+            dur="2s"
+            repeatCount="indefinite"
+          />
+        </circle>
+        {/* Active live data point with glow */}
+        <circle
+          cx={lastPoint[0]}
+          cy={lastPoint[1]}
+          r="4.5"
           fill={color}
           opacity="0.3"
         />

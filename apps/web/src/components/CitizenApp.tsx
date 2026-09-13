@@ -202,6 +202,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           <button
             onClick={toggleTheme}
+            className="btn-tactile"
             style={{
               backgroundColor: isDark ? '#1c202c' : '#eeeee6',
               color: isDark ? '#f3f4f6' : '#1a1c17',
@@ -220,6 +221,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
           </button>
           <button
             onClick={() => onNavigate('gateway')}
+            className="btn-tactile"
             style={{
               backgroundColor: 'transparent',
               color: '#9ca3af',
@@ -346,6 +348,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                     <button
                       type="button"
                       onClick={startVoiceDictation}
+                      className="btn-tactile"
                       style={{
                         fontSize: '9px',
                         fontFamily: '"JetBrains Mono", monospace',
@@ -434,6 +437,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                       />
                     )}
                     <label
+                      className="btn-tactile"
                       style={{
                         padding: '10px 16px',
                         fontSize: '11px',
@@ -463,7 +467,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                   </div>
 
                   {selectedPhoto && (
-                    <div style={{
+                    <div className="fade-slide-in" style={{
                       marginTop: '8px',
                       padding: '8px 12px',
                       backgroundColor: isDark ? '#1a2736' : '#e0f2fe',
@@ -480,6 +484,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
                 {/* Submit Button */}
                 <button
                   type="submit"
+                  className="btn-tactile"
                   style={{
                     backgroundColor: '#b7102a',
                     color: '#ffffff',
@@ -501,7 +506,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
           </div>
         ) : (
           /* Success AI Status Card + Interactive Spatial Map */
-          <div style={{
+          <div className="fade-slide-in" style={{
             backgroundColor: isDark ? '#161922' : '#ffffff',
             border: `2px solid ${isDark ? '#2a2f3d' : '#1a1c17'}`,
             padding: '32px',
@@ -642,6 +647,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
             <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
               <button
                 onClick={() => onNavigate('gateway')}
+                className="btn-tactile"
                 style={{
                   flex: 1,
                   backgroundColor: isDark ? '#1c202c' : '#1a1c17',
@@ -659,6 +665,7 @@ export default function CitizenApp({ onNavigate }: CitizenAppProps) {
               </button>
               <button
                 onClick={handleReset}
+                className="btn-tactile"
                 style={{
                   backgroundColor: isDark ? '#1c202c' : '#eeeee6',
                   color: isDark ? '#f3f4f6' : '#1a1c17',

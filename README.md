@@ -6,72 +6,182 @@
 </p>
 
 <p align="center">
-  <a href="https://civictwin-web-silk.vercel.app/"><strong>🌐 Live Deployment</strong></a> &nbsp;&nbsp;|&nbsp;&nbsp; 
-  <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><strong>📂 GitHub Repository</strong></a>
+  <a href="https://civictwin-web-silk.vercel.app/"><img src="https://img.shields.io/badge/Live%20Demo-CivicTwin%20Web-4FC9DC?style=for-the-badge&logo=vercel" alt="Live Demo" /></a> &nbsp;&nbsp;
+  <a href="https://github.com/SIDDHARTHXMEUR/CIVICTWIN"><img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github" alt="GitHub Repository" /></a> &nbsp;&nbsp;
+  <img src="https://img.shields.io/badge/Algorand-Testnet%20x402-000000?style=for-the-badge&logo=algorand" alt="Algorand" /> &nbsp;&nbsp;
+  <img src="https://img.shields.io/badge/Version-2.4.0%20Latest-10B981?style=for-the-badge" alt="Version 2.4.0" />
 </p>
 
 ---
 
 > [!IMPORTANT]
-> **CivicTwin** is an open-source municipal operations and spatial intelligence platform that unifies fragmented urban telemetry, public grievances, and GIS spatial layers into a single real-time operational layer — built with **Algorand Testnet x402 micropayments** for decentralized machine-to-machine AI failure diagnostics and immutable audit trails.
+> **CivicTwin** is an open-source municipal operations and spatial intelligence platform that unifies fragmented urban telemetry, public grievances, and GIS spatial layers into a single real-time operational layer. Built with **Algorand Testnet x402 machine-to-machine (M2M) compute micropayments**, it anchors heavy predictive cascade simulations, automated multi-agency dispatch, and cryptographic tamper-evident diligence audits directly to the blockchain.
 
 ---
 
 ## 📑 Table of Contents
 - [Executive Overview](#-executive-overview)
-- [Algorand Blockchain Integration](#-algorand-blockchain--x402-protocol)
+- [Algorand Blockchain & x402 M2M Compute Settlement](#-algorand-blockchain--x402-m2m-compute-settlement)
+- [Free vs. Paid Features (Zero Barrier to Safety)](#-free-vs-paid-features-zero-barrier-to-safety)
+- [Deep Dive: Intelligence & Unlocked Post-Payment Features](#-deep-dive-intelligence--unlocked-post-payment-features)
+- [Recent Updates & Version 2.4 Highlights](#-recent-updates--version-24-highlights)
 - [The Problem: Fragmented City Signals](#-the-problem-fragmented-city-signals)
-- [Repository Architecture](#-repository-architecture)
+- [Product Model: The Operational Loop](#-product-model-the-operational-loop)
+- [Core Capabilities & System Features](#-core-capabilities--system-features)
+- [Technical Architecture & Data Flow](#-technical-architecture--data-flow)
+- [Flagship Scenario: Water Infrastructure Failure](#-flagship-scenario-water-infrastructure-failure)
+- [Application Modules Reference](#-application-modules-reference)
+- [Design System & Mission Control Typography](#-design-system--mission-control-typography)
+- [Full Technology Stack](#-full-technology-stack)
+- [Backend API Specification](#-backend-api-specification)
 - [Quick Start Guide](#-quick-start-guide)
-- [01 — Product Model: The Operational Loop](#01--product-model-the-operational-loop)
-- [02 — Core Capabilities & System Features](#02--core-capabilities--system-features)
-- [03 — Technical Architecture & Data Flow](#03--technical-architecture--data-flow)
-- [04 — Flagship Scenario: Water Infrastructure Failure](#04--flagship-scenario-water-infrastructure-failure)
-- [05 — Application Modules Reference](#05--application-modules-reference)
-- [06 — Design System & Mission Control Typography](#06--design-system--mission-control-typography)
-- [07 — Full Technology Stack](#07--full-technology-stack)
-- [08 — Backend API Specification](#08--backend-api-specification)
-- [09 — System Maturity & Verification Status](#09--system-maturity--verification-status)
-- [10 — Roadmap & Future City Federation](#10--roadmap--future-city-federation)
-- [11 — Platform Vision](#11--platform-vision)
+- [Roadmap & Future City Federation](#-roadmap--future-city-federation)
+- [Platform Vision](#-platform-vision)
 
 ---
 
 ## 🏛️ Executive Overview
 
-Municipal systems historically operate in disconnected silos:
-- **Citizen grievances** arrive through disparate portals and social queues.
-- **SCADA pressure sensors** broadcast telemetry to isolated engineering boards.
-- **Transit and traffic signals** feed independent control dashboards.
-- **Field response squads** coordinate via ad-hoc radio and phone calls.
+Municipal control centers historically operate in isolated, disconnected silos:
+- **Citizen grievances** trickle in through disjointed portals, helplines, and social queues.
+- **SCADA pressure & hydraulic sensors** broadcast raw telemetry to isolated engineering stations.
+- **Transit and traffic signals** feed separate regional monitoring consoles.
+- **Field response crews** coordinate via ad-hoc radio chatter and cell phone calls.
 
-When critical urban infrastructure breaks, municipal operators lose critical minutes manually correlating signals across disjointed screens.
+When critical urban infrastructure breaks, municipal operators waste precious minutes manually connecting the dots across disparate dashboards.
 
-**CivicTwin serves as the missing operational layer between what a city observes and what a city does:**
-1. **Unifies Urban Signals**: Combines citizen geotagged grievances, 144 IoT telemetry sensors, and multi-layer GIS into one synchronized cockpit.
-2. **Predicts Failure Cascades**: Evaluates spatial anomaly propagation and severity with transparent, rule-based scoring (1–10 scale).
-3. **Surfaces Contextual Decisions**: Recommends immediate tactical interventions through an actionable **Decision Rail**.
+**CivicTwin provides the missing operational layer between what a city observes and what a city does:**
+1. **Synchronizes Urban Signals**: Consolidates citizen geotagged grievances, 144 IoT telemetry sensors, and multi-layer GIS into one unified tactical cockpit.
+2. **Predicts Failure Cascades**: Evaluates spatial anomaly propagation vectors and severity with transparent, rule-based scoring (1–10 scale).
+3. **Surfaces Contextual Decisions**: Recommends immediate tactical interventions through an actionable, high-contrast **Decision Rail**.
 4. **Dispatches Autonomous Crews**: Computes shortest-path emergency routes using simulated **Vehicle Routing with Time Windows (VRPTW)**.
-5. **Algorand Decentralized Settlement**: Implements **x402 machine-to-machine micropayments** directly on **Algorand Testnet** for trustless, cryptographic diagnostic data monetization and audit logging.
+5. **Algorand Decentralized Settlement**: Implements **x402 machine-to-machine micropayments** directly on **Algorand Testnet** to settle heavy predictive compute and anchor immutable audit trails.
 
 > *"Urban data is only valuable when it directly empowers an operator to make a faster, higher-confidence decision."*
 
 ---
 
-## ⛓️ Algorand Blockchain & x402 Protocol
+## ⛓️ Algorand Blockchain & x402 M2M Compute Settlement
 
-CivicTwin leverages **Algorand** as its decentralized settlement layer for sovereign urban intelligence:
+### The Rationale: Why Algorand? Why Pay?
+CivicTwin reframes payment around **Machine-to-Machine (M2M) Compute Settlement**:
+- A free dashboard view cannot justify running heavy, resource-intensive mathematical hydraulic simulations, multi-vector graph traversals, and cryptographic state hashing across every minor sensor fluctuation.
+- Rather than charging citizens or putting life-safety features behind a corporate credit card paywall, **Algorand micro-billing settles compute costs trustlessly in sub-seconds (~3.3s finality)** for high-grade computational workloads.
+- Every payment settles `0.1 USDC` (or `0.05 ALGO`) on Algorand Testnet using the **x402 standard** (`HTTP 402 Payment Required`), generating an on-chain transaction hash (`TxID`) that cryptographically binds the compute request to its resulting state.
 
-- **Algorand Testnet Settlement**: High-throughput, low-latency transaction finality (~3.3 seconds) perfectly matched for municipal machine-to-machine (M2M) telemetry verification.
-- **x402 HTTP Paywall Standard**: Enables automated API consumers, autonomous vehicles, and private utilities to purchase high-value predictive failure reports with sub-cent `0.05 ALGO` micropayments.
-- **Cryptographic Auditability**: Every unlocked failure diagnostic generates an immutable on-chain transaction hash (`TxID`), providing tamper-proof municipal accountability without intermediary fees.
-- **Non-Custodial Wallet Integration**: Seamless support for Pera Wallet and direct Algorand node / indexer signing via `@x402-avm/core`.
+### Key Blockchain Mechanics
+- **Algorand Testnet Speed & Finality**: Instant block confirmation (~3.3s) without re-org risk, perfectly suited for live municipal emergency dispatch.
+- **Micro-Billing Efficiency**: Sub-cent transaction fees prevent municipal budget bloat while monetizing heavy compute resources.
+- **Cryptographic State Anchoring**: Telemetry snapshots are SHA-256 hashed into an immutable digital digest and anchored to the ledger, creating a legally defensible audit record for municipal insurance, government oversight, and inter-agency accountability.
+- **Non-Custodial Web3 Integration**: Compatible with Algorand indexers, Pera Wallet, and direct programmatic API clients via `@x402-avm/core`.
+
+---
+
+## ⚖️ Free vs. Paid Features: Zero Barrier to Safety
+
+> [!NOTE]
+> **Safety First Commitment**: Dispatching emergency crews, reviewing citizen grievances, isolating compromised grids, and viewing root-cause diagnostics are **always 100% free and immediate**. Payment never blocks an operator's ability to protect the public.
+
+| Feature Category | Capability / Tool | Free Tier | Algorand Unlocked (M2M Settle) | Purpose & Operational Impact |
+| :--- | :--- | :---: | :---: | :--- |
+| **Public Grievances** | Citizen Incident Gateway & Geotagging | ✅ Free | — | Citizens report issues with GPS & photos; auto-clusters duplicate reports within 500m. |
+| **Spatial Digital Twin** | Leaflet Multi-Basemap GIS & 144 Sensors | ✅ Free | — | View live sensor health, anomaly radar rings, and city infrastructure layers. |
+| **Live Urban KPIs** | City Health, AQI, Mobility Sparklines | ✅ Free | — | Real-time trend sparklines with tabular numbers and 3-second live jitter. |
+| **Decision Rail Triage** | 10-Tier Severity, Cause & Playbook | ✅ Free | — | Immediate root-cause diagnosis (SCADA delta, GPS) and standard manual mitigation playbook. |
+| **Tactical Grid Action** | `ISOLATE GRID` & Manual `DISPATCH CREW` | ✅ Free | — | Immediate operational intervention to shut valves or call squads without paying a cent. |
+| **Command Palette** | `Ctrl+K` Fuzzy Search & Shortcuts | ✅ Free | — | Rapid keyboard navigation across nodes, anomalies, and portals. |
+| **Predictive Simulation** | 120-Min Anomaly Cascade Timeline | 🔒 Paid | ✅ Unlocked | Heavy compute multi-horizon (15m–120m) cascade model calculating structural damage & population risk. |
+| **Autonomous Dispatch** | Automated Multi-Agency Dispatch & VRPTW | 🔒 Paid | ✅ Unlocked | Autonomous squad coordination (Water + Police + Power) with live optimized route preview. |
+| **On-Chain Audit** | Cryptographic State Root Digest | 🔒 Paid | ✅ Unlocked | SHA-256 sensor state hash committed directly to Algorand Testnet with live explorer verification. |
+| **Audit Compliance** | Signed JSON Dossier Download | 🔒 Paid | ✅ Unlocked | Machine-readable, cryptographically verified record for insurance, judicial reviews, and ERPs. |
+| **Contractor Escrows** | Milestone-Based Smart Escrows (Phase 4) | 🔒 Paid | ✅ Unlocked | Automated escrow payout locked on-chain and released when IoT sensors normalize post-repair. |
+
+---
+
+## 🔬 Deep Dive: Intelligence & Unlocked Post-Payment Features
+
+When an operator or automated municipal system triggers the **Algorand x402 Payment Gate** (`0.1 USDC` / `0.05 ALGO`), the platform settles machine compute and unlocks the **Mission Dossier**:
+
+```
+                                [ ALGORAND x402 SETTLEMENT ]
+                                              │
+                    ┌─────────────────────────┴─────────────────────────┐
+                    ▼                                                   ▼
+       [ ⚡ SIMULATION & DISPATCH ]                             [ 🔒 ON-CHAIN AUDIT ]
+  • 120-Min Cascade Timeline                              • SHA-256 Sensor Snapshot Hash
+  • Financial Exposure & Pop at Risk                      • Algorand Testnet TxID & LoRA Link
+  • Automated Multi-Agency Dispatch                       • Diligence Certification Note
+  • Live Turn-by-Turn VRPTW Polyline                      • One-Click Signed JSON Audit Export
+```
+
+### 1. 120-Minute Anomaly Cascade Timeline (`CascadeTimeline.tsx`)
+- **How It Works**:
+  - The simulation engine projects failure propagation across 4 discrete time horizons: **15 min**, **30 min**, **60 min**, and **120 min**.
+  - At each stage, the system calculates hydraulic pressure degradation, secondary network strain, road congestion index, and cumulative financial exposure.
+  - Formatted strictly according to the **Indian Currency System** (`₹38.30 Lakh`, `₹71.04 Lakh`, up to `₹2.41 Cr`).
+- **Why It's Useful**:
+  - Shifts municipal response from *reactive fire-fighting* to *proactive containment*. An operator can see that an unresolved water main leak will escalate into a `₹2.41 Cr` arterial road subsidence affecting 57,350 citizens within 2 hours, justifying immediate inter-agency escalation.
+
+### 2. Automated Multi-Agency Dispatch Execution & VRPTW Routing
+- **How It Works**:
+  - Dispatches coordinated field units simultaneously across multiple municipal departments:
+    - **Primary Squad**: Hydraulic Rapid Response Squad (e.g. *Squad #4*, assigned to isolate valve V-14).
+    - **Traffic Management**: Traffic Police dispatch to establish cordons and reroute arterial traffic.
+    - **Power Distribution**: Secondary electrical crew to safeguard underground conduits.
+  - The routing engine executes a **Vehicle Routing Problem with Time Windows (VRPTW)** algorithm, rendering optimal shortest-path navigation polylines directly on the Leaflet GIS centerpiece with live ETA waypoints.
+- **Why It's Useful**:
+  - Replaces manual phone calls and inter-departmental red tape with a single, synchronized automated dispatch command.
+
+### 3. Cryptographically-Referenced On-Chain Audit Record (`IncidentAuditRecord.tsx`)
+- **How It Works**:
+  - Aggregates raw sensor readings, pressure differentials, citizen report corroborations, operator timestamp, and coordinates into a canonical payload.
+  - Generates a **SHA-256 Cryptographic Hash** representing the exact city state at the moment of incident triage:
+    ```
+    6acd219f6bbb0e7ad7ec6f9100ba757215fca00d2f45b86f14f02eb8a303924b
+    ```
+  - Commits this hash to Algorand Testnet with a verifiable transaction ID (`TxID`), linked directly to the **LoRA Algorand Explorer**.
+- **Why It's Useful**:
+  - **Zero Tampering**: Municipal officials cannot retroactively alter timestamps or claim sensors were normal.
+  - **Insurance & Judicial Diligence**: Serves as immutable, tamper-proof legal evidence during insurance damage claims and public inquiries.
+
+### 4. One-Click Signed JSON Audit Export
+- **How It Works**:
+  - Generates a machine-readable JSON document containing incident metadata, telemetry vectors, severity metrics, SHA-256 state roots, and Algorand transaction confirmation receipts.
+- **Why It's Useful**:
+  - Allows direct ingestion into sovereign municipal enterprise resource planning systems (SAP, Oracle Urban ERP) and open-government transparency portals.
+
+---
+
+## 🚀 Recent Updates & Version 2.4 Highlights
+
+### 1. Intelligence Dossier Tidy Redesign & Noticeable Tab Switcher
+- **Unified 3-Metric Diagnostic Telemetry HUD**: Consolidated bulky, stacked severity, impact, and confidence cards into a single, high-density telemetry strip with hairline dividers and precision micro-meters.
+- **High-Visibility Tactical Switcher**: Replaced low-contrast buttons with an inset segmented tray featuring:
+  - Context header label **`DOSSIER VIEW`** with dynamic status pills: **`● SIMULATION ACTIVE`** (amber) and **`● AUDIT ANCHORED`** (emerald).
+  - Elevated active white card with drop shadow (`boxShadow: 0 2px 5px rgba(0,0,0,0.18)`).
+  - High-visibility active borders: **`2px solid #d97706`** for Simulation & Dispatch, **`2px solid #059669`** for On-Chain Audit.
+- **Scrollbar Sprawl Elimination**: Replaced 1,500px vertical scrolling with clean, focused dual-tab navigation.
+
+### 2. Strict Indian Currency System Formatting
+- **Standard Notation Implementation**: Corrected invalid `₹240.87 Lakh` representation. In the Indian numbering system, 100 Lakh = 1 Crore:
+  - $\ge 10,000,000$ (1 Crore) $\rightarrow$ **`₹X.XX Cr`** (e.g., **`₹2.41 Cr`**, **`₹1.32 Cr`**).
+  - $\ge 100,000$ (1 Lakh) $\rightarrow$ **`₹X.XX Lakh`** (e.g., **`₹38.30 Lakh`**, **`₹71.04 Lakh`**).
+- **No-Wrap Layout Guarantee**: Hardened with `whiteSpace: nowrap` and `flexShrink: 0` so currency symbols and denominations never wrap awkwardly across lines.
+
+### 3. Decision Rail Legibility & Contrast Overhaul
+- **Light Mode Re-architecture**: Replaced dark navy headers in light mode with crisp white card headers framed by a vibrant `4px` left accent border.
+- **Enlarged Typography Hierarchy**:
+  - Titles upgraded to **`13px` bold `Space Grotesk`** (`#0a0a0a`).
+  - Descriptions upgraded to **`11px`** in `#0f172a` with `1.45` line height.
+  - `CAUSE:` and `PLAYBOOK:` rows upgraded to **`9.5px` bold** with distinct color badges (`#0369a1` cyan and `#059669` emerald).
+  - Timestamps and `REPORTED BY` badges upgraded with high-contrast pill styling.
+- **Site-Wide Contrast Compliance**: Light-mode secondary text enforces a minimum 7:1 contrast ratio to guarantee zero eye fatigue.
 
 ---
 
 ## ⚡ The Problem: Fragmented City Signals
 
-A major water-main rupture may begin as an underground pressure drop, trigger a citizen grievance, flood an arterial thoroughfare, and cause cascading traffic gridlock miles away. When telemetry lives in separate databases, operators must connect the dots manually.
+A major water-main rupture begins as an underground pressure drop, triggers citizen grievances, floods an arterial road, and causes cascading traffic gridlock miles away. When telemetry lives in separate databases, operators must connect the dots manually.
 
 ```
 Citizen Grievance ──┐
@@ -97,43 +207,225 @@ flowchart TD
     end
 
     subgraph RESOLUTION ["🚀 03. TRIAGE & DISPATCH"]
-        D["<b>🚨 Contextual Decision Rail</b><br/>Recommended Interventions & Root Causes"]
-        A["<b>🚚 Municipal Response</b><br/>VRPTW Crew Dispatch & Grid Isolation"]
+        D["<b>🚨 Contextual Decision Rail</b><br/>Recommended Interventions & Root Causes (FREE)"]
+        A["<b>🚚 Municipal Response</b><br/>VRPTW Crew Dispatch & Grid Isolation (FREE)"]
+        P["<b>⛓️ Algorand x402 Compute Settle</b><br/>Cascade Simulation & On-Chain Audit (PAID)"]
     end
 
     C & S & I & E --> T
     T --> R & M
     R & M --> D
     D --> A
+    D --> P
 ```
 
 ---
 
-## 📂 Repository Architecture
+## 🔁 Product Model: The Operational Loop
 
-CivicTwin is structured as a clean, production-grade monorepo:
+CivicTwin operates on a continuous, four-stage feedback cycle:
 
+$$\text{Observe} \longrightarrow \text{Predict} \longrightarrow \text{Act} \longrightarrow \text{Verify}$$
+
+```mermaid
+flowchart TD
+    O["<b>01. OBSERVE</b><br/>• Citizen Grievances & Geotagged Evidence<br/>• 144 IoT Telemetry & Hydraulic Sensors<br/>• Real-time Spatial Infrastructure Basemaps"]
+    P["<b>02. PREDICT & EVALUATE</b><br/>• Automated Severity Scoring (1–10 Scale)<br/>• Anomaly Propagation Vectors on GIS<br/>• 500m Grievance Corroboration Clustering"]
+    A["<b>03. ACT & INTERVENE</b><br/>• Contextual Decision Rail Triage Pane<br/>• Autonomous VRPTW Crew Dispatch Routing<br/>• M2M x402 Compute Settlement (Algorand)"]
+    V["<b>04. VERIFY & AUDIT</b><br/>• Real-time Sensor Telemetry Normalization<br/>• Synchronized City Health Index Update<br/>• Immutable Ledger Audit Record & PDF Export"]
+
+    O --> P
+    P --> A
+    A --> V
+    V -.->|Continuous Operational Telemetry Loop| O
 ```
-CIVICTWIN/
-├── apps/
-│   └── web/                 # Frontend: React 19, TypeScript, Vite, Zustand, Leaflet GIS
-│       ├── src/
-│       │   ├── components/  # Command Center, Decision Rail, GIS Map, Payments, Citizen App
-│       │   ├── store/       # Zustand persistent store & live telemetry simulation loop
-│       │   ├── config/      # Map coordinate configs (Jaipur Metro Grid center & zoom)
-│       │   └── lib/         # Web3 Algorand Testnet, Supabase client, and audio utilities
-├── services/
-│   └── api/                 # Backend: FastAPI (Python 3.12, Uvicorn, Pydantic)
-│       ├── routers/         # Incidents, Reports, VRPTW Routing, Scenario Simulation, Auth
-│       ├── database.py      # SQLAlchemy SQLite/Postgres connection & schema compatibility
-│       └── main.py          # FastAPI application server entrypoint & WebSocket handlers
-├── supabase/
-│   └── migrations/          # Declarative Postgres schemas, RLS policies & Realtime channels
-├── infra/                   # Deployment configurations and seed data
-├── DESIGN_SYSTEM.md         # UI/UX guidelines, color tokens & typography standards
-├── README.md                # Technical project documentation
-└── docker-compose.yml       # Containerized local orchestration
+
+1. **Observe**: Ingest real-time citizen reports and sensor telemetry onto an interactive spatial map.
+2. **Predict**: Evaluate severity scores, failure cascade likelihood, and spatial propagation corridors.
+3. **Act**: Present direct, human-authorized tactical resolution actions alongside raw telemetry.
+4. **Verify**: Confirm resolution via sensor normalization and update city health indicators.
+
+---
+
+## 🛠️ Core Capabilities & System Features
+
+### 🗺️ 1. Leaflet Spatial Digital Twin (GIS Centerpiece)
+- **Jaipur Metro Grid Topology**: Centered at `26.9124° N, 75.7873° E` with 144 connected IoT sensor nodes.
+- **Dynamic 3-Tier Severity Encoding**:
+  - *Normal* (`#64748b` / `#10b981`): Calm baseline marker.
+  - *Warning* (`#f59e0b`): Amber marker for elevated risk.
+  - *Critical Anomaly* (`#ea3b1b`): High-contrast red marker with animated radar pulsing ring.
+- **Multi-Basemap Switching**: Seamlessly toggle between **Vector GIS** (OpenStreetMap), **World Imagery Satellite** (ArcGIS), and **Topographic** terrain layers.
+- **Edge-to-Edge Fullscreen Mode**: Custom resize engine invoking `map.invalidateSize()` across animation intervals for 100% viewport coverage.
+- **Spatial Anomaly Propagation Vectors**: Visual dashed polylines indicating potential cascading impact corridors (e.g., MI Road pressure drop $\rightarrow$ Ajmeri Gate traffic gridlock).
+
+### 🚨 2. Decision Rail & Contextual Triage (Always Free)
+- **10-Segment Severity Meter**: Color-coded visual severity indicator (1–10 scale) on every incident card.
+- **Root-Cause Diagnostic Drawer**: Expandable diagnostic pane detailing hydraulic pressure differentials, sensor spikes, and GPS coordinates.
+- **Tactical Action Triggers**: Pre-configured operational commands (`DISPATCH CREW`, `REROUTE TRAFFIC`, `ISOLATE GRID`, `NOTIFY TRANSIT`).
+- **High-Contrast Typography**: Designed for mission-critical legibility with clean white cards and vibrant left border accents in light mode.
+- **"Resolved Today" Audit Log**: Chronological record of cleared incidents with relative timestamps.
+
+### 🚚 3. Autonomous VRPTW AI Crew Dispatch Routing
+- **Routing Engine Endpoint**: Computes optimized emergency response paths based on incident category, urgency, and logistics depots.
+- **Live Polyline Navigation**: Renders multi-stop dispatch paths on the Leaflet GIS digital twin with glowing drop shadows (`#10b981`).
+- **Turn-by-Turn Waypoints**: Generates step-by-step route instructions from municipal logistics depots to incident coordinates.
+
+### 💳 4. Algorand x402 Micropayment Protocol
+- **M2M Compute Settlement**: Settles `0.1 USDC` or `0.05 ALGO` via Algorand Testnet to execute compute-intensive simulations.
+- **Cryptographic Audit Ledger**: Transaction ledger tracking Tx Hashes, amounts, resource paths, and settled timestamps.
+- **Operational Resolution Action Card**: Tactical report generated post-settlement detailing crew assignments and estimated resolution timeframes.
+
+### 📱 5. Citizen Incident Gateway (`CitizenApp.tsx`)
+- **4-Step Submission Flow**: Location GPS tagging $\rightarrow$ Category selection $\rightarrow$ Severity rating $\rightarrow$ Photo evidence submission.
+- **Intelligent 500m Spatial Clustering**: Duplicate citizen reports within a 500-meter radius are automatically merged into parent incidents, incrementing `REPORTED BY: X` counters without cluttering the map.
+- **Public Status Tracker**: Citizens receive unique tracking IDs (`JP-W01-XXXX`) to monitor real-time municipal resolution progress.
+
+### 📊 6. Live KPI Strip & Telemetry Sparklines
+- **Core City Metrics**: City Health Score (0–100 scale), Mobility Flow (%), Air Quality Index (AQI).
+- **SVG Area Gradient Sparklines**: Gradient fill under trend lines with pulsing live endpoint indicators.
+- **Tabular Numerals**: Uses `font-variant-numeric: tabular-nums` to eliminate layout shift during live sensor jitter.
+
+---
+
+## 🏛️ Technical Architecture & Data Flow
+
+```mermaid
+flowchart TD
+    subgraph INTAKE ["📡 01. URBAN INGESTION LAYER"]
+        CIT["<b>👥 Citizen Gateway</b><br/>Public Grievances & Geotagged Evidence"]
+        IOT["<b>📶 IoT Telemetry Grid</b><br/>144 SCADA, Hydraulic & Acoustic Sensors"]
+        INF["<b>🏗️ Infrastructure Assets</b><br/>Water Pipelines, Power Grids & Transit"]
+        ENV["<b>🌤️ Environmental Sensors</b><br/>Real-time AQI, Weather & Microclimate"]
+    end
+
+    subgraph BACKEND ["⚙️ 02. CORE BACKEND & PERSISTENCE"]
+        SB[("<b>🗄️ Supabase Postgres</b><br/>Realtime Sync Channels & RLS Security")]
+        FAST["<b>⚡ FastAPI Service Engine</b><br/>VRPTW Routing Engine & Scenario Simulation"]
+        ALGO["<b>⛓️ Algorand Testnet</b><br/>x402 Micropayment Protocol Gateway"]
+    end
+
+    subgraph WORKSPACE ["💻 03. CIVICTWIN COMMAND CENTER"]
+        GIS["<b>🗺️ Leaflet Spatial Digital Twin</b><br/>Multi-basemap GIS, Vector Corridors & Anomaly Pins"]
+        DEC["<b>🚨 Contextual Decision Rail</b><br/>Tactical Triage, Severity Meters & Root Causes (FREE)"]
+        INT["<b>🧠 Intelligence Dossier Hub</b><br/>Cascade Simulation & On-Chain Audit (ALGORAND)"]
+        CMD["<b>📊 Command Center Shell</b><br/>KPI Sparklines, Global Ctrl+K Palette & PDF Export"]
+    end
+
+    subgraph ACTION ["🚒 04. MUNICIPAL DISPATCH & RESOLUTION"]
+        VRPTW["<b>🚚 Autonomous VRPTW Dispatch</b><br/>Turn-by-Turn Waypoints & Route Polylines"]
+        REROUTE["<b>🚦 Traffic & Grid Management</b><br/>Dynamic Signal Adjustments & Corridor Rerouting"]
+        RES["<b>✅ Operational State Sync</b><br/>Sensor Normalization & City Health Verification"]
+    end
+
+    CIT & IOT --> SB
+    INF & ENV --> FAST
+    FAST <--> SB
+    ALGO <--> INT
+    SB <==> WORKSPACE
+    DEC --> VRPTW & REROUTE
+    VRPTW & REROUTE --> RES
+    RES -.->|Telemetry Normalization Feedback| SB
 ```
+
+---
+
+## 🌊 Flagship Scenario: Water Infrastructure Failure
+
+The following sequence illustrates CivicTwin's end-to-end operational chain during an underground water-main rupture:
+
+```mermaid
+sequenceDiagram 
+    autonumber
+    actor C as 👥 Citizen
+    participant G as 📱 Citizen Gateway
+    participant GIS as 🗺️ Spatial Digital Twin
+    participant O as 🚨 Decision Rail (Free)
+    participant AI as 🧠 Intelligence Dossier (Algorand x402)
+    participant R as 🚒 Multi-Agency Response Squad
+
+    C->>G: 1. Reports pipeline fracture & surface flooding
+    G->>G: 2. Captures GPS coordinates (26.9124°N, 75.7873°E)
+    G->>GIS: 3. Corroborates with SCADA sensor JP-W01 (pressure drops to 2.4 bar)
+    GIS->>O: 4. Triggers Critical Alert (Severity 9.2/10) with Cause & Playbook
+    O->>O: 5. Free Action: Operator isolates grid segment via valve V-14
+    O->>AI: 6. Settle 0.1 USDC on Algorand to run heavy 120-min cascade simulation
+    AI->>AI: 7. Computes ₹2.41 Cr risk, hashes state (SHA-256), anchors to Algorand Testnet
+    AI->>R: 8. Executes Automated Multi-Agency Dispatch with live VRPTW navigation
+    R->>GIS: 9. Repair squad arrives, fixes main; sensor reading normalizes to 4.8 bar
+    GIS->>O: 10. Incident moves to "Resolved" with permanent on-chain audit record
+```
+
+---
+
+## 📦 Application Modules Reference
+
+| Module | File Path | Core Responsibilities |
+| :--- | :--- | :--- |
+| `Gateway.tsx` | `apps/web/src/components/` | Municipal entrance, citizen vs. officer authentication, GIS map preview, system search |
+| `CitizenApp.tsx` | `apps/web/src/components/` | Citizen reporting stepper, automatic GPS tagging, severity selection, photo upload |
+| `IntelligencePanel.tsx` | `apps/web/src/components/` | 3-Metric Diagnostic Telemetry HUD, prominent Dossier Switcher, Algorand payment gate |
+| `CascadeTimeline.tsx` | `apps/web/src/components/` | 120-min predictive cascade model with strict Indian currency formatting (`₹X.XX Cr`) |
+| `IncidentAuditRecord.tsx`| `apps/web/src/components/` | Cryptographic audit record, SHA-256 digest, LoRA explorer links, JSON export |
+| `PaymentGate.tsx` | `apps/web/src/components/` | Algorand x402 payment modal, Testnet signing, transaction verification |
+| `DecisionRail.tsx` | `apps/web/src/components/` | High-contrast incident cards, 10-tier severity meters, Cause & Playbook triage, free action buttons |
+| `GridTopologyPanel.tsx` | `apps/web/src/components/` | Leaflet GIS digital twin, vector/satellite/topo layers, fullscreen mode, crew polylines |
+| `KpiStrip.tsx` | `apps/web/src/components/` | High-impact telemetry metrics with SVG area gradient sparklines and delta percentages |
+| `PaymentsPanel.tsx` | `apps/web/src/components/` | Algorand transaction ledger, x402 status verification, explorer tx hash links |
+| `CommandPalette.tsx` | `apps/web/src/components/` | `Ctrl+K` modal for fuzzy searching nodes, incidents, and triggering municipal actions |
+| `Sidebar.tsx` | `apps/web/src/components/` | Domain navigation (Infrastructure, Mobility, Environment, Payments) with badge counters |
+| `TopBar.tsx` | `apps/web/src/components/` | Federated city switcher, briefing PDF export, dark/light theme toggle, user profile |
+
+---
+
+## 🎨 Design System & Mission Control Typography
+
+CivicTwin follows a **Tactical Mission Control / Functionalist** design system built for high-stress municipal operations.
+
+### Typography Triad
+- **Display & Headers**: **`Space Grotesk`** (Weights: 700, 800 | Tracking: `-0.02em`) — Geometric, authoritative character for panel titles and incident cards.
+- **Body & Information**: **`Plus Jakarta Sans`** & **`Hanken Grotesk`** (Weights: 400, 500, 600) — Humanist, crisp legibility across high-density panels.
+- **Telemetry & Numbers**: **`JetBrains Mono`** (Weights: 500, 700, 800 | Tabular Figures: `tnum 1`) — Monospace alignment for GPS coordinates, currency values, and Algorand transaction hashes.
+
+### Color Tokens
+| Token | Hex Value | Operational Meaning |
+| :--- | :--- | :--- |
+| **Civic Cyan** | `#4FC9DC` / `#0284C7` | Active selection, route polylines, and primary operational accents |
+| **Critical Red** | `#EA3B1B` | Anomaly nodes, critical severity (7–10), and emergency dispatch |
+| **Warning Amber** | `#F59E0B` / `#D97706` | Elevated risk, simulation active tab border, and cascade notices |
+| **Resolved Emerald** | `#10B981` / `#059669` | On-chain audit active tab border, settled micropayments, normal status |
+| **Tactical Slate** | `#0B0C0E` / `#161922` | Dark mode mission control background and card frames |
+| **Warm Sand** | `#F0EDE4` / `#F5F2E8` | Light mode canvas and component surfaces |
+
+---
+
+## 💻 Full Technology Stack
+
+| Layer | Technologies | Role in CivicTwin |
+| :--- | :--- | :--- |
+| **Frontend Framework** | React 19, TypeScript, Vite v8 | High-density operational single-page application |
+| **Styling & Theme** | Tailwind CSS v4, PostCSS, Vanilla CSS | Custom 3D beveled frames, tactical themes, micro-animations |
+| **State Management** | Zustand v5 | Persistent store, reactive filters, and 3-second simulation loops |
+| **GIS & Spatial Mapping** | Leaflet v1.9, React-Leaflet | Hardware-accelerated map rendering, custom DivIcons, polylines |
+| **Basemaps** | OpenStreetMap, ArcGIS World Imagery, OpenTopoMap | Vector, satellite, and topographic basemap tiles |
+| **Backend Framework** | FastAPI, Python 3.12, Uvicorn, Pydantic | RESTful endpoints, VRPTW crew routing, scenario simulations |
+| **Database & Realtime** | Supabase Postgres / SQLite | Relational incident storage, spatial coordinates, Realtime channels |
+| **Blockchain / Web3** | Algorand Testnet, `@x402-avm/core`, `@perawallet/connect` | Machine-to-machine x402 micropayments for diagnostic reports |
+| **Icons & Fonts** | Lucide React, Google Fonts | Space Grotesk, Plus Jakarta Sans, JetBrains Mono, Hanken Grotesk |
+
+---
+
+## 🔌 Backend API Specification
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/` | Root service health check and Jaipur node metadata |
+| `POST` | `/api/v1/routing/optimal-crew-dispatch` | Calculates VRPTW shortest crew route & waypoints |
+| `POST` | `/api/v1/simulation/scenario` | Runs scenario simulations (`monsoon_flood`, `power_cascade`) |
+| `GET` | `/api/incidents/` | Retrieves all active and resolved municipal incidents |
+| `POST` | `/api/reports/` | Ingests new citizen grievances with coordinates & category |
+| `GET` | `/api/infrastructure/` | Fetches connected infrastructure asset and sensor points |
+| `WS` | `/ws/incidents` | WebSocket channel for real-time incident broadcast |
 
 ---
 
@@ -168,288 +460,12 @@ uvicorn main:app --reload --port 8000
 
 ---
 
-## 01 — Product Model: The Operational Loop
-
-CivicTwin operates on a continuous, four-stage feedback cycle:
-
-$$\text{Observe} \longrightarrow \text{Predict} \longrightarrow \text{Act} \longrightarrow \text{Verify}$$
-
-```mermaid
-flowchart TD
-    O["<b>01. OBSERVE</b><br/>• Ingest Citizen Grievances & GPS Evidence<br/>• 144 IoT Telemetry & Hydraulic Pressure Sensors<br/>• Real-time Spatial Infrastructure Grid & Basemaps"]
-    P["<b>02. PREDICT & EVALUATE</b><br/>• Automated Severity Scoring (1–10 Scale)<br/>• Anomaly Propagation Vectors & Spatial Risk Corridors<br/>• Intelligent 500m Grievance Corroboration Clustering"]
-    A["<b>03. ACT & INTERVENE</b><br/>• Contextual Decision Rail Triage Pane<br/>• Autonomous VRPTW Emergency Crew Dispatch Routing<br/>• Machine-to-Machine x402 Diagnostic Settlement (Algorand)"]
-    V["<b>04. VERIFY & AUDIT</b><br/>• Real-time Sensor Telemetry Normalization<br/>• Synchronized City Health Index Update<br/>• Immutable Ledger Audit Record & Municipal PDF Briefing"]
-
-    O --> P
-    P --> A
-    A --> V
-    V -.->|Continuous Operational Telemetry Loop| O
-```
-
-1. **Observe**: Ingest real-time citizen reports and sensor telemetry onto an interactive spatial map.
-2. **Predict**: Evaluate severity scores, failure cascade likelihood, and spatial propagation corridors.
-3. **Act**: Present direct, human-authorized tactical resolution actions alongside raw telemetry.
-4. **Verify**: Confirm resolution via sensor normalization and update city health indicators.
-
----
-
-## 02 — Core Capabilities & System Features
-
-### 🗺️ 1. Leaflet Spatial Digital Twin (GIS Centerpiece)
-The primary spatial operating surface for city-wide infrastructure monitoring:
-- **Jaipur Metro Grid Topology**: Centered at `26.9124° N, 75.7873° E` with 144 connected IoT sensor nodes.
-- **Dynamic 3-Tier Severity Encoding**:
-  - *Normal* (`#64748b` / `#10b981`): 8px calm baseline marker.
-  - *Warning* (`#f59e0b`): 12px amber marker for elevated risk.
-  - *Critical Anomaly* (`#ea3b1b`): 18px red-orange marker with animated radar pulsing ring.
-- **Multi-Basemap Switching**: Seamlessly toggle between **Vector GIS** (OpenStreetMap), **World Imagery Satellite** (ArcGIS), and **Topographic** terrain layers.
-- **Edge-to-Edge Fullscreen Mode**: Custom resize engine invoking `map.invalidateSize()` across animation intervals to guarantee 100% viewport coverage.
-- **Spatial Anomaly Propagation Vectors**: Visual dashed polylines indicating potential cascading impact corridors (e.g., MI Road pressure drop $\rightarrow$ Ajmeri Gate traffic gridlock).
-
----
-
-### 🚨 2. Decision Rail & Contextual Triage
-The operational nexus where spatial intelligence transforms into direct municipal action:
-- **10-Segment Severity Meter**: Color-coded visual severity indicator (1–10 scale) on every incident card.
-- **Root-Cause Diagnostic Drawer**: Expandable diagnostic pane detailing hydraulic pressure differentials, sensor spikes, and GPS coordinates.
-- **Tactical Action Triggers**: Pre-configured operational commands (`DISPATCH CREW`, `REROUTE TRAFFIC`, `ISOLATE GRID`, `NOTIFY TRANSIT`).
-- **Primary vs. Secondary Action Hierarchy**: High-contrast filled primary buttons paired with subtle ghost secondary actions.
-- **"Resolved Today" Audit Log**: Chronological record of cleared incidents with relative timestamps (`Just now`, `5 min ago`).
-
----
-
-### 🚚 3. Autonomous VRPTW AI Crew Dispatch Routing
-Simulates a Vehicle Routing Problem with Time Windows (VRPTW) model for municipal logistics:
-- **Routing Engine Endpoint**: Computes optimized emergency response paths based on incident category, urgency, and logistics depots.
-- **Live Polyline Navigation**: Renders multi-stop dispatch paths on the Leaflet GIS digital twin with glowing drop shadows (`#10b981`).
-- **Turn-by-Turn Waypoints**: Generates step-by-step route instructions from municipal logistics depots to incident coordinates.
-
----
-
-### 💳 4. x402 Micropayment Protocol on Algorand Testnet
-Demonstrates machine-to-machine micropayments for decentralized urban data access:
-- **Payment-Gated AI Diagnostics**: 0.05 ALGO micropayments unlock predictive infrastructure failure analysis reports.
-- **Algorand Testnet Transaction Signing**: Integration with Algorand indexers and testnet node gateways.
-- **Cryptographic Audit Ledger**: Transaction ledger tracking Tx Hashes, amounts, resource paths, and settled timestamps.
-- **Operational Resolution Action Card**: Tactical report generated post-settlement detailing crew assignments and estimated resolution timeframes.
-
----
-
-### 📱 5. Citizen Incident Gateway (`CitizenApp.tsx`)
-A public-facing portal empowering citizens to submit infrastructure issues seamlessly:
-- **4-Step Submission Flow**:
-  1. *Location*: Automatic GPS device geolocation tagging.
-  2. *Category*: Selection across Water, Mobility, Environment, Electrical, and Structural.
-  3. *Severity & Details*: User-reported severity slider and descriptive grievance input.
-  4. *Evidence*: Image upload and immediate municipal command handoff.
-- **Intelligent 500m Spatial Clustering**: Duplicate citizen reports within a 500-meter radius are automatically merged into parent incidents, incrementing `REPORTED BY: X` counters without cluttering the map.
-- **Public Status Tracker**: Citizens receive unique tracking IDs (`JP-W01-XXXX`) to monitor real-time municipal resolution progress.
-
----
-
-### 📊 6. Live KPI Strip & Telemetry Sparklines
-Real-time urban health monitoring across key municipal indicators:
-- **Core City Metrics**:
-  - *City Health Score* (0–100 scale) with alert thresholds.
-  - *Mobility Flow* (%) tracking corridor transit efficiency.
-  - *Air Quality Index* (AQI) monitoring particulate pollution.
-- **SVG Area Gradient Sparklines**: Gradient fill under trend lines with pulsing live endpoint indicators.
-- **Tabular Numerals (`font-variant-numeric: tabular-nums`)**: Eliminates horizontal jitter during live telemetry updates.
-- **Continuous 3-Second Simulation Loop**: Simulates sensor jitter, packet loss fluctuations, and diagnostic pings.
-
----
-
-### 🌐 7. Federated Multi-City Twin Registry
-A scalable architecture designed for state-wide and national municipal cohorts:
-- **Active Jaipur Metro Node**: Full operational telemetry (`26.9124° N, 75.7873° E`).
-- **Upcoming City Provisioning Queue**: Interactive selector supporting **New Delhi** (28.84°N), **Mumbai Metro** (19.07°N), and **Bengaluru Tech** (12.97°N).
-
----
-
-### ⌨️ 8. Global Tactical Command Palette (`Ctrl+K`)
-Keyboard-driven mission control navigation:
-- **Fuzzy Search**: Search across all 144 sensor assets, active critical incidents, and domain views.
-- **Emergency Shortcut Commands**: Trigger simulated grid anomalies, clear filters, and navigate to public or officer portals instantly.
-- **Top Bar Integration**: Quick `[COMMANDS Ctrl K]` button in the top bar for easy discoverability.
-
----
-
-### 📄 9. Municipal Operational Briefing PDF Export
-Generate formal municipal executive reports with one click:
-- **Executive Summary**: City health score, unresolved incident count, and settled micropayments.
-- **Incident Matrix**: Tabular breakdown of incident IDs, severity scores, descriptions, and current lifecycle states.
-- **x402 Audit Log**: Full cryptographic transaction hash ledger for administrative accountability.
-
----
-
-## 03 — Technical Architecture & Data Flow
-
-```mermaid
-flowchart TD
-    subgraph INTAKE ["📡 01. URBAN INGESTION LAYER"]
-        CIT["<b>👥 Citizen Gateway</b><br/>Public Grievances & Geotagged Evidence"]
-        IOT["<b>📶 IoT Telemetry Grid</b><br/>144 SCADA, Hydraulic & Acoustic Sensors"]
-        INF["<b>🏗️ Infrastructure Assets</b><br/>Water Pipelines, Power Grids & Transit"]
-        ENV["<b>🌤️ Environmental Sensors</b><br/>Real-time AQI, Weather & Microclimate"]
-    end
-
-    subgraph BACKEND ["⚙️ 02. CORE BACKEND & PERSISTENCE"]
-        SB[("<b>🗄️ Supabase Postgres</b><br/>Realtime Sync Channels & RLS Security")]
-        FAST["<b>⚡ FastAPI Service Engine</b><br/>VRPTW Routing Engine & Scenario Simulation"]
-        ALGO["<b>⛓️ Algorand Testnet</b><br/>x402 Micropayment Protocol Gateway"]
-    end
-
-    subgraph WORKSPACE ["💻 03. CIVICTWIN COMMAND CENTER"]
-        GIS["<b>🗺️ Leaflet Spatial Digital Twin</b><br/>Multi-basemap GIS, Vector Corridors & Anomaly Pins"]
-        DEC["<b>🚨 Contextual Decision Rail</b><br/>Tactical Triage, Severity Meters & Root Causes"]
-        INT["<b>🧠 Intelligence & Predictive Hub</b><br/>AI Predictive Diagnostics & Risk Scoring"]
-        CMD["<b>📊 Command Center Shell</b><br/>KPI Sparklines, Global Ctrl+K Palette & PDF Export"]
-    end
-
-    subgraph ACTION ["🚒 04. MUNICIPAL DISPATCH & RESOLUTION"]
-        VRPTW["<b>🚚 Autonomous VRPTW Dispatch</b><br/>Turn-by-Turn Waypoints & Route Polylines"]
-        REROUTE["<b>🚦 Traffic & Grid Management</b><br/>Dynamic Signal Adjustments & Corridor Rerouting"]
-        RES["<b>✅ Operational State Sync</b><br/>Sensor Normalization & City Health Verification"]
-    end
-
-    CIT & IOT --> SB
-    INF & ENV --> FAST
-    FAST <--> SB
-    ALGO <--> INT
-    SB <==> WORKSPACE
-    DEC --> VRPTW & REROUTE
-    VRPTW & REROUTE --> RES
-    RES -.->|Telemetry Normalization Feedback| SB
-```
-
----
-
-## 04 — Flagship Scenario: Water Infrastructure Failure
-
-The following sequence illustrates CivicTwin's end-to-end operational chain during an underground water-main rupture:
-
-```mermaid
-sequenceDiagram 
-    autonumber
-    actor C as 👥 Citizen
-    participant G as 📱 Citizen Gateway
-    participant AI as 🧠 Intelligence Layer
-    participant GIS as 🗺️ Spatial Digital Twin
-    participant O as 🚨 Decision Rail / Operator
-    participant R as 🚒 Response Squad (VRPTW)
-
-    C->>G: 1. Reports major pipeline fracture & surface flooding
-    G->>G: 2. Captures precise GPS coordinates (26.9124°N, 75.7873°E)
-    G->>AI: 3. Forwards grievance + acoustic sensor telemetry
-    AI->>AI: 4. Clusters corroborating reports (500m radius, Count: 3)
-    AI->>GIS: 5. Plots critical anomaly marker with pulsing radar ring
-    GIS->>O: 6. Triggers priority incident alert (Severity 8/10)
-    O->>R: 7. Operator approves AI-recommended "DISPATCH CREW"
-    R->>GIS: 8. Calculates & renders optimal green route polyline
-    R->>O: 9. Crew arrives on-site & executes hydraulic clamp repair
-    O->>GIS: 10. Sensor reading normalizes (4.8 bar) & incident moves to "Resolved"
-```
-
-1. **Signal Intake**: Acoustic pressure sensor `JP-W01` detects a pressure drop to 2.4 bar; a citizen concurrently submits a report with photo evidence via the Citizen Gateway.
-2. **Corroboration**: The intelligence layer clusters duplicate reports within 500m and increments corroboration count to 3.
-3. **Spatial Awareness**: The incident appears on the Leaflet GIS digital twin as a high-severity red anomaly pin (`#ea3b1b`) with a propagation vector toward Ajmeri Gate.
-4. **Triage & Decision**: The Decision Rail surfaces the incident with recommended action `DISPATCH CREW` (Assigned: *Rapid Hydro Repair Squad #4*, ETA: 8 min).
-5. **Dispatch & Routing**: The operator approves dispatch; the VRPTW routing engine calculates turn-by-turn waypoints and draws a green route polyline on the map.
-6. **Resolution & Audit**: Following field repair, the sensor reading normalizes, the incident is marked resolved, and the event is appended to the audit ledger.
-
----
-
-## 05 — Application Modules Reference
-
-| Module | File Path | Core Responsibilities |
-| :--- | :--- | :--- |
-| `Gateway.tsx` | `apps/web/src/components/` | Municipal entrance, citizen vs. officer authentication, GIS map preview, system search |
-| `CitizenApp.tsx` | `apps/web/src/components/` | Citizen reporting stepper, automatic GPS tagging, severity selection, photo upload |
-| `App.tsx` | `apps/web/src/` | Main application shell, route views, realtime toast alerts, scrolling operational ticker |
-| `GridTopologyPanel.tsx` | `apps/web/src/components/` | Leaflet GIS digital twin, vector/satellite/topo layers, fullscreen mode, crew polylines |
-| `IntelligencePanel.tsx` | `apps/web/src/components/` | AI predictive failure reports, x402 payment gate, post-payment resolution action card |
-| `DecisionRail.tsx` | `apps/web/src/components/` | Critical & warning alerts, severity meter bars, root-cause drawer, rapid action buttons |
-| `KpiStrip.tsx` | `apps/web/src/components/` | High-impact telemetry metrics with SVG area gradient sparklines and delta percentages |
-| `PaymentsPanel.tsx` | `apps/web/src/components/` | Algorand transaction ledger, x402 status verification, explorer tx hash links |
-| `CommandPalette.tsx` | `apps/web/src/components/` | `Ctrl+K` modal for fuzzy searching nodes, incidents, and triggering municipal actions |
-| `Sidebar.tsx` | `apps/web/src/components/` | Domain navigation (Infrastructure, Mobility, Environment, Payments) with active count badges |
-| `TopBar.tsx` | `apps/web/src/components/` | Federated city switcher, briefing PDF export, dark/light theme toggle, user profile |
-
----
-
-## 06 — Design System & Mission Control Typography
-
-CivicTwin follows a **Tactical Mission Control / Functionalist** design system built for high-stress municipal operations.
-
-### Typography Triad
-- **Display & Headers**: **`Space Grotesk`** (Weights: 600, 700, 800 | Tracking: `-0.02em`) — Geometric, authoritative architectural character for panel titles and brand identity.
-- **Body & Cards**: **`Plus Jakarta Sans`** (Weights: 400, 500, 600) — Humanist, ultra-crisp legibility across high-density incident cards.
-- **Telemetry & Numbers**: **`JetBrains Mono`** (Weights: 500, 700, 800 | Tabular Figures: `tnum 1`) — Monospace alignment for GPS coordinates, sparkline values, and Algorand transaction hashes.
-
-### Color Tokens
-| Token | Hex Value | Operational Meaning |
-| :--- | :--- | :--- |
-| **Civic Cyan** | `#4FC9DC` | Active selection, route polylines, and primary operational accents |
-| **Critical Red** | `#EA3B1B` | Anomaly nodes, critical severity (7–10), and emergency dispatch |
-| **Warning Amber** | `#F59E0B` | Elevated risk, warning telemetry (4–6), and cascade notices |
-| **Resolved Emerald** | `#10B981` | Settled micropayments, normal status (1–3), and verified nodes |
-| **Obsidian Slate** | `#0B0C0E` / `#161922` | Dark mode tactical background and card frames |
-| **Warm Sand** | `#F0EDE4` / `#F5F2E8` | Light mode canvas and component surfaces |
-
----
-
-## 07 — Full Technology Stack
-
-| Layer | Technologies | Role in CivicTwin |
-| :--- | :--- | :--- |
-| **Frontend Framework** | React 19, TypeScript, Vite v8 | High-density operational single-page application |
-| **Styling & Theme** | Tailwind CSS v4, PostCSS, Vanilla CSS | Custom 3D beveled frames, tactical themes, micro-animations |
-| **State Management** | Zustand v5 | Persistent store, reactive filters, and 3-second simulation loops |
-| **GIS & Spatial Mapping** | Leaflet v1.9, React-Leaflet | Hardware-accelerated map rendering, custom DivIcons, polylines |
-| **Map Basemaps** | OpenStreetMap, ArcGIS World Imagery, OpenTopoMap | Vector, satellite, and topographic basemap tiles |
-| **Backend Framework** | FastAPI, Python 3.12, Uvicorn, Pydantic | RESTful endpoints, VRPTW crew routing, scenario simulations |
-| **Database & Realtime** | Supabase Postgres / SQLite | Relational incident storage, spatial coordinates, Realtime channels |
-| **Blockchain / Web3** | Algorand Testnet, `@x402-avm/core`, `@perawallet/connect` | Machine-to-machine x402 micropayments for diagnostic reports |
-| **Icons & Fonts** | Lucide React, Google Fonts | Interface iconography, Space Grotesk, Plus Jakarta Sans, JetBrains Mono |
-
----
-
-## 08 — Backend API Specification
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | Root service health check and Jaipur node metadata |
-| `POST` | `/api/v1/routing/optimal-crew-dispatch` | Calculates VRPTW shortest crew route & waypoints |
-| `POST` | `/api/v1/simulation/scenario` | Runs scenario simulations (`monsoon_flood`, `power_cascade`) |
-| `GET` | `/api/incidents/` | Retrieves all active and resolved municipal incidents |
-| `POST` | `/api/reports/` | Ingests new citizen grievances with coordinates & category |
-| `GET` | `/api/infrastructure/` | Fetches connected infrastructure asset and sensor points |
-| `WS` | `/ws/incidents` | WebSocket channel for real-time incident broadcast |
-
----
-
-## 09 — System Maturity & Verification Status
-
-| Capability | Current Status | Notes |
-| :--- | :--- | :--- |
-| **Spatial Digital Twin (GIS)** | **Implemented** | Leaflet multi-layer map with custom anomaly markers & fullscreen mode |
-| **Decision Rail Triage** | **Implemented** | Severity meters, root-cause drawer, and action dispatch |
-| **Citizen Gateway** | **Implemented** | 4-step reporting workflow with GPS tagging & clustering |
-| **VRPTW Crew Routing** | **Implemented (Simulated)** | Algorithmic shortest-path route computation & polyline rendering |
-| **x402 Micropayments** | **Implemented (Testnet)** | Algorand Testnet integration for payment-gated diagnostics |
-| **Telemetry Sensor Feeds** | **Simulated** | 144 nodes with continuous 3-second simulation loop |
-| **Multi-City Federation** | **Planned (Roadmap)** | Jaipur active; New Delhi, Mumbai, Bengaluru in provisioning queue |
-| **Computer Vision Detection** | **Planned (Roadmap)** | Architecture defined for future CCTV edge inference models |
-
----
-
-## 10 — Roadmap & Future City Federation
+## 🗺️ Roadmap & Future City Federation
 
 ```mermaid
 flowchart TD
     subgraph PHASE1 ["🟢 PHASE 01 — JAIPUR OPERATIONAL TWIN (ACTIVE LIVE)"]
-        P1["<b>Jaipur Metro Grid</b><br/>• Full Leaflet Spatial Digital Twin (144 IoT Sensors)<br/>• Contextual Decision Rail with 10-tier severity triage<br/>• Autonomous VRPTW Crew Routing & Turn-by-Turn Waypoints<br/>• x402 Micropayments Protocol on Algorand Testnet"]
+        P1["<b>Jaipur Metro Grid</b><br/>• Full Leaflet Spatial Digital Twin (144 IoT Sensors)<br/>• Contextual Decision Rail with 10-tier severity triage<br/>• Autonomous VRPTW Crew Routing & Turn-by-Turn Waypoints<br/>• x402 M2M Compute Settlement on Algorand Testnet<br/>• 120-min Cascade Timeline & Cryptographic State Hashing"]
     end
 
     subgraph PHASE2 ["🟡 PHASE 02 — FEDERATED MULTI-CITY REGISTRY (IN PROGRESS)"]
@@ -460,27 +476,27 @@ flowchart TD
         P3["<b>Edge AI & Spatial Diagnostics</b><br/>• Automated CCTV traffic-flow computer vision integration<br/>• Real-time road fracture and pothole edge detection<br/>• Predictive structural fatigue models"]
     end
 
-    subgraph PHASE4 ["🟣 PHASE 04 — AUTONOMOUS MUNICIPAL SWARMS (VISION)"]
-        P4["<b>Decentralized Municipal Automation</b><br/>• Direct telemetry integration with municipal UAV swarms<br/>• Automated SCADA flood mitigation and pump grid activation<br/>• Decentralized sovereign municipal data governance"]
+    subgraph PHASE4 ["🟣 PHASE 04 — CONTRACTOR SMART ESCROWS (IN ROADMAP)"]
+        P4["<b>Decentralized Municipal Automation</b><br/>• Milestone-based smart contract escrows on Algorand<br/>• Automated bounty release when IoT sensors normalize<br/>• Direct integration with municipal UAV swarms & smart pumps"]
     end
 
     PHASE1 --> PHASE2 --> PHASE3 --> PHASE4
 ```
 
-- **Phase 01 — Jaipur Operational Twin (Active)**: Full GIS digital twin, decision rail, autonomous VRPTW dispatch, and x402 payment gate.
+- **Phase 01 — Jaipur Operational Twin (Active)**: Full GIS digital twin, high-contrast decision rail, autonomous VRPTW dispatch, x402 payment gate, cascade simulations, and on-chain cryptographic audit anchoring.
 - **Phase 02 — Multi-City Federated Registry**: Cross-city node telemetry sync and automated regional emergency escalation.
 - **Phase 03 — Predictive Computer Vision**: Live CCTV traffic-flow computer vision integration and automated road fracture detection.
-- **Phase 04 — Autonomous Municipal Swarms**: Direct integration with municipal UAVs, smart water pumps, and SCADA traffic light grids.
+- **Phase 04 — Contractor Smart Escrows**: Automated milestone escrow release upon IoT sensor normalization.
 
 ---
 
-## 11 — Platform Vision
+## 🌐 Platform Vision
 
-Cities already generate enormous volumes of data. The missing layer is not another dashboard — it is the **operational workspace** connecting those signals directly to decisions and immediate actions.
+Cities already generate enormous volumes of telemetry. The missing layer is not another passive dashboard — it is the **operational workspace** connecting those signals directly to decisions, machine-to-machine compute settlement, and immediate field actions.
 
 <p align="center">
   <strong>CivicTwin — Municipal Urban Operational Layer & Spatial Digital Twin</strong><br/>
-  <em>Observe → Predict → Act</em>
+  <em>See the city. Predict the risk. Act before it escalates.</em>
 </p>
 
 <p align="center">
@@ -489,5 +505,5 @@ Cities already generate enormous volumes of data. The missing layer is not anoth
 </p>
 
 <p align="center">
-  <strong>Built for Resilient Cities & Urban Intelligence</strong>
+  <strong>Built for Resilient Cities & Sovereign Urban Intelligence</strong>
 </p>

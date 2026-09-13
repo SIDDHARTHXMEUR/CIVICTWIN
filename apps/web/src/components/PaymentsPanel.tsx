@@ -72,16 +72,21 @@ export default function PaymentsPanel() {
           </div>
 
           {/* Ledger Rows */}
-          {payments.map(payment => (
-            <div key={payment.id} className="beveled-3d-frame" style={{
-              display: 'grid',
-              gridTemplateColumns: '120px 2fr 100px 100px 140px 100px',
-              gap: '12px',
-              padding: '12px 16px',
-              alignItems: 'center',
-              backgroundColor: isDark ? '#1c202c' : '#ffffff',
-              fontSize: '13px'
-            }}>
+          {payments.map((payment, idx) => (
+            <div 
+              key={payment.id} 
+              className={`beveled-3d-frame row-interactive fade-slide-in stagger-${(idx % 6) + 1}`} 
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '120px 2fr 100px 100px 140px 100px',
+                gap: '12px',
+                padding: '12px 16px',
+                alignItems: 'center',
+                backgroundColor: isDark ? '#1c202c' : '#ffffff',
+                fontSize: '13px',
+                cursor: 'pointer',
+              }}
+            >
               <div style={{ fontSize: '11px', fontFamily: '"JetBrains Mono", monospace', color: isDark ? '#9ca3af' : '#6b7280' }}>
                 {new Date(payment.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
               </div>
@@ -105,6 +110,7 @@ export default function PaymentsPanel() {
                   href={`https://lora.algokit.io/testnet/transaction/${payment.tx_hash}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="btn-tactile"
                   style={{
                     color: '#00a5e3',
                     textDecoration: 'none',
@@ -112,7 +118,9 @@ export default function PaymentsPanel() {
                     fontSize: '11px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '4px'
+                    gap: '4px',
+                    padding: '2px 4px',
+                    borderRadius: '2px',
                   }}
                 >
                   {payment.tx_hash.substring(0, 12)}...
@@ -121,13 +129,17 @@ export default function PaymentsPanel() {
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                {payment.status === 'settled' && <CheckCircle2 size={14} color="#10b981" />}
-                {payment.status === 'pending' && <Clock size={14} color="#f59e0b" />}
+                {payment.status === 'settled' && (
+                  <CheckCircle2 size={14} color="#10b981" style={{ filter: 'drop-shadow(0 0 3px rgba(16, 185, 129, 0.5))' }} />
+                )}
+                {payment.status === 'pending' && (
+                  <Clock size={14} color="#f59e0b" style={{ animation: 'rhythmicPulse 1.5s ease-in-out infinite' }} />
+                )}
                 {payment.status === 'failed' && <XCircle size={14} color="#ef4444" />}
                 <span style={{ 
                   fontSize: '11px', 
                   fontWeight: 800, 
-                  fontFamily: '"JetBrains Mono", monospace',
+                  fontFamily: '"JetBrains Mono", monospace', 
                   color: payment.status === 'settled' ? '#10b981' : payment.status === 'pending' ? '#f59e0b' : '#ef4444'
                 }}>
                   {payment.status.toUpperCase()}

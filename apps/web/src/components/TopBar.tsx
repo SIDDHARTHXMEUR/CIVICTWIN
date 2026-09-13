@@ -192,9 +192,10 @@ export default function TopBar({ onNavigate }: TopBarProps) {
               window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
             }}
             title="Open Quick Command Palette (Ctrl+K)"
+            className="btn-tactile"
             style={{
               marginLeft: '8px',
-              fontSize: '9px',
+              fontSize: '10px',
               fontFamily: '"JetBrains Mono", monospace',
               fontWeight: 700,
               color: isDark ? '#9ca3af' : '#6b7280',
@@ -219,7 +220,7 @@ export default function TopBar({ onNavigate }: TopBarProps) {
           </button>
 
           {showCityMenu && (
-            <div className="beveled-3d-frame" style={{
+            <div className="beveled-3d-frame fade-slide-in" style={{
               position: 'absolute',
               top: '100%',
               left: 0,
@@ -319,6 +320,7 @@ export default function TopBar({ onNavigate }: TopBarProps) {
         <button
           onClick={handleExportBriefing}
           title="Generate Printable Municipal Briefing PDF"
+          className="btn-tactile"
           style={{
             backgroundColor: isDark ? '#1c202c' : '#eeeee6',
             color: '#4fc9dc',
@@ -341,6 +343,7 @@ export default function TopBar({ onNavigate }: TopBarProps) {
             toggleTheme();
           }}
           title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className="btn-tactile"
           style={{
             backgroundColor: isDark ? '#1c202c' : '#eeeee6',
             color: isDark ? '#f3f4f6' : '#1a1c17',
@@ -363,6 +366,7 @@ export default function TopBar({ onNavigate }: TopBarProps) {
         {onNavigate && (
           <button
             onClick={() => onNavigate('gateway')}
+            className="btn-tactile"
             style={{
               backgroundColor: isDark ? '#1c202c' : '#eeeee6',
               color: isDark ? '#f3f4f6' : '#1a1c17',
@@ -382,16 +386,20 @@ export default function TopBar({ onNavigate }: TopBarProps) {
         <div style={{ position: 'relative' }}>
           <button 
             onClick={() => { setShowNotifications(!showNotifications); setShowProfile(false); }}
+            className="btn-tactile"
             style={{ background: showNotifications ? (isDark ? '#2a2f3d' : '#e5e7eb') : 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', borderRadius: '0px' }} title="Notifications"
           >
             <Bell size={15} color={isDark ? '#9ca3af' : '#6b7280'} />
             {incidents.some(i => i.status === 'reported') && (
-              <span style={{ position: 'absolute', top: '2px', right: '4px', width: '6px', height: '6px', backgroundColor: '#ea3b1b', borderRadius: '50%' }}></span>
+              <span style={{ position: 'absolute', top: '2px', right: '4px', width: '6px', height: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span className="beacon-ring" style={{ backgroundColor: '#ea3b1b' }} />
+                <span style={{ width: '6px', height: '6px', backgroundColor: '#ea3b1b', borderRadius: '50%', boxShadow: '0 0 6px #ea3b1b' }}></span>
+              </span>
             )}
           </button>
           
           {showNotifications && (
-            <div className="beveled-3d-frame" style={{
+            <div className="beveled-3d-frame fade-slide-in" style={{
               position: 'absolute',
               top: '100%',
               right: 0,
@@ -408,7 +416,7 @@ export default function TopBar({ onNavigate }: TopBarProps) {
               </div>
               <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
                 {incidents.filter(i => i.status !== 'resolved').slice(0, 5).map(inc => (
-                  <div key={inc.id} style={{ padding: '8px 12px', borderBottom: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}` }}>
+                  <div key={inc.id} className="row-interactive" style={{ padding: '8px 12px', borderBottom: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}` }}>
                     <div style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#f3f4f6' : '#1a1c17' }}>{inc.title}</div>
                     <div style={{ fontSize: '9px', color: '#6b7280', marginTop: '2px' }}>{new Date(inc.updatedAt).toLocaleTimeString()}</div>
                   </div>
@@ -421,13 +429,14 @@ export default function TopBar({ onNavigate }: TopBarProps) {
         <div style={{ position: 'relative' }}>
           <button 
             onClick={() => { setShowProfile(!showProfile); setShowNotifications(false); }}
+            className="btn-tactile"
             style={{ background: showProfile ? (isDark ? '#2a2f3d' : '#e5e7eb') : 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', borderRadius: '0px' }} title="Officer Profile"
           >
             <User size={15} color={isDark ? '#9ca3af' : '#6b7280'} />
           </button>
 
           {showProfile && (
-            <div className="beveled-3d-frame" style={{
+            <div className="beveled-3d-frame fade-slide-in" style={{
               position: 'absolute',
               top: '100%',
               right: 0,

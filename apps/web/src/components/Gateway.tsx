@@ -231,6 +231,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
           </button>
           <button
             onClick={() => setShowNotifDrawer(true)}
+            className="btn-tactile"
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', position: 'relative' }}
             title="System Notifications"
           >
@@ -238,12 +239,16 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             {openIncidentsCount > 0 && (
               <span style={{
                 position: 'absolute', top: '2px', right: '2px',
-                width: '6px', height: '6px', backgroundColor: '#ea3b1b',
-              }}></span>
+                width: '6px', height: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <span className="beacon-ring" style={{ backgroundColor: '#ea3b1b' }} />
+                <span style={{ width: '6px', height: '6px', backgroundColor: '#ea3b1b', borderRadius: '50%', boxShadow: '0 0 6px #ea3b1b' }}></span>
+              </span>
             )}
           </button>
           <button
             onClick={() => setShowStaffModal(true)}
+            className="btn-tactile"
             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
             title="Officer Authentication"
           >
@@ -252,6 +257,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
 
           <button
             onClick={toggleTheme}
+            className="btn-tactile"
             style={{
               backgroundColor: isDark ? '#1c202c' : '#e8e4d8',
               color: isDark ? '#f3f4f6' : '#0a0a0a',
@@ -502,7 +508,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
           width: '100%',
         }}>
           {/* Card 1: Citizen App */}
-          <div style={{
+          <div className="card-interactive fade-slide-in stagger-1" style={{
             backgroundColor: isDark ? '#161922' : '#f5f2e8',
             border: `2px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
             padding: '18px 22px',
@@ -595,6 +601,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             {/* Action Button positioned with normal tight 14px top margin */}
             <button
               onClick={() => onSelectRole('citizen')}
+              className="btn-tactile"
               style={{
                 backgroundColor: isDark ? '#1c202c' : '#4fc9dc',
                 color: isDark ? '#ffffff' : '#0a0a0a',
@@ -616,7 +623,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
           </div>
 
           {/* Card 2: Municipal Staff */}
-          <div style={{
+          <div className="card-interactive fade-slide-in stagger-2" style={{
             backgroundColor: isDark ? '#161922' : '#f5f2e8',
             border: `2px solid ${isDark ? '#2a2f3d' : '#0a0a0a'}`,
             padding: '18px 22px',
@@ -729,6 +736,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
             {/* Action Button positioned with normal tight 14px top margin (Critical Reserved Red-Orange) */}
             <button
               onClick={() => setShowStaffModal(true)}
+              className="btn-tactile"
               style={{
                 backgroundColor: '#ea3b1b',
                 color: '#ffffff',
