@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
-import { IncidentAuditRecord } from './IncidentAuditRecord';
 import { CascadeTimeline } from './CascadeTimeline';
 
 export default function IntelligencePanel() {
@@ -12,7 +11,6 @@ export default function IntelligencePanel() {
   const activeDomain = useStore(state => state.activeDomain);
   const activeIncidents = incidents.filter(i => ['reported', 'classified', 'in_progress', 'open'].includes(i.status) && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [unlockedTab, setUnlockedTab] = useState<'simulation' | 'audit'>('simulation');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const topAnomaly = activeIncidents.length > 0
@@ -257,208 +255,100 @@ export default function IntelligencePanel() {
             </div>
 
             {/* ────────────────────────────────────────────────────────── */}
-            {/* 2. DOSSIER & OPERATIONAL AUDIT LAYER                       */}
-            {/* ────────────────────────────────────────────────────────── */}
+            {/* 2. INCIDENT MITIGATION & CASCADE TIMELINE LAYER */}
             <div style={{ borderTop: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`, paddingTop: '8px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {/* Clean Tab Switcher */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '0 2px',
-                    }}>
-                      <span style={{
-                        fontSize: '9px',
-                        fontWeight: 800,
-                        fontFamily: '"JetBrains Mono", monospace',
-                        color: isDark ? '#94a3b8' : '#334155',
-                        letterSpacing: '0.08em',
-                      }}>
-                        DOSSIER VIEW
+                {/* Automated Dispatch Action Card */}
+                <div style={{
+                  padding: '10px',
+                  backgroundColor: isDark ? '#1c202c' : '#ffffff',
+                  border: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '8.5px', fontWeight: 800, color: isDark ? '#4fc9dc' : '#007090', letterSpacing: '0.06em', fontFamily: '"JetBrains Mono", monospace' }}>
+                      AUTOMATED DISPATCH EXECUTION
+                    </span>
+                    {topAnomaly.status === 'resolved' ? (
+                      <span style={{ fontSize: '8px', fontWeight: 800, color: '#10b981', fontFamily: '"JetBrains Mono", monospace' }}>
+                        ✓ DISPATCHED
                       </span>
-                      <span style={{
-                        fontSize: '8px',
-                        fontWeight: 800,
-                        fontFamily: '"JetBrains Mono", monospace',
-                        color: unlockedTab === 'simulation' ? '#4fc9dc' : '#059669',
-                        backgroundColor: unlockedTab === 'simulation'
-                          ? (isDark ? 'rgba(79,201,220,0.15)' : '#e0f2fe')
-                          : (isDark ? 'rgba(5,150,105,0.15)' : '#d1fae5'),
-                        padding: '1px 6px',
-                        borderRadius: '0px',
-                        border: `1px solid ${unlockedTab === 'simulation' ? '#4fc9dc' : '#059669'}`,
-                      }}>
-                        {unlockedTab === 'simulation' ? '● SIMULATION ACTIVE' : '● AUDIT READY'}
+                    ) : (
+                      <span style={{ fontSize: '8px', fontWeight: 800, color: '#3b82f6', fontFamily: '"JetBrains Mono", monospace' }}>
+                        READY
                       </span>
-                    </div>
-
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      backgroundColor: isDark ? '#1c202c' : '#e8e4d8',
-                      border: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`,
-                      padding: '2px',
-                      gap: '2px',
-                    }}>
-                      <button
-                        onClick={() => setUnlockedTab('simulation')}
-                        style={{
-                          padding: '6px 4px',
-                          fontSize: '9.5px',
-                          fontWeight: 800,
-                          fontFamily: '"JetBrains Mono", monospace',
-                          letterSpacing: '0.03em',
-                          backgroundColor: unlockedTab === 'simulation' ? (isDark ? '#2a3245' : '#ffffff') : 'transparent',
-                          color: unlockedTab === 'simulation' ? (isDark ? '#ffffff' : '#0a0a0a') : (isDark ? '#94a3b8' : '#475569'),
-                          border: 'none',
-                          borderRadius: '0px',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '4px',
-                        }}
-                      >
-                        <span style={{ fontSize: '10px', color: '#4fc9dc' }}>⚡</span>
-                        <span>SIMULATION &amp; DISPATCH</span>
-                      </button>
-
-                      <button
-                        onClick={() => setUnlockedTab('audit')}
-                        style={{
-                          padding: '6px 4px',
-                          fontSize: '9.5px',
-                          fontWeight: 800,
-                          fontFamily: '"JetBrains Mono", monospace',
-                          letterSpacing: '0.03em',
-                          backgroundColor: unlockedTab === 'audit' ? (isDark ? '#2a3245' : '#ffffff') : 'transparent',
-                          color: unlockedTab === 'audit' ? (isDark ? '#ffffff' : '#0a0a0a') : (isDark ? '#94a3b8' : '#475569'),
-                          border: 'none',
-                          borderRadius: '0px',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '4px',
-                        }}
-                      >
-                        <span style={{ fontSize: '10px', color: '#059669' }}>📋</span>
-                        <span>OPERATIONAL AUDIT</span>
-                      </button>
-                    </div>
+                    )}
                   </div>
 
-                  {/* Tab 1 Content: SIMULATION & DISPATCH */}
-                  {unlockedTab === 'simulation' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {/* Automated Dispatch Action Card */}
-                      <div style={{
-                        padding: '10px',
-                        backgroundColor: isDark ? '#1c202c' : '#ffffff',
-                        border: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`,
+                  <div style={{ fontSize: '10px', color: isDark ? '#f3f4f6' : '#0a0a0a', lineHeight: 1.4, fontWeight: 500 }}>
+                    {topAnomaly.recommendedAction || "Isolate affected grid node and dispatch emergency field unit."}
+                  </div>
+
+                  {topAnomaly.status !== 'resolved' ? (
+                    <button
+                      onClick={() => {
+                        executeIncidentAction(topAnomaly.id, 'DISPATCH RESOLUTION', true);
+                        setToastMessage("✓ AUTOMATED DISPATCH EXECUTED // FIELD UNIT DEPLOYED");
+                        setTimeout(() => setToastMessage(null), 3500);
+                      }}
+                      className="btn-tactile"
+                      style={{
+                        width: '100%',
+                        padding: '8px 10px',
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        fontFamily: '"JetBrains Mono", monospace',
+                        backgroundColor: isDark ? '#4fc9dc' : '#0a0a0a',
+                        color: isDark ? '#0a0a0a' : '#ffffff',
+                        border: 'none',
+                        borderRadius: '0px',
+                        cursor: 'pointer',
+                        letterSpacing: '0.04em',
                         display: 'flex',
-                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         gap: '6px',
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <span style={{ fontSize: '8.5px', fontWeight: 800, color: isDark ? '#4fc9dc' : '#007090', letterSpacing: '0.06em', fontFamily: '"JetBrains Mono", monospace' }}>
-                            AUTOMATED DISPATCH EXECUTION
-                          </span>
-                          {topAnomaly.status === 'resolved' ? (
-                            <span style={{ fontSize: '8px', fontWeight: 800, color: '#10b981', fontFamily: '"JetBrains Mono", monospace' }}>
-                              ✓ DISPATCHED
-                            </span>
-                          ) : (
-                            <span style={{ fontSize: '8px', fontWeight: 800, color: '#3b82f6', fontFamily: '"JetBrains Mono", monospace' }}>
-                              READY
-                            </span>
-                          )}
-                        </div>
-
-                        <div style={{ fontSize: '10px', color: isDark ? '#f3f4f6' : '#0a0a0a', lineHeight: 1.4, fontWeight: 500 }}>
-                          {topAnomaly.recommendedAction || "Isolate affected grid node and dispatch emergency field unit."}
-                        </div>
-
-                        {topAnomaly.status !== 'resolved' ? (
-                          <button
-                            onClick={() => {
-                              executeIncidentAction(topAnomaly.id, 'DISPATCH RESOLUTION', true);
-                              setToastMessage("✓ AUTOMATED DISPATCH EXECUTED // FIELD UNIT DEPLOYED");
-                              setTimeout(() => setToastMessage(null), 3500);
-                            }}
-                            className="btn-tactile"
-                            style={{
-                              width: '100%',
-                              padding: '8px 10px',
-                              fontSize: '10px',
-                              fontWeight: 800,
-                              fontFamily: '"JetBrains Mono", monospace',
-                              backgroundColor: isDark ? '#4fc9dc' : '#0a0a0a',
-                              color: isDark ? '#0a0a0a' : '#ffffff',
-                              border: 'none',
-                              borderRadius: '0px',
-                              cursor: 'pointer',
-                              letterSpacing: '0.04em',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                            }}
-                          >
-                            <span>⚡ EXECUTE MULTI-AGENCY DISPATCH →</span>
-                          </button>
-                        ) : (
-                          /* Unified Active Response Status Card */
-                          <div style={{
-                            padding: '8px 10px',
-                            backgroundColor: isDark ? '#12141a' : '#f8fafc',
-                            border: `1px solid ${isDark ? '#2a2f3d' : '#e2e8f0'}`,
-                            fontSize: '8.5px',
-                            fontFamily: '"JetBrains Mono", monospace',
-                            color: isDark ? '#94a3b8' : '#334155',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '4px',
-                          }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#f3f4f6' : '#0a0a0a', fontWeight: 700 }}>
-                              <span>RESPONSE UNIT:</span>
-                              <span style={{ color: '#10b981' }}>Taskforce #04</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#cbd5e1' : '#475569' }}>
-                              <span>ACTION:</span>
-                              <span>Grid Isolation &amp; Valve Lock</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#4fc9dc' : '#007090', fontWeight: 700 }}>
-                              <span>GREEN CORRIDOR ETA:</span>
-                              <span>7 Mins</span>
-                            </div>
-                          </div>
-                        )}
+                      }}
+                    >
+                      <span>⚡ EXECUTE MULTI-AGENCY DISPATCH →</span>
+                    </button>
+                  ) : (
+                    /* Unified Active Response Status Card */
+                    <div style={{
+                      padding: '8px 10px',
+                      backgroundColor: isDark ? '#12141a' : '#f8fafc',
+                      border: `1px solid ${isDark ? '#2a2f3d' : '#e2e8f0'}`,
+                      fontSize: '8.5px',
+                      fontFamily: '"JetBrains Mono", monospace',
+                      color: isDark ? '#94a3b8' : '#334155',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '4px',
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#f3f4f6' : '#0a0a0a', fontWeight: 700 }}>
+                        <span>RESPONSE UNIT:</span>
+                        <span style={{ color: '#10b981' }}>Taskforce #04</span>
                       </div>
-
-                      {/* Cascade Timeline Component */}
-                      <CascadeTimeline
-                        incident={topAnomaly}
-                        isDark={isDark}
-                      />
-                    </div>
-                  )}
-
-                  {/* Tab 2 Content: OPERATIONAL AUDIT */}
-                  {unlockedTab === 'audit' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <IncidentAuditRecord
-                        incident={topAnomaly}
-                        txHash={`AUDIT-${topAnomaly.id.replace('INC-', '')}-VERIFIED`}
-                        isDark={isDark}
-                      />
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#cbd5e1' : '#475569' }}>
+                        <span>ACTION:</span>
+                        <span>Grid Isolation &amp; Valve Lock</span>
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#4fc9dc' : '#007090', fontWeight: 700 }}>
+                        <span>GREEN CORRIDOR ETA:</span>
+                        <span>7 Mins</span>
+                      </div>
                     </div>
                   )}
                 </div>
+
+                {/* Cascade Timeline Component */}
+                <CascadeTimeline
+                  incident={topAnomaly}
+                  isDark={isDark}
+                />
+              </div>
             </div>
           </div>
         )}
