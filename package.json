@@ -4,7 +4,9 @@
   "version": "2.4.0",
   "type": "module",
   "scripts": {
-    "dev": "npm --prefix apps/web run dev",
+    "dev:web": "npm --prefix apps/web run dev",
+    "dev:api": "cd apps/api && mvnw.cmd spring-boot:run",
+    "dev": "npx -y concurrently \"npm run dev:web\" \"npm run dev:api\"",
     "build": "npm --prefix apps/web run build",
     "preview": "npm --prefix apps/web run preview",
     "lint": "npm --prefix apps/web run lint"
