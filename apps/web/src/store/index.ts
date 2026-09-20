@@ -55,22 +55,11 @@ export interface InteractionLoopState {
   relatedIncidentId?: string;
 }
 
-export interface X402PaymentRecord {
-  id: string;
-  payer_algorand_address: string;
-  tx_hash: string;
-  resource_path: string;
-  amount: number;
-  asset_id: string;
-  status: 'pending' | 'settled' | 'failed';
-  created_at: string;
-}
 
 interface AppState {
   nodes: CityNode[];
   kpis: KpiMetric[];
   incidents: Incident[];
-  payments: X402PaymentRecord[];
   interactionLoop: InteractionLoopState;
   activeDomain: string;
   theme: "dark" | "light";
@@ -89,8 +78,6 @@ interface AppState {
   setFocusedIncidentId: (id: string | null) => void;
   loadFromSupabase: () => Promise<void>;
   loadFromSupabaseV2: () => Promise<void>;
-  fetchPayments: () => Promise<void>;
-  addPayment: (payment: X402PaymentRecord) => void;
   subscribeToRealtime: () => () => void;
   simulateAIPrediction: () => void;
   realtimeConnected: boolean;
@@ -388,7 +375,6 @@ export const useStore = create<AppState>((set, get) => ({
   nodes: initialNodes,
   kpis: initialKpis,
   incidents: initialIncidents,
-  payments: [],
   interactionLoop: { stage: "act", relatedIncidentId: "INC-001" },
   activeDomain: "all",
   theme: "light",
@@ -474,32 +460,6 @@ export const useStore = create<AppState>((set, get) => ({
       });
     }, 3000);
     return () => clearInterval(interval);
-  },
-
-  fetchPayments: async () => {
-    try {
-      const { data, error } = await supabase
-        .from('x402_payments')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching payments:', error);
-        return;
-      }
-      
-      if (data) {
-        set({ payments: data as X402PaymentRecord[] });
-      }
-    } catch (e) {
-      console.error('Failed to fetch payments:', e);
-    }
-  },
-
-  addPayment: (payment: X402PaymentRecord) => {
-    set((state) => ({
-      payments: [payment, ...state.payments.filter(p => p.tx_hash !== payment.tx_hash)],
-    }));
   },
 
   subscribeToRealtime: () => {
@@ -614,36 +574,10 @@ export const useStore = create<AppState>((set, get) => ({
       )
       .subscribe();
 
-    // Subscribe to x402_payments for live payment unlock
-    const channel4 = supabase
-      .channel('x402-payments-realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'x402_payments' },
-        (payload) => {
-          const row = payload.new as any;
-          const payment: X402PaymentRecord = {
-            id: row.id,
-            payer_algorand_address: row.payer_algorand_address,
-            tx_hash: row.tx_hash,
-            resource_path: row.resource_path,
-            amount: row.amount,
-            asset_id: row.asset_id,
-            status: row.status,
-            created_at: row.created_at,
-          };
-          set((state) => ({
-            payments: [payment, ...state.payments.filter(p => p.tx_hash !== payment.tx_hash)],
-          }));
-        }
-      )
-      .subscribe();
-
     return () => {
       supabase.removeChannel(channel1);
       supabase.removeChannel(channel2);
       supabase.removeChannel(channel3);
-      supabase.removeChannel(channel4);
     };
   },
 

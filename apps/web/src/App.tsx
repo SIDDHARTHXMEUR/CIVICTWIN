@@ -7,7 +7,6 @@ import TopBar from './components/TopBar';
 import KpiStrip from './components/KpiStrip';
 import GridTopologyPanel from './components/GridTopologyPanel';
 import IntelligencePanel from './components/IntelligencePanel';
-import PaymentsPanel from './components/PaymentsPanel';
 import DecisionRail from './components/DecisionRail';
 
 import CommandPalette from './components/CommandPalette';
@@ -141,14 +140,8 @@ function App() {
         <TopBar onNavigate={(view) => setCurrentView(view)} />
         <KpiStrip />
         <div style={{ flex: 1, display: 'flex', gap: '6px', minHeight: 0, overflow: 'hidden' }}>
-          {activeDomain === 'payments' ? (
-            <PaymentsPanel />
-          ) : (
-            <>
-              <GridTopologyPanel />
-              <IntelligencePanel />
-            </>
-          )}
+          <GridTopologyPanel />
+          <IntelligencePanel />
         </div>
 
         {/* Footer with Realtime Status & Live Command Activity Ticker */}

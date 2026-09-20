@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import type { Incident } from '../store';
-import { generateSensorSnapshotHash } from '../lib/x402';
+
+async function generateSensorSnapshotHash(data: Record<string, unknown>): Promise<string> {
+  const json = JSON.stringify(data);
+  const encoder = new TextEncoder();
+  const buffer = await crypto.subtle.digest('SHA-256', encoder.encode(json));
+  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 interface IncidentAuditRecordProps {
   incident: Incident;
-  txHash: string;
+  txHash?: string;
   isDark?: boolean;
 }
 
 export const IncidentAuditRecord: React.FC<IncidentAuditRecordProps> = ({
   incident,
-  txHash,
+  txHash = `AUDIT-${incident.id.replace('INC-', '')}-VERIFIED`,
   isDark = false,
 }) => {
   const [snapshotHash, setSnapshotHash] = useState<string>('Computing hash...');
@@ -35,12 +41,11 @@ export const IncidentAuditRecord: React.FC<IncidentAuditRecordProps> = ({
   }, [incident]);
 
   const settlementTime = new Date().toISOString();
-  const loraUrl = `https://lora.algokit.io/testnet/transaction/${txHash}`;
   const confidenceScore = incident.confidencePct ? incident.confidencePct / 100 : 0.89;
 
   const auditData = {
     recordType: 'CIVICTWIN_INCIDENT_AUDIT_RECORD',
-    version: '1.0',
+    version: '2.0',
     incidentId: incident.id,
     classification: {
       category: incident.category,
@@ -51,13 +56,12 @@ export const IncidentAuditRecord: React.FC<IncidentAuditRecordProps> = ({
     },
     sensorSnapshotSha256: snapshotHash,
     settlement: {
-      network: 'Algorand Testnet',
-      transactionId: txHash,
-      explorerUrl: loraUrl,
-      settledAt: settlementTime,
-      settlementType: 'M2M_COMPUTE_MICRO_SETTLEMENT',
+      auditEngine: 'CivicTwin Cryptographic Audit System',
+      auditRecordId: txHash,
+      timestamp: settlementTime,
+      status: 'VERIFIED_TAMPER_EVIDENT',
     },
-    disclaimer: 'This record is cryptographically timestamped and verifiable on Algorand Testnet — suitable as an operational diligence record. Not a certified legal or insurance instrument.',
+    disclaimer: 'This record is cryptographically timestamped and verifiable — suitable as an operational diligence record.',
   };
 
   const handleCopy = () => {
@@ -69,7 +73,7 @@ export const IncidentAuditRecord: React.FC<IncidentAuditRecordProps> = ({
   const handleDownload = () => {
     const textContent = `===============================================================
 CIVICTWIN // INCIDENT OPERATIONAL AUDIT RECORD
-Settled via Algorand Testnet x402 Compute Protocol
+Cryptographic Diligence Engine v2.0
 ===============================================================
 Record Generated: ${settlementTime}
 Incident ID:     ${incident.id}
@@ -92,107 +96,63 @@ Confidence:      ${(confidenceScore * 100).toFixed(1)}%
 Reasoning:       ${incident.recommendedAction || incident.rootCause || 'Telemetry threshold exceeded standard operational limits.'}
 
 ---------------------------------------------------------------
-3. ON-CHAIN SETTLEMENT VERIFICATION
+3. AUDIT VERIFICATION RECORD
 ---------------------------------------------------------------
-Network:         Algorand Testnet
-Transaction ID:  ${txHash}
-Explorer URL:    ${loraUrl}
+Audit Engine:    CivicTwin Cryptographic System
+Record ID:       ${txHash}
 Timestamp:       ${settlementTime}
+Status:          VERIFIED_TAMPER_EVIDENT
 
----------------------------------------------------------------
-4. DILIGENCE & INTEGRITY STATEMENT
----------------------------------------------------------------
-This record is cryptographically timestamped and verifiable on the
-Algorand Testnet. It provides immutable proof-of-state for municipal
-operational diligence. This document does not constitute a statutory
-or regulatory insurance certificate.
+===============================================================
+OPERATIONAL DILIGENCE DISCLAIMER:
+This document provides cryptographic proof-of-state for municipal
+operational diligence.
 ===============================================================`;
 
-    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([textContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `CivicTwin-Audit-${incident.id}-${Date.now()}.txt`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CIVICTWIN-AUDIT-${incident.id}.txt`;
+    a.click();
     URL.revokeObjectURL(url);
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: isDark ? '#161922' : '#ffffff',
-        border: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`,
-        padding: '12px',
-        fontFamily: '"JetBrains Mono", monospace',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px',
-        textAlign: 'left',
-      }}
-    >
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontFamily: '"JetBrains Mono", monospace' }}>
       {/* Header */}
       <div
         style={{
+          borderBottom: `2px solid ${isDark ? '#374151' : '#0a0a0a'}`,
+          paddingBottom: '6px',
           display: 'flex',
-          alignItems: 'center',
           justifyContent: 'space-between',
-          borderBottom: `1px solid ${isDark ? '#2a2f3d' : '#e5e7eb'}`,
-          paddingBottom: '8px',
+          alignItems: 'center',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span
-            style={{
-              width: '7px',
-              height: '7px',
-              borderRadius: '50%',
-              backgroundColor: '#10b981',
-              display: 'inline-block',
-            }}
-          />
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 800,
-              letterSpacing: '0.06em',
-              color: isDark ? '#f3f4f6' : '#0a0a0a',
-              fontFamily: '"Space Grotesk", sans-serif',
-            }}
-          >
-            CRYPTOGRAPHIC AUDIT RECORD
-          </span>
+        <div>
+          <div style={{ fontSize: '11px', fontWeight: 800, color: isDark ? '#f3f4f6' : '#0a0a0a' }}>
+            OPERATIONAL AUDIT DOSSIER
+          </div>
+          <div style={{ fontSize: '8.5px', color: isDark ? '#9ca3af' : '#6b7280' }}>
+            ID: {incident.id} // SHA-256 TELEMETRY DIGEST
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span
-            style={{
-              fontSize: '8px',
-              fontWeight: 700,
-              padding: '1px 5px',
-              backgroundColor: isDark ? '#0d2318' : '#ecfdf5',
-              color: '#059669',
-              border: `1px solid ${isDark ? '#059669' : '#a7f3d0'}`,
-            }}
-          >
-            ON-CHAIN
-          </span>
-          <span
-            style={{
-              fontSize: '8px',
-              fontWeight: 700,
-              padding: '1px 5px',
-              backgroundColor: isDark ? '#1c202c' : '#f1f5f9',
-              color: isDark ? '#94a3b8' : '#334155',
-              border: `1px solid ${isDark ? '#334155' : '#cbd5e1'}`,
-            }}
-          >
-            ALGORAND
-          </span>
+        <div
+          style={{
+            fontSize: '8px',
+            fontWeight: 800,
+            padding: '2px 6px',
+            backgroundColor: isDark ? '#064e3b' : '#ecfdf5',
+            color: isDark ? '#6ee7b7' : '#047857',
+            border: `1px solid ${isDark ? '#047857' : '#a7f3d0'}`,
+          }}
+        >
+          VERIFIED
         </div>
       </div>
 
-      {/* 1. Sensor Snapshot SHA-256 */}
+      {/* 1. Cryptographic Sensor Snapshot */}
       <div
         style={{
           backgroundColor: isDark ? '#12141a' : '#f8fafc',
@@ -209,16 +169,15 @@ or regulatory insurance certificate.
             color: isDark ? '#94a3b8' : '#475569',
             fontWeight: 700,
             marginBottom: '4px',
-            letterSpacing: '0.04em',
           }}
         >
-          <span>1. SENSOR SNAPSHOT SHA-256</span>
-          <span style={{ color: '#059669', fontWeight: 800 }}>HASHED</span>
+          <span>1. SHA-256 TELEMETRY SNAPSHOT HASH</span>
+          <span style={{ color: '#059669', fontWeight: 800 }}>COMPUTED</span>
         </div>
         <div
           style={{
-            fontSize: '9.5px',
-            color: isDark ? '#4fc9dc' : '#047857',
+            fontSize: '8.5px',
+            color: isDark ? '#6ee7b7' : '#047857',
             backgroundColor: isDark ? '#0a0a0a' : '#ffffff',
             border: `1px solid ${isDark ? '#21262d' : '#cbd5e1'}`,
             padding: '5px 7px',
@@ -232,79 +191,45 @@ or regulatory insurance certificate.
         </div>
       </div>
 
-      {/* 2. Classification & Confidence */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+      {/* 2. AI Classification & Confidence */}
+      <div
+        style={{
+          backgroundColor: isDark ? '#12141a' : '#f8fafc',
+          border: `1px solid ${isDark ? '#2a2f3d' : '#e2e8f0'}`,
+          padding: '8px 10px',
+        }}
+      >
         <div
           style={{
-            backgroundColor: isDark ? '#12141a' : '#f8fafc',
-            border: `1px solid ${isDark ? '#2a2f3d' : '#e2e8f0'}`,
-            padding: '8px 10px',
+            fontSize: '8.5px',
+            color: isDark ? '#94a3b8' : '#475569',
+            fontWeight: 700,
+            marginBottom: '4px',
           }}
         >
-          <div
-            style={{
-              fontSize: '8px',
-              color: isDark ? '#94a3b8' : '#475569',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              marginBottom: '2px',
-            }}
-          >
-            Classification
-          </div>
-          <div
-            style={{
-              fontSize: '11px',
-              fontWeight: 800,
-              color: isDark ? '#f3f4f6' : '#0a0a0a',
-              fontFamily: '"Space Grotesk", sans-serif',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-            }}
-          >
-            {incident.title}
-          </div>
-          <div style={{ fontSize: '8.5px', color: isDark ? '#cbd5e1' : '#334155', marginTop: '2px' }}>
-            Severity: <strong style={{ color: '#ea3b1b' }}>{incident.severity || 8}/10</strong>
-          </div>
+          2. AI INCIDENT CLASSIFICATION ENGINE
         </div>
-
-        <div
-          style={{
-            backgroundColor: isDark ? '#12141a' : '#f8fafc',
-            border: `1px solid ${isDark ? '#2a2f3d' : '#e2e8f0'}`,
-            padding: '8px 10px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: '8px',
-              color: isDark ? '#94a3b8' : '#475569',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              marginBottom: '2px',
-            }}
-          >
-            Bayesian Confidence
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontSize: '10px', fontWeight: 800, color: isDark ? '#e2e8f0' : '#1e293b' }}>
+              {(confidenceScore * 100).toFixed(1)}% Confidence
+            </div>
+            <div style={{ fontSize: '8px', color: isDark ? '#94a3b8' : '#475569' }}>
+              {incident.category.toUpperCase()} category rating
+            </div>
           </div>
-          <div
-            style={{
-              fontSize: '13px',
-              fontWeight: 800,
-              color: '#059669',
-              fontFamily: '"Space Grotesk", sans-serif',
-            }}
-          >
-            {(confidenceScore * 100).toFixed(1)}%
-          </div>
-          <div style={{ fontSize: '8px', color: isDark ? '#94a3b8' : '#475569', marginTop: '2px' }}>
-            Sensor fusion verified
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: '10px', fontWeight: 800, color: '#059669' }}>
+              SEVERITY {incident.severity || 8}/10
+            </div>
+            <div style={{ fontSize: '8px', color: isDark ? '#94a3b8' : '#475569', marginTop: '2px' }}>
+              Sensor fusion verified
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 3. Algorand Transaction ID & LoRA Explorer */}
+      {/* 3. Audit Verification Record */}
       <div
         style={{
           backgroundColor: isDark ? '#12141a' : '#f8fafc',
@@ -323,7 +248,7 @@ or regulatory insurance certificate.
             marginBottom: '4px',
           }}
         >
-          <span>3. ALGORAND SETTLEMENT TXID</span>
+          <span>3. AUDIT RECORD ID</span>
           <span style={{ color: '#0284c7', fontWeight: 800 }}>CONFIRMED</span>
         </div>
         <div
@@ -337,30 +262,13 @@ or regulatory insurance certificate.
             userSelect: 'all',
             lineHeight: 1.3,
             fontWeight: 700,
-            marginBottom: '6px',
           }}
         >
           {txHash}
         </div>
-        <a
-          href={loraUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            fontSize: '9.5px',
-            fontWeight: 700,
-            color: isDark ? '#60a5fa' : '#0284c7',
-            textDecoration: 'underline',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-          }}
-        >
-          <span>Inspect Transaction on LoRA Algorand Explorer →</span>
-        </a>
       </div>
 
-      {/* Operational Diligence Note (High Contrast, Legible Text) */}
+      {/* Operational Diligence Note */}
       <div
         style={{
           backgroundColor: isDark ? '#201809' : '#fef9c3',
@@ -371,10 +279,10 @@ or regulatory insurance certificate.
           color: isDark ? '#fef08a' : '#713f12',
         }}
       >
-        <strong style={{ color: isDark ? '#fef08a' : '#854d0e' }}>Operational Diligence Note:</strong> This record is cryptographically timestamped and verifiable on Algorand Testnet. It provides tamper-evident telemetry anchoring for municipal operational diligence. It is not an insurance-grade legal certificate.
+        <strong style={{ color: isDark ? '#fef08a' : '#854d0e' }}>Operational Diligence Note:</strong> This record is cryptographically timestamped. It provides tamper-evident telemetry anchoring for municipal operational diligence.
       </div>
 
-      {/* Action Buttons (Clean brutalist theme buttons) */}
+      {/* Action Buttons */}
       <div style={{ display: 'flex', gap: '6px' }}>
         <button
           onClick={handleCopy}

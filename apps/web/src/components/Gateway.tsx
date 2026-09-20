@@ -684,7 +684,7 @@ export default function Gateway({ onSelectRole }: GatewayProps) {
                 <span style={{ color: '#ea3b1b', fontWeight: 800 }}>✓</span> Live Anomaly Simulation & Resolution Loop
               </li>
               <li style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ color: '#ea3b1b', fontWeight: 800 }}>✓</span> x402 Payment-Gated AI Reports via Algorand Testnet
+                <span style={{ color: '#ea3b1b', fontWeight: 800 }}>✓</span> Predictive Failure Simulation & Cascade Intelligence
               </li>
             </ul>
 

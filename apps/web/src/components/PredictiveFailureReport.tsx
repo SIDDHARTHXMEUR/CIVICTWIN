@@ -55,11 +55,11 @@ function generateReport(incident: Incident): PredictiveReportData {
 
 interface PredictiveFailureReportProps {
   incident: Incident;
-  txHash: string;
+  txHash?: string;
   isDark: boolean;
 }
 
-export const PredictiveFailureReport: React.FC<PredictiveFailureReportProps> = ({ incident, txHash, isDark }) => {
+export const PredictiveFailureReport: React.FC<PredictiveFailureReportProps> = ({ incident, isDark }) => {
   const report = generateReport(incident);
   
   const bg = isDark ? '#0d1117' : '#f8f9fa';
@@ -75,30 +75,6 @@ export const PredictiveFailureReport: React.FC<PredictiveFailureReportProps> = (
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '10px', fontFamily: mono }}>
-      {/* Verified payment badge */}
-      <div style={{
-        padding: '5px 8px',
-        backgroundColor: '#ecfdf5',
-        border: '1px solid #10b981',
-        color: '#065f46',
-        fontSize: '9px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-      }}>
-        <span>✓</span>
-        <span>PREMIUM UNLOCKED — TX: </span>
-        <a
-          href={`https://lora.algokit.io/testnet/transaction/${txHash}`}
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: '#065f46', textDecoration: 'underline', fontWeight: 700 }}
-        >
-          {txHash.slice(0, 16)}...
-        </a>
-        <span style={{ marginLeft: 'auto', color: '#6b7280' }}>ALGORAND TESTNET</span>
-      </div>
-
       {/* Main risk score */}
       <div style={{
         backgroundColor: bg,

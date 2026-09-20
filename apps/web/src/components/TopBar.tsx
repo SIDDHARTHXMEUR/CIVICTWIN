@@ -20,7 +20,6 @@ export default function TopBar({ onNavigate }: TopBarProps) {
   const [cityNotice, setCityNotice] = useState<string | null>(null);
   
   const incidents = useStore(state => state.incidents);
-  const payments = useStore(state => state.payments);
   const setIsAuthenticated = useStore(state => state.setIsAuthenticated);
 
   const handleExportBriefing = () => {
@@ -49,7 +48,7 @@ export default function TopBar({ onNavigate }: TopBarProps) {
           <div class="meta">JAIPUR METRO NODE // LAT 26.9124° N, LNG 75.7873° E // GENERATED: ${new Date().toLocaleString()}</div>
 
           <div class="section-title">01. EXECUTIVE SUMMARY & CITY HEALTH</div>
-          <p>City Health Score: <strong>98% (STABLE)</strong> | Active Unresolved Incidents: <strong>${activeList.length}</strong> | Settled Micro-Payments: <strong>${payments.filter(p => p.status === 'settled').length}</strong></p>
+          <p>City Health Score: <strong>98% (STABLE)</strong> | Active Unresolved Incidents: <strong>${activeList.length}</strong></p>
 
           <div class="section-title">02. ACTIVE CRITICAL & WARNING INCIDENTS</div>
           <table>
@@ -64,23 +63,6 @@ export default function TopBar({ onNavigate }: TopBarProps) {
                   <td><span class="badge">${i.severity}/10</span></td>
                   <td>${i.reportCount}</td>
                   <td><code>${i.status.toUpperCase()}</code></td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-
-          <div class="section-title">03. X402 MICROPAYMENT RESOLUTION AUDIT LOG</div>
-          <table>
-            <thead>
-              <tr><th>TX HASH</th><th>RESOURCE</th><th>AMOUNT</th><th>STATUS</th></tr>
-            </thead>
-            <tbody>
-              ${payments.map(p => `
-                <tr>
-                  <td><code>${p.tx_hash.substring(0, 16)}...</code></td>
-                  <td>${p.resource_path}</td>
-                  <td>$${p.amount} ALGO</td>
-                  <td><strong>${p.status.toUpperCase()}</strong></td>
                 </tr>
               `).join('')}
             </tbody>

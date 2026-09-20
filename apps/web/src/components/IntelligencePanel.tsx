@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useStore } from '../store';
-import { PaymentGate } from './PaymentGate';
 import { IncidentAuditRecord } from './IncidentAuditRecord';
 import { CascadeTimeline } from './CascadeTimeline';
 
@@ -10,7 +9,6 @@ export default function IntelligencePanel() {
   const theme = useStore(state => state.theme);
   const isDark = theme === 'dark';
 
-  const payments = useStore(state => state.payments);
   const activeDomain = useStore(state => state.activeDomain);
   const activeIncidents = incidents.filter(i => ['reported', 'classified', 'in_progress', 'open'].includes(i.status) && (activeDomain === 'all' || activeDomain === 'intelligence' || i.category.includes(activeDomain)));
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -270,17 +268,10 @@ export default function IntelligencePanel() {
             </div>
 
             {/* ────────────────────────────────────────────────────────── */}
-            {/* 2. ALGORAND x402 SETTLED LAYER (COMPUTE & AUDIT)           */}
+            {/* 2. PREDICTIVE COMPUTE & AUDIT LAYER                       */}
             {/* ────────────────────────────────────────────────────────── */}
             <div style={{ borderTop: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`, paddingTop: '8px' }}>
-              <PaymentGate
-                resourceId={`prediction-${topAnomaly.id}`}
-                priceUsdc={0.1}
-                description="AUTOMATED DISPATCH & M2M COMPUTE // ALGORAND x402"
-                subtitle="Standard manual mitigation playbook is available in the Decision Rail. Settle 0.1 USDC via Algorand Testnet to execute automated multi-agency dispatch, 120-min cascade simulation & cryptographic diligence audit anchoring."
-                isDark={isDark}
-              >
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {/* Prominent Dossier Switcher */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <div style={{
@@ -503,10 +494,7 @@ export default function IntelligencePanel() {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <IncidentAuditRecord
                         incident={topAnomaly}
-                        txHash={
-                          payments.find(p => p.resource_path === `prediction-${topAnomaly.id}` && p.status === 'settled')?.tx_hash ||
-                          'GBT2DZZHKZF4GYG4U7USIFOG46LI3LQX5MJRKSMB3EORBT2KL4PQ'
-                        }
+                        txHash={`AUDIT-${topAnomaly.id.replace('INC-', '')}-VERIFIED`}
                         isDark={isDark}
                       />
                     </div>
@@ -539,7 +527,6 @@ export default function IntelligencePanel() {
                     </span>
                   </div>
                 </div>
-              </PaymentGate>
             </div>
           </div>
         )}
