@@ -82,17 +82,6 @@ export default function IntelligencePanel() {
           {toastMessage}
         </div>
       )}
-      {/* Scanline Beam Animation */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '2px',
-        background: 'linear-gradient(90deg, transparent, #4fc9dc, #ea3b1b, transparent)',
-        animation: 'scanline 3s linear infinite',
-        zIndex: 10,
-      }} />
 
       {/* Header — 20px bold Space Grotesk title with numeric index 02 / */}
       <div style={{
@@ -135,7 +124,7 @@ export default function IntelligencePanel() {
         ) : (
           <div style={{ padding: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             {/* ────────────────────────────────────────────────────────── */}
-            {/* 1. FREE DIAGNOSTIC TIAGE LAYER (UNIFIED HUD)             */}
+            {/* 1. DIAGNOSTIC TRIAGE LAYER                                */}
             {/* ────────────────────────────────────────────────────────── */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -152,7 +141,7 @@ export default function IntelligencePanel() {
                           useStore.getState().setFocusedIncidentId(activeIncidents[idx].id);
                         }}
                         style={{
-                          padding: '1px 5px',
+                          padding: '2px 6px',
                           fontSize: '9px',
                           fontFamily: '"JetBrains Mono", monospace',
                           fontWeight: 800,
@@ -268,11 +257,11 @@ export default function IntelligencePanel() {
             </div>
 
             {/* ────────────────────────────────────────────────────────── */}
-            {/* 2. PREDICTIVE COMPUTE & AUDIT LAYER                       */}
+            {/* 2. DOSSIER & OPERATIONAL AUDIT LAYER                       */}
             {/* ────────────────────────────────────────────────────────── */}
             <div style={{ borderTop: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`, paddingTop: '8px' }}>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {/* Prominent Dossier Switcher */}
+                  {/* Clean Tab Switcher */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     <div style={{
                       display: 'flex',
@@ -293,80 +282,72 @@ export default function IntelligencePanel() {
                         fontSize: '8px',
                         fontWeight: 800,
                         fontFamily: '"JetBrains Mono", monospace',
-                        color: unlockedTab === 'simulation' ? '#d97706' : '#059669',
+                        color: unlockedTab === 'simulation' ? '#4fc9dc' : '#059669',
                         backgroundColor: unlockedTab === 'simulation'
-                          ? (isDark ? 'rgba(217,119,6,0.2)' : '#fef3c7')
-                          : (isDark ? 'rgba(5,150,105,0.2)' : '#d1fae5'),
+                          ? (isDark ? 'rgba(79,201,220,0.15)' : '#e0f2fe')
+                          : (isDark ? 'rgba(5,150,105,0.15)' : '#d1fae5'),
                         padding: '1px 6px',
-                        borderRadius: '3px',
-                        border: `1px solid ${unlockedTab === 'simulation' ? '#d97706' : '#059669'}`,
+                        borderRadius: '0px',
+                        border: `1px solid ${unlockedTab === 'simulation' ? '#4fc9dc' : '#059669'}`,
                       }}>
-                        {unlockedTab === 'simulation' ? '● SIMULATION ACTIVE' : '● AUDIT ANCHORED'}
+                        {unlockedTab === 'simulation' ? '● SIMULATION ACTIVE' : '● AUDIT READY'}
                       </span>
                     </div>
 
                     <div style={{
                       display: 'grid',
                       gridTemplateColumns: '1fr 1fr',
-                      backgroundColor: isDark ? '#0b0f19' : '#e2e8f0',
-                      border: `1.5px solid ${isDark ? '#334155' : '#94a3b8'}`,
-                      borderRadius: '6px',
-                      padding: '3px',
-                      gap: '4px',
-                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)',
+                      backgroundColor: isDark ? '#1c202c' : '#e8e4d8',
+                      border: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`,
+                      padding: '2px',
+                      gap: '2px',
                     }}>
                       <button
                         onClick={() => setUnlockedTab('simulation')}
                         style={{
-                          padding: '8px 4px',
-                          fontSize: '10px',
+                          padding: '6px 4px',
+                          fontSize: '9.5px',
                           fontWeight: 800,
                           fontFamily: '"JetBrains Mono", monospace',
                           letterSpacing: '0.03em',
-                          backgroundColor: unlockedTab === 'simulation' ? (isDark ? '#1e293b' : '#ffffff') : 'transparent',
+                          backgroundColor: unlockedTab === 'simulation' ? (isDark ? '#2a3245' : '#ffffff') : 'transparent',
                           color: unlockedTab === 'simulation' ? (isDark ? '#ffffff' : '#0a0a0a') : (isDark ? '#94a3b8' : '#475569'),
-                          border: unlockedTab === 'simulation' 
-                            ? `2px solid #d97706` 
-                            : '2px solid transparent',
-                          borderRadius: '4px',
-                          boxShadow: unlockedTab === 'simulation' ? '0 2px 5px rgba(0,0,0,0.18)' : 'none',
+                          border: 'none',
+                          borderRadius: '0px',
                           cursor: 'pointer',
                           transition: 'all 0.15s ease',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '5px',
+                          gap: '4px',
                         }}
                       >
-                        <span style={{ fontSize: '11px', color: '#d97706' }}>⚡</span>
+                        <span style={{ fontSize: '10px', color: '#4fc9dc' }}>⚡</span>
                         <span>SIMULATION &amp; DISPATCH</span>
                       </button>
 
                       <button
                         onClick={() => setUnlockedTab('audit')}
                         style={{
-                          padding: '8px 4px',
-                          fontSize: '10px',
+                          padding: '6px 4px',
+                          fontSize: '9.5px',
                           fontWeight: 800,
                           fontFamily: '"JetBrains Mono", monospace',
                           letterSpacing: '0.03em',
-                          backgroundColor: unlockedTab === 'audit' ? (isDark ? '#1e293b' : '#ffffff') : 'transparent',
+                          backgroundColor: unlockedTab === 'audit' ? (isDark ? '#2a3245' : '#ffffff') : 'transparent',
                           color: unlockedTab === 'audit' ? (isDark ? '#ffffff' : '#0a0a0a') : (isDark ? '#94a3b8' : '#475569'),
-                          border: unlockedTab === 'audit' 
-                            ? `2px solid #059669` 
-                            : '2px solid transparent',
-                          borderRadius: '4px',
-                          boxShadow: unlockedTab === 'audit' ? '0 2px 5px rgba(0,0,0,0.18)' : 'none',
+                          border: 'none',
+                          borderRadius: '0px',
                           cursor: 'pointer',
                           transition: 'all 0.15s ease',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          gap: '5px',
+                          gap: '4px',
                         }}
                       >
-                        <span style={{ fontSize: '11px', color: '#059669' }}>🔒</span>
-                        <span>ON-CHAIN AUDIT</span>
+                        <span style={{ fontSize: '10px', color: '#059669' }}>📋</span>
+                        <span>OPERATIONAL AUDIT</span>
                       </button>
                     </div>
                   </div>
@@ -374,7 +355,7 @@ export default function IntelligencePanel() {
                   {/* Tab 1 Content: SIMULATION & DISPATCH */}
                   {unlockedTab === 'simulation' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {/* Automated Dispatch Action */}
+                      {/* Automated Dispatch Action Card */}
                       <div style={{
                         padding: '10px',
                         backgroundColor: isDark ? '#1c202c' : '#ffffff',
@@ -431,55 +412,33 @@ export default function IntelligencePanel() {
                             <span>⚡ EXECUTE MULTI-AGENCY DISPATCH →</span>
                           </button>
                         ) : (
+                          /* Unified Active Response Status Card */
                           <div style={{
-                            padding: '6px 8px',
+                            padding: '8px 10px',
                             backgroundColor: isDark ? '#12141a' : '#f8fafc',
                             border: `1px solid ${isDark ? '#2a2f3d' : '#e2e8f0'}`,
                             fontSize: '8.5px',
                             fontFamily: '"JetBrains Mono", monospace',
                             color: isDark ? '#94a3b8' : '#334155',
-                            lineHeight: 1.45,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: '4px',
                           }}>
-                            <div style={{ color: isDark ? '#f3f4f6' : '#0a0a0a', fontWeight: 700, marginBottom: '2px' }}>
-                              EXECUTION LOG:
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#f3f4f6' : '#0a0a0a', fontWeight: 700 }}>
+                              <span>RESPONSE UNIT:</span>
+                              <span style={{ color: '#10b981' }}>Taskforce #04</span>
                             </div>
-                            <div>• Emergency Field Taskforce #04 Dispatched</div>
-                            <div>• Sub-surface isolation valve engaged (Pressure stabilized)</div>
-                            <div>• Priority green wave routing ETA: 7 Mins</div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#cbd5e1' : '#475569' }}>
+                              <span>ACTION:</span>
+                              <span>Grid Isolation &amp; Valve Lock</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#4fc9dc' : '#007090', fontWeight: 700 }}>
+                              <span>GREEN CORRIDOR ETA:</span>
+                              <span>7 Mins</span>
+                            </div>
                           </div>
                         )}
                       </div>
-
-                      {/* Active Dispatch Status & Navigation Corridor */}
-                      {topAnomaly.status === 'resolved' && (
-                        <div style={{
-                          padding: '10px',
-                          backgroundColor: isDark ? '#1c202c' : '#ffffff',
-                          border: `1px solid ${isDark ? '#2a2f3d' : '#d5d0c3'}`,
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '6px',
-                          fontFamily: '"JetBrains Mono", monospace',
-                          fontSize: '9px',
-                        }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `1px solid ${isDark ? '#2a2f3d' : '#e5e7eb'}`, paddingBottom: '4px' }}>
-                            <span style={{ fontSize: '8.5px', fontWeight: 800, color: isDark ? '#4fc9dc' : '#005073', letterSpacing: '0.06em' }}>
-                              ACTIVE FIELD UNIT ROUTE
-                            </span>
-                            <span style={{ fontSize: '8px', color: '#10b981', fontWeight: 800 }}>ACTIVE</span>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#d1d5db' : '#374151' }}>
-                            <span>Assigned:</span>
-                            <strong style={{ color: isDark ? '#ffffff' : '#0a0a0a' }}>Taskforce #04</strong>
-                          </div>
-
-                          <div style={{ display: 'flex', justifyContent: 'space-between', color: isDark ? '#d1d5db' : '#374151' }}>
-                            <span>Arrival:</span>
-                            <strong style={{ color: isDark ? '#4fc9dc' : '#007090' }}>7 MINS (Green Corridor)</strong>
-                          </div>
-                        </div>
-                      )}
 
                       {/* Cascade Timeline Component */}
                       <CascadeTimeline
@@ -489,7 +448,7 @@ export default function IntelligencePanel() {
                     </div>
                   )}
 
-                  {/* Tab 2 Content: ON-CHAIN AUDIT */}
+                  {/* Tab 2 Content: OPERATIONAL AUDIT */}
                   {unlockedTab === 'audit' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       <IncidentAuditRecord
@@ -499,33 +458,6 @@ export default function IntelligencePanel() {
                       />
                     </div>
                   )}
-
-                  {/* Compact 1-Line Roadmap Chip */}
-                  <div style={{
-                    backgroundColor: isDark ? '#161922' : '#ffffff',
-                    border: `1px solid ${isDark ? '#2a2f3d' : '#e2e8f0'}`,
-                    padding: '6px 9px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    fontFamily: '"JetBrains Mono", monospace',
-                    fontSize: '8.5px',
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', color: isDark ? '#cbd5e1' : '#334155' }}>
-                      <span style={{ color: '#f59e0b' }}>⚙</span>
-                      <span>ROADMAP: Contractor Smart Escrows</span>
-                    </div>
-                    <span style={{
-                      fontSize: '7.5px',
-                      fontWeight: 800,
-                      padding: '1px 4px',
-                      backgroundColor: isDark ? '#201809' : '#fffbeb',
-                      color: '#b45309',
-                      border: `1px solid ${isDark ? '#78350f' : '#fde68a'}`,
-                    }}>
-                      PHASE 4
-                    </span>
-                  </div>
                 </div>
             </div>
           </div>
