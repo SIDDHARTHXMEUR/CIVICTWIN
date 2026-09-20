@@ -45,7 +45,7 @@ export const IncidentAuditRecord: React.FC<IncidentAuditRecordProps> = ({
 
   const auditData = {
     recordType: 'CIVICTWIN_INCIDENT_AUDIT_RECORD',
-    version: '2.0',
+    version: '2.4',
     incidentId: incident.id,
     classification: {
       category: incident.category,
@@ -56,12 +56,12 @@ export const IncidentAuditRecord: React.FC<IncidentAuditRecordProps> = ({
     },
     sensorSnapshotSha256: snapshotHash,
     settlement: {
-      auditEngine: 'CivicTwin Cryptographic Audit System',
+      auditEngine: 'Java Spring Data JPA AuditService',
       auditRecordId: txHash,
       timestamp: settlementTime,
-      status: 'VERIFIED_TAMPER_EVIDENT',
+      status: 'AUDIT_LOG_PERSISTED',
     },
-    disclaimer: 'This record is cryptographically timestamped and verifiable — suitable as an operational diligence record.',
+    disclaimer: 'This record is persisted via Java Spring Data JPA AuditService to server logs for municipal operational diligence.',
   };
 
   const handleCopy = () => {
@@ -73,7 +73,7 @@ export const IncidentAuditRecord: React.FC<IncidentAuditRecordProps> = ({
   const handleDownload = () => {
     const textContent = `===============================================================
 CIVICTWIN // INCIDENT OPERATIONAL AUDIT RECORD
-Cryptographic Diligence Engine v2.0
+Java Spring Data JPA Audit Engine v2.4
 ===============================================================
 Record Generated: ${settlementTime}
 Incident ID:     ${incident.id}
@@ -82,31 +82,31 @@ Severity Score:  ${incident.severity || 8}/10
 Geo Coordinates: [${(incident.lat || 26.9124).toFixed(5)}, ${(incident.lng || 75.7873).toFixed(5)}]
 
 ---------------------------------------------------------------
-1. CRYPTOGRAPHIC SENSOR SNAPSHOT
+1. TELEMETRY SNAPSHOT DIGEST
 ---------------------------------------------------------------
 SHA-256 Digest:
 ${snapshotHash}
 (Computed over raw telemetry readings, threshold telemetry, and timestamp)
 
 ---------------------------------------------------------------
-2. AI CLASSIFICATION & CONFIDENCE
+2. SEVERITY ENGINE CLASSIFICATION
 ---------------------------------------------------------------
 Classification:  ${incident.title}
 Confidence:      ${(confidenceScore * 100).toFixed(1)}%
 Reasoning:       ${incident.recommendedAction || incident.rootCause || 'Telemetry threshold exceeded standard operational limits.'}
 
 ---------------------------------------------------------------
-3. AUDIT VERIFICATION RECORD
+3. JAVA BACKEND AUDIT LOG RECORD
 ---------------------------------------------------------------
-Audit Engine:    CivicTwin Cryptographic System
+Audit Engine:    Java Spring Boot AuditService (JPA / H2)
 Record ID:       ${txHash}
 Timestamp:       ${settlementTime}
-Status:          VERIFIED_TAMPER_EVIDENT
+Status:          AUDIT_LOG_PERSISTED
 
 ===============================================================
 OPERATIONAL DILIGENCE DISCLAIMER:
-This document provides cryptographic proof-of-state for municipal
-operational diligence.
+This document provides server-persisted proof-of-state for municipal
+operational diligence via Java Spring Boot AuditService.
 ===============================================================`;
 
     const blob = new Blob([textContent], { type: 'text/plain' });
@@ -279,7 +279,7 @@ operational diligence.
           color: isDark ? '#fef08a' : '#713f12',
         }}
       >
-        <strong style={{ color: isDark ? '#fef08a' : '#854d0e' }}>Operational Diligence Note:</strong> This record is cryptographically timestamped. It provides tamper-evident telemetry anchoring for municipal operational diligence.
+        <strong style={{ color: isDark ? '#fef08a' : '#854d0e' }}>Operational Diligence Note:</strong> This record is persisted via Java Spring Data JPA AuditService to server logs for municipal operational diligence.
       </div>
 
       {/* Action Buttons */}

@@ -107,7 +107,7 @@ export default function DecisionRail() {
           </span>
         </div>
         <div style={{ fontSize: '10px', color: isDark ? '#94a3b8' : '#1e293b', fontWeight: 700, fontFamily: '"JetBrains Mono", monospace', marginTop: '4px' }}>
-          AI Incident Alerts &amp; Triage
+          Java Priority Queue Triage
         </div>
       </div>
 
@@ -227,10 +227,10 @@ export default function DecisionRail() {
           backgroundColor: isDark ? '#2a2f3d' : '#111318',
           borderRadius: '0px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '10px', color: '#fff', fontWeight: 700, flexShrink: 0,
+          fontSize: '9px', color: '#4fc9dc', fontWeight: 700, flexShrink: 0,
           fontFamily: '"JetBrains Mono", monospace',
-        }}>AI</div>
-        <span style={{ fontSize: '10px', color: '#6b7280', fontFamily: '"JetBrains Mono", monospace' }}>Engine Online</span>
+        }}>JAVA</div>
+        <span style={{ fontSize: '10px', color: '#6b7280', fontFamily: '"JetBrains Mono", monospace' }}>Spring Boot (Port 8080)</span>
         <div style={{ marginLeft: 'auto', position: 'relative', width: '8px', height: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span className="beacon-ring" style={{ backgroundColor: '#10b981' }} />
           <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0, boxShadow: '0 0 6px #10b981' }}></span>
@@ -560,7 +560,7 @@ function InsightsCard({ isDark }: { isDark: boolean }) {
       flexShrink: 0,
     }}>
       <div style={{ fontSize: '8px', fontWeight: 800, color: isDark ? '#7dd3fc' : '#0369a1', letterSpacing: '0.08em', marginBottom: '4px', fontFamily: '"JetBrains Mono", monospace' }}>
-        💡 SYSTEM OPTIMIZATION INSIGHT
+        📊 DBSCAN SPATIAL ANALYTICS INSIGHT
       </div>
       <div style={{ fontSize: '11px', fontWeight: 800, color: isDark ? '#38bdf8' : '#0369a1', lineHeight: 1.2, marginBottom: '6px', fontFamily: '"Space Grotesk", sans-serif' }}>
         West Zone AQI Stabilization
