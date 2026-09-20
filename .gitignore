@@ -44,3 +44,8 @@ venv/
 ENV/
 .pytest_cache/
 .ruff_cache/
+
+# Java Maven Build Output
+target/
+apps/api/target/
+
