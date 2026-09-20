@@ -18,8 +18,6 @@ function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const theme = useStore(state => state.theme);
   const isAuthenticated = useStore(state => state.isAuthenticated);
-  const newIncidentAlert = useStore(state => state.newIncidentAlert);
-  const clearNewIncidentAlert = useStore(state => state.clearNewIncidentAlert);
   const realtimeConnected = useStore(state => state.realtimeConnected);
   const activeDomain = useStore(state => state.activeDomain);
   const simLatency = useStore(state => state.simLatency);
@@ -44,14 +42,6 @@ function App() {
     const stopTelemetry = useStore.getState().startTelemetrySimulation();
     return () => { unsubscribe(); stopTelemetry(); };
   }, []);
-
-  // Auto-dismiss alert after 6s
-  useEffect(() => {
-    if (newIncidentAlert) {
-      const t = setTimeout(() => clearNewIncidentAlert(), 6000);
-      return () => clearTimeout(t);
-    }
-  }, [newIncidentAlert]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -104,33 +94,7 @@ function App() {
       transition: 'background-color 0.2s ease, color 0.2s ease',
     }}>
 
-      {/* Live Incident Toast Alert */}
-      {newIncidentAlert && (
-        <div
-          onClick={clearNewIncidentAlert}
-          className="toast-pop btn-tactile"
-          style={{
-            position: 'fixed',
-            top: '16px',
-            left: '50%',
-            zIndex: 99999,
-            backgroundColor: newIncidentAlert.startsWith('🤖') ? '#1e3a5f' : '#7f1d1d',
-            color: '#ffffff',
-            padding: '10px 20px',
-            fontFamily: '"JetBrains Mono", monospace',
-            fontSize: '12px',
-            fontWeight: 800,
-            letterSpacing: '0.06em',
-            border: newIncidentAlert.startsWith('🤖') ? '1px solid #3b82f6' : '1px solid #ef4444',
-            boxShadow: newIncidentAlert.startsWith('🤖') ? '0 8px 32px rgba(59, 130, 246, 0.4)' : '0 8px 32px rgba(239, 68, 68, 0.4)',
-            cursor: 'pointer',
-            maxWidth: '600px',
-            textAlign: 'center',
-          }}
-        >
-          {newIncidentAlert} <span style={{ opacity: 0.6, marginLeft: '12px', fontSize: '10px' }}>CLICK TO DISMISS</span>
-        </div>
-      )}
+
 
       {/* 01: Left Sidebar */}
       <Sidebar onNavigate={(view) => setCurrentView(view)} />
