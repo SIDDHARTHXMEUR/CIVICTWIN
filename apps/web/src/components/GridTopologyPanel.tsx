@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useStore } from '../store';
 import type { CityNode } from '../store';
 import { MapContainer, TileLayer, Marker, Popup, Tooltip, Polyline, Circle, useMap } from 'react-leaflet';
@@ -65,16 +65,29 @@ function MapUpdater({ targetCoords }: { targetCoords: [number, number] | null })
   const focusedIncidentId = useStore(state => state.focusedIncidentId);
   const incidents = useStore(state => state.incidents);
   
+  const lastTargetKeyRef = useRef<string | null>(null);
+  const lastFocusedIdRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (targetCoords) {
-      map.flyTo(targetCoords, 16, { duration: 1.2 });
-    } else if (focusedIncidentId) {
-      const incident = incidents.find(i => i.id === focusedIncidentId);
-      if (incident && incident.lat && incident.lng) {
-        map.flyTo([incident.lat, incident.lng], 15, { duration: 1.5 });
+      const key = `${targetCoords[0].toFixed(5)},${targetCoords[1].toFixed(5)}`;
+      if (lastTargetKeyRef.current !== key) {
+        lastTargetKeyRef.current = key;
+        map.flyTo(targetCoords, 16, { duration: 1.2 });
       }
+    } else if (focusedIncidentId) {
+      if (lastFocusedIdRef.current !== focusedIncidentId) {
+        const incident = incidents.find(i => i.id === focusedIncidentId);
+        if (incident && incident.lat && incident.lng) {
+          lastFocusedIdRef.current = focusedIncidentId;
+          map.flyTo([incident.lat, incident.lng], 15, { duration: 1.5 });
+        }
+      }
+    } else {
+      lastTargetKeyRef.current = null;
+      lastFocusedIdRef.current = null;
     }
-  }, [focusedIncidentId, incidents, targetCoords, map]);
+  }, [focusedIncidentId, targetCoords, map, incidents]);
   
   return null;
 }
@@ -423,7 +436,6 @@ export default function GridTopologyPanel() {
             />
           ))}
 
-          <MapFlyEffect hasAnomaly={hasAnomaly} anomalies={anomalies} defaultCenter={mapCenter} />
         </MapContainer>
         
         {/* Collapsible Map Legend Toggle */}
@@ -639,18 +651,3 @@ export default function GridTopologyPanel() {
   );
 }
 
-function MapFlyEffect({ hasAnomaly, anomalies, defaultCenter }: {
-  hasAnomaly: boolean;
-  anomalies: CityNode[];
-  defaultCenter: [number, number];
-}) {
-  const map = useMap();
-  useEffect(() => {
-    if (hasAnomaly && anomalies.length > 0) {
-      map.flyTo([anomalies[0].lat, anomalies[0].lng], 15, { duration: 1.2 });
-    } else {
-      map.flyTo(defaultCenter, 13, { duration: 1.2 });
-    }
-  }, [hasAnomaly, anomalies.length]);
-  return null;
-}
